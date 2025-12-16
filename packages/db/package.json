@@ -1,0 +1,18 @@
+{
+  "name": "@supermarket/db",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "license": "MIT",
+  "scripts": {
+    "generate": "prisma generate --schema prisma/schema.prisma",
+    "migrate": "prisma migrate dev --schema prisma/schema.prisma",
+    "studio": "prisma studio --schema prisma/schema.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.18.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.18.0"
+  }
+}
