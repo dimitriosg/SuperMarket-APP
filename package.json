@@ -1,0 +1,35 @@
+{
+  "name": "supermarket-app",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "bun@1.1.17",
+  "engines": {
+    "node": "^22.0.0",
+    "bun": ">=1.1.17"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n api,web \"bun run --cwd apps/api dev\" \"bun run --cwd apps/web dev\"",
+    "lint": "bun run lint --cwd apps/api && bun run lint --cwd apps/web",
+    "typecheck": "bun run typecheck --cwd apps/api && bun run typecheck --cwd apps/web",
+    "format": "bun run format --cwd apps/api && bun run format --cwd apps/web",
+    "db:up": "docker compose up -d",
+    "db:migrate": "bunx prisma migrate dev --schema packages/db/prisma/schema.prisma",
+    "db:studio": "bunx prisma studio --schema packages/db/prisma/schema.prisma"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.7.0",
+    "@types/node": "^22.0.0",
+    "bun-types": "^1.1.17",
+    "concurrently": "^9.0.1",
+    "eslint": "^9.7.0",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.9",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4",
+    "typescript-eslint": "^8.4.0"
+  }
+}
