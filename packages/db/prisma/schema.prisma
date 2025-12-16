@@ -1,0 +1,19 @@
+// Prisma schema for SuperMarket APP
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model IngestionRun {
+  id          String   @id @default(cuid())
+  source      String
+  status      String
+  startedAt   DateTime @default(now())
+  finishedAt  DateTime?
+  errorReason String?
+}
