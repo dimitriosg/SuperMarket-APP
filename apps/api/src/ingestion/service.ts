@@ -37,12 +37,19 @@ export async function upsertIngestedRows(rows: IngestedProductRow[]): Promise<In
 
   // 2) Upsert store
   const store = await prisma.store.upsert({
-    where: { externalId: first.storeExternalId },
-    update: {},
+    where: {
+      chainId_externalId: {
+        chainId: chain.id,
+        externalId: first.storeExternalId,
+      },
+    },
+    update: {
+      name: `DEBUG Store ${first.storeExternalId}`,
+    },
     create: {
+      chainId: chain.id,
       externalId: first.storeExternalId,
       name: `DEBUG Store ${first.storeExternalId}`,
-      chainId: chain.id,
     },
   });
 
