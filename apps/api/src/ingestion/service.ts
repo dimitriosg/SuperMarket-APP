@@ -140,3 +140,5 @@ export async function ingestRows(rows: IngestedProductRow[]): Promise<IngestionR
     createdSnapshots,
   };
 }
+
+export { ingestRows as upsertIngestedRows };
