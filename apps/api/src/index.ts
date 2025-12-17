@@ -1,8 +1,6 @@
 import dotenv from 'dotenv';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
-import helmet from '@fastify/helmet';
-import rateLimit from '@fastify/rate-limit';
 import { envSchema, type HealthResponse } from '@shared/index';
 
 dotenv.config();
@@ -15,13 +13,6 @@ const app = Fastify({
 
 await app.register(cors, {
   origin: true
-});
-
-await app.register(helmet);
-
-await app.register(rateLimit, {
-  max: env.API_RATE_LIMIT_MAX,
-  timeWindow: env.API_RATE_LIMIT_WINDOW
 });
 
 app.get('/health', async (): Promise<HealthResponse> => ({
