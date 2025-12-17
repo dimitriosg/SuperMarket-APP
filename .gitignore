@@ -1,0 +1,12 @@
+node_modules
+.bun
+.env
+.env.local
+.env.*.local
+.DS_Store
+dist
+build
+coverage
+.prisma
+.idea
+.vscode
