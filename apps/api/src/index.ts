@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import { envSchema, type HealthResponse } from '@shared/index';
+import { prisma } from './db';
 
 dotenv.config();
 
@@ -19,6 +20,18 @@ app.get('/health', async (): Promise<HealthResponse> => ({
   ok: true,
   ts: new Date().toISOString()
 }));
+
+app.get('/debug/db', async (request, reply) => {
+  try {
+    await prisma.$queryRaw`SELECT 1 AS "ok"`;
+
+    return { ok: true };
+  } catch (error) {
+    request.log.error(error);
+    reply.status(500);
+    return { ok: false, error: 'db_error' };
+  }
+});
 
 const port = env.API_PORT ?? 4000;
 const host = '0.0.0.0';
