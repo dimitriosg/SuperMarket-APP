@@ -7,32 +7,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
-enum IngestionSource {
-  WOLT
-  EFOOD
-  AB
-  MY_MARKET
-  UNKNOWN
-}
-
-enum IngestionStatus {
-  PENDING
-  RUNNING
-  SUCCESS
-  FAILED
-}
-
-enum PromotionType {
-  PERCENT_DISCOUNT
-  FIXED_DISCOUNT
-  MULTIBUY
-  UNKNOWN
-}
-
 model Chain {
   id        String   @id @default(cuid())
   slug      String   @unique
-  name      String
+  label     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -40,105 +18,56 @@ model Chain {
 }
 
 model Store {
-  id             String   @id @default(cuid())
-  chainId        String
-  externalId     String
-  name           String
-  city           String?
-  area           String?
-  latitude       Float?
-  longitude      Float?
-  deliveryRadius Float?
-  isActive       Boolean  @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id         String   @id @default(cuid())
+  chainId    String
+  externalId String
+  name       String
+  city       String?
+  area       String?
+  latitude   Float?
+  longitude  Float?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  chain    Chain          @relation(fields: [chainId], references: [id])
-  products StoreProduct[]
+  chain    Chain     @relation(fields: [chainId], references: [id])
+  products Product[]
 
   @@unique([chainId, externalId])
   @@index([chainId])
 }
 
-model CanonicalSku {
-  id        String   @id @default(cuid())
-  ean       String   @unique
-  nameEl    String
-  brand     String?
-  size      String?
-  unit      String?
-  imageUrl  String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Product {
+  id         String   @id @default(cuid())
+  storeId    String
+  externalId String
+  name       String
+  brand      String?
+  quantity   String?
+  ean        String?
+  imageUrl   String?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
-  storeLinks StoreProduct[]
-
-  @@index([nameEl])
-}
-
-model StoreProduct {
-  id              String        @id @default(cuid())
-  storeId         String
-  canonicalSkuId  String?
-  storeSkuId      String
-  titleRaw        String
-  normalizedTitle String
-  url             String?
-  isActive        Boolean       @default(true)
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-
-  store          Store         @relation(fields: [storeId], references: [id])
-  canonicalSku   CanonicalSku? @relation(fields: [canonicalSkuId], references: [id])
+  store          Store           @relation(fields: [storeId], references: [id])
   priceSnapshots PriceSnapshot[]
-  promotions     Promotion[]
 
-  @@unique([storeId, storeSkuId])
-  @@index([canonicalSkuId])
-  @@index([normalizedTitle])
+  @@unique([storeId, externalId])
+  @@index([storeId])
+  @@index([ean])
 }
 
 model PriceSnapshot {
-  id             String   @id @default(cuid())
-  storeProductId String
-  price          Decimal  @db.Decimal(10, 2)
-  currency       String   @default("EUR")
-  isAvailable    Boolean  @default(true)
-  capturedAt     DateTime @default(now())
+  id         String   @id @default(cuid())
+  productId  String
+  price      Decimal  @db.Decimal(10, 2)
+  promoPrice Decimal? @db.Decimal(10, 2)
+  inStock    Boolean  @default(true)
+  collectedAt DateTime @default(now())
 
-  storeProduct StoreProduct @relation(fields: [storeProductId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
 
-  @@index([storeProductId, capturedAt(sort: Desc)])
-  @@index([capturedAt])
-}
-
-model Promotion {
-  id             String         @id @default(cuid())
-  storeProductId String
-  promoType      PromotionType
-  priceBefore    Decimal?       @db.Decimal(10, 2)
-  priceAfter     Decimal?       @db.Decimal(10, 2)
-  description    String?
-  startAt        DateTime?
-  endAt          DateTime?
-  rawPayload     Json?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-
-  storeProduct StoreProduct @relation(fields: [storeProductId], references: [id])
-
-  @@index([storeProductId, startAt, endAt])
-  @@index([promoType])
-}
-
-model IngestionRun {
-  id           String           @id @default(cuid())
-  source       IngestionSource
-  status       IngestionStatus  @default(PENDING)
-  startedAt    DateTime         @default(now())
-  finishedAt   DateTime?
-  errorMessage String?
-  meta         Json?
-  createdAt    DateTime         @default(now())
+  @@index([productId, collectedAt(sort: Desc)])
+  @@index([collectedAt])
 }
