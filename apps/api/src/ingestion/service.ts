@@ -22,18 +22,16 @@ export async function upsertIngestedRows(rows: IngestedProductRow[]): Promise<In
   const first = rows[0];
 
   // 1) Upsert chain
-  const chainName = getChainName(first.chain);
+  const chainLabel = getChainName(first.chain);
 
   const chain = await prisma.chain.upsert({
     where: { slug: first.chain },
     update: {
-      name: chainName,
-      label: chainName,
+      label: chainLabel,
     },
     create: {
       slug: first.chain,
-      name: chainName,
-      label: chainName,
+      label: chainLabel,
     },
   });
 
