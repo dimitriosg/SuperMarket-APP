@@ -21,15 +21,13 @@ app.get('/health', async (): Promise<HealthResponse> => ({
   ts: new Date().toISOString()
 }));
 
-app.get('/debug/db', async (request, reply) => {
+app.get('/debug/db', async (req, reply) => {
   try {
     await prisma.$queryRaw`SELECT 1 AS "ok"`;
-
-    return { ok: true };
-  } catch (error) {
-    request.log.error(error);
-    reply.status(500);
-    return { ok: false, error: 'db_error' };
+    reply.code(200).send({ ok: true });
+  } catch (err) {
+    req.log.error({ err }, 'DB debug failed');
+    reply.code(500).send({ ok: false, error: 'db_error' });
   }
 });
 
