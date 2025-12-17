@@ -1,28 +1,37 @@
 import { Prisma, prisma } from '../db';
 import type { IngestedProductRow } from '@shared/ingestion';
-import { SUPPORTED_CHAINS } from '@shared/chains';
 
-function getChainName(slug: string): string {
-  const meta = SUPPORTED_CHAINS.find((c) => c.slug === slug);
-  return meta?.label ?? slug;
+export type IngestionResultSummary = {
+  chainId: string;
+  chainLabel: string;
+  storeId: string;
+  storeExternalId: string;
+  storeName: string;
+  totalRows: number;
+  createdProducts: number;
+  updatedProducts: number;
+  createdSnapshots: number;
+};
+
+function getChainLabel(slug: string): string {
+  switch (slug) {
+    case 'wolt':
+      return 'Wolt Market / Retail';
+    default:
+      return slug;
+  }
 }
 
-export interface IngestionResultSummary {
-  chainId: number;
-  storeId: number;
-  productsUpserted: number;
-  priceSnapshotsCreated: number;
-}
-
-export async function upsertIngestedRows(rows: IngestedProductRow[]): Promise<IngestionResultSummary> {
-  if (rows.length === 0) {
+export async function upsertChainStore(
+  rows: IngestedProductRow[],
+): Promise<{ chain: Prisma.ChainGetPayload<{}>; store: Prisma.StoreGetPayload<{}> }> {
+  if (!rows.length) {
     throw new Error('No rows to ingest');
   }
 
   const first = rows[0];
 
-  // 1) Upsert chain
-  const chainLabel = getChainName(first.chain);
+  const chainLabel = getChainLabel(first.chain);
 
   const chain = await prisma.chain.upsert({
     where: { slug: first.chain },
@@ -35,7 +44,6 @@ export async function upsertIngestedRows(rows: IngestedProductRow[]): Promise<In
     },
   });
 
-  // 2) Upsert store
   const store = await prisma.store.upsert({
     where: {
       chainId_externalId: {
@@ -45,99 +53,90 @@ export async function upsertIngestedRows(rows: IngestedProductRow[]): Promise<In
     },
     update: {
       name: `DEBUG Store ${first.storeExternalId}`,
+      city: first.storeCity ?? null,
+      area: first.storeArea ?? null,
+      latitude: first.storeLatitude ?? null,
+      longitude: first.storeLongitude ?? null,
     },
     create: {
       chainId: chain.id,
       externalId: first.storeExternalId,
       name: `DEBUG Store ${first.storeExternalId}`,
+      city: first.storeCity ?? null,
+      area: first.storeArea ?? null,
+      latitude: first.storeLatitude ?? null,
+      longitude: first.storeLongitude ?? null,
     },
   });
 
-  let productsUpserted = 0;
-  let priceSnapshotsCreated = 0;
+  return { chain, store };
+}
+
+export async function ingestRows(rows: IngestedProductRow[]): Promise<IngestionResultSummary> {
+  const { chain, store } = await upsertChainStore(rows);
+
+  let createdProducts = 0;
+  let updatedProducts = 0;
+  let createdSnapshots = 0;
 
   for (const row of rows) {
-    // 3) Upsert product (by EAN when available, otherwise by name+brand+size)
-    let product = null;
-
-    if (row.ean) {
-      product = await prisma.product.upsert({
-        where: { ean: row.ean },
-        update: {
-          name: row.name,
-          brand: row.brand,
-          size: row.quantity,
-        },
-        create: {
-          ean: row.ean,
-          name: row.name,
-          brand: row.brand,
-          size: row.quantity,
-        },
-      });
-    } else {
-      product =
-        (await prisma.product.findFirst({
-          where: {
-            name: row.name,
-            brand: row.brand ?? undefined,
-            size: row.quantity ?? undefined,
-          },
-        })) ??
-        (await prisma.product.create({
-          data: {
-            name: row.name,
-            brand: row.brand,
-            size: row.quantity,
-          },
-        }));
-    }
-
-    productsUpserted += 1;
-
-    // 4) Upsert store product
-    const storeProduct = await prisma.storeProduct.upsert({
+    // Product is unique per (storeId, externalId) according to the Prisma schema.
+    const product = await prisma.product.upsert({
       where: {
-        storeId_externalProductId: {
+        storeId_externalId: {
           storeId: store.id,
-          externalProductId: row.productExternalId,
+          externalId: row.productExternalId,
         },
       },
       update: {
         name: row.name,
-        unitSize: row.quantity,
-        imageUrl: row.imageUrl,
-        productId: product.id,
+        brand: row.brand ?? null,
+        quantity: row.quantity ?? null,
+        ean: row.ean ?? null,
+        imageUrl: row.imageUrl ?? null,
+        isActive: row.isActive ?? true,
       },
       create: {
         storeId: store.id,
-        externalProductId: row.productExternalId,
+        externalId: row.productExternalId,
         name: row.name,
-        unitSize: row.quantity,
-        imageUrl: row.imageUrl,
-        productId: product.id,
+        brand: row.brand ?? null,
+        quantity: row.quantity ?? null,
+        ean: row.ean ?? null,
+        imageUrl: row.imageUrl ?? null,
+        isActive: row.isActive ?? true,
       },
     });
 
-    // 5) Create price snapshot
+    // Simple heuristic: when a row is first created, createdAt == updatedAt.
+    if (product.createdAt.getTime() === product.updatedAt.getTime()) {
+      createdProducts++;
+    } else {
+      updatedProducts++;
+    }
+
     await prisma.priceSnapshot.create({
       data: {
-        storeProductId: storeProduct.id,
-        price: new Prisma.Decimal(row.price),
-        promoPrice: row.promoPrice != null ? new Prisma.Decimal(row.promoPrice) : undefined,
+        productId: product.id,
+        price: row.price,
+        promoPrice: row.promoPrice ?? null,
         inStock: row.inStock,
-        currency: 'EUR',
-        collectedAt: new Date(row.collectedAt),
+        collectedAt: row.collectedAt,
       },
     });
 
-    priceSnapshotsCreated += 1;
+    createdSnapshots++;
   }
 
   return {
     chainId: chain.id,
+    chainLabel: chain.label,
     storeId: store.id,
-    productsUpserted,
-    priceSnapshotsCreated,
+    storeExternalId: store.externalId,
+    storeName: store.name,
+    totalRows: rows.length,
+    createdProducts,
+    updatedProducts,
+    createdSnapshots,
   };
 }
