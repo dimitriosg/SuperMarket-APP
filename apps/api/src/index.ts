@@ -3,6 +3,8 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import { envSchema, type HealthResponse } from '@shared/index';
 import { prisma } from './db';
+import { woltIngestionPlugin } from './ingestion/wolt';
+import { upsertIngestedRows } from './ingestion/service';
 
 dotenv.config();
 
@@ -28,6 +30,27 @@ app.get('/debug/db', async (req, reply) => {
   } catch (err) {
     req.log.error({ err }, 'DB debug failed');
     reply.code(500).send({ ok: false, error: 'db_error' });
+  }
+});
+
+app.get('/debug/ingestion/wolt/:storeExternalId', async (req, reply) => {
+  const { storeExternalId } = req.params as { storeExternalId: string };
+
+  try {
+    const rows = await woltIngestionPlugin.fetchStoreSnapshot(storeExternalId);
+    const summary = await upsertIngestedRows(rows);
+
+    return reply.send({
+      ok: true,
+      rows: rows.length,
+      summary,
+    });
+  } catch (err) {
+    req.log.error({ err }, 'Wolt ingestion debug failed');
+    return reply.code(500).send({
+      ok: false,
+      error: 'ingestion_failed',
+    });
   }
 });
 
