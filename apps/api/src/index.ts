@@ -1,68 +1,59 @@
-import dotenv from 'dotenv';
-import Fastify from 'fastify';
-import cors from '@fastify/cors';
-import { envSchema, type HealthResponse } from '@shared/index';
-import { prisma } from './db';
-import { woltIngestionPlugin } from './ingestion/wolt';
-import { upsertIngestedRows } from './ingestion/service';
+// api/src/index.ts
+import Fastify from "fastify";
+import cors from "@fastify/cors";
+import { prisma } from "./db";
+import { runIngestionForStore } from "./ingestion/service";
+import { discoverAbCategories } from "./ingestion/ab/discovery";
 
-dotenv.config();
+const server = Fastify({ logger: true });
 
-const env = envSchema.parse(process.env);
-
-const app = Fastify({
-  logger: true
+server.register(cors, {
+  origin: "*", // Allow all origins for dev
 });
 
-await app.register(cors, {
-  origin: true
+// Health Check
+server.get("/health", async () => {
+  return { status: "ok", timestamp: new Date() };
 });
 
-app.get('/health', async (): Promise<HealthResponse> => ({
-  ok: true,
-  ts: new Date().toISOString()
-}));
-
-app.get('/debug/db', async (req, reply) => {
+// Debug Endpoint: Trigger Ingestion Manually
+// Usage: http://localhost:3001/debug/ingestion/sklavenitis/AUTO
+server.get("/debug/ingestion/:chain/:storeId", async (req, reply) => {
+  const { chain, storeId } = req.params as { chain: string; storeId: string };
+  
   try {
-    await prisma.$queryRaw`SELECT 1 AS "ok"`;
-    reply.code(200).send({ ok: true });
-  } catch (err) {
-    req.log.error({ err }, 'DB debug failed');
-    reply.code(500).send({ ok: false, error: 'db_error' });
+    // Run the scraper
+    // Note: We don't await this if we want it to run in background, 
+    // but for debug let's await to see errors.
+    await runIngestionForStore(chain, storeId);
+    
+    return { 
+      success: true, 
+      message: `Ingestion triggered for ${chain}` 
+    };
+  } catch (error) {
+    req.log.error(error);
+    return reply.status(500).send({ error: "Ingestion failed", details: error });
   }
 });
 
-app.get('/debug/ingestion/wolt/:storeExternalId', async (req, reply) => {
-  const { storeExternalId } = req.params as { storeExternalId: string };
-
-  try {
-    const rows = await woltIngestionPlugin.fetchStoreSnapshot(storeExternalId);
-    const summary = await upsertIngestedRows(rows);
-
-    return reply.send({
-      ok: true,
-      rows: rows.length,
-      summary,
-    });
-  } catch (err) {
-    req.log.error({ err }, 'Wolt ingestion debug failed');
-    return reply.code(500).send({
-      ok: false,
-      error: 'ingestion_failed',
-    });
-  }
+server.get("/debug/ingestion/ab/DISCOVERY", async () => {
+  const categories = await discoverAbCategories();
+  return { 
+    message: "AB Discovery finished. Check your terminal for the table.",
+    count: categories.length,
+    categories 
+  };
 });
 
-const port = env.API_PORT ?? 4000;
-const host = '0.0.0.0';
-
-app
-  .listen({ port, host })
-  .then(() => {
-    app.log.info(`API listening on http://${host}:${port}`);
-  })
-  .catch((err) => {
-    app.log.error(err);
+const start = async () => {
+  try {
+    await server.listen({ port: 3001, host: "0.0.0.0" });
+    console.log("🚀 Server running at http://localhost:3001");
+  } catch (err) {
+    server.log.error(err);
     process.exit(1);
-  });
+  }
+};
+
+start();
