@@ -4,6 +4,7 @@ import cors from "@fastify/cors";
 import { prisma } from "./db";
 import { runIngestionForStore } from "./ingestion/service";
 import { discoverAbCategories } from "./ingestion/ab/discovery";
+import { startIngestionScheduler } from "./ingestion/scheduler";
 
 const server = Fastify({ logger: true });
 
@@ -146,6 +147,7 @@ const start = async () => {
     // Χρησιμοποίησε 127.0.0.1 αντί για 0.0.0.0
     await server.listen({ port: 3001, host: "127.0.0.1" });
     console.log("🚀 API Server ready at http://localhost:3001");
+    startIngestionScheduler();
   } catch (err) {
     server.log.error(err);
     process.exit(1);
