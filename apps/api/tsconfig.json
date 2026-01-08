@@ -1,7 +1,13 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "types": ["bun"],                  // Λέει στην TS να φορτώσει τους τύπους του Bun
+    "module": "ESNext",                // Απαραίτητο για το import.meta
+    "moduleResolution": "bundler"      // Βοηθάει στην εύρεση των πακέτων
   },
-  "include": ["src"]
+  "include": [
+    "src", 
+    "*.ts"                             // Επιτρέπει αρχεία .ts που είναι στο root του apps/api
+  ]
 }

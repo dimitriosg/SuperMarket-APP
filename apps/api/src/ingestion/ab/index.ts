@@ -25,23 +25,47 @@ const fetchAbCategory = async (categoryId: string): Promise<IngestedProductRow[]
 
   const url = `https://www.ab.gr/api/v1/?operationName=GetCategoryProductSearch&variables=${encodeURIComponent(JSON.stringify(variables))}&extensions=${encodeURIComponent(JSON.stringify(extensions))}`;
 
-  try {
+try {
     const res = await fetch(url, { headers: AB_HEADERS });
     if (!res.ok) return [];
 
     const json = await res.json() as any;
     const items = json.data?.categoryProductSearch?.products || [];
 
-    return items.map((item: any) => ({
-      externalId: item.code,
-      name: item.name,
-      price: item.price?.current?.value || 0,
-      isOffer: item.price?.isPromotion || false,
-      offerPrice: item.price?.current?.value || 0,
-      image: item.image || "",
-      url: `https://www.ab.gr${item.url}`,
-      categories: [item.categoryName || ""],
-    }));
+    return items.map((item: any) => {
+      // 1. Εξαγωγή Τιμής - Ο ΑΒ έχει πολλές εναλλακτικές
+      // Προτεραιότητα: Προσφορά > Τρέχουσα > Unit Price
+      const currentPrice = 
+        item.price?.current?.value || 
+        item.price?.value || 
+        item.price?.unitPrice || 
+        0;
+      
+      // 2. Εξαγωγή Εικόνας
+      // Στο GraphQL συνήθως είναι στο item.images[0].url
+      let imageUrl = "";
+      if (item.images && item.images.length > 0) {
+        imageUrl = item.images[0].url;
+      } else if (item.image) {
+        imageUrl = item.image;
+      }
+      
+      // Διόρθωση URL
+      if (imageUrl && imageUrl.startsWith("/")) {
+        imageUrl = `https://www.ab.gr${imageUrl}`;
+      }
+
+      return {
+        externalId: item.code,
+        name: item.name,
+        price: currentPrice,
+        isOffer: item.price?.isPromotion || false,
+        offerPrice: currentPrice,
+        image: imageUrl || "https://via.placeholder.com/150",
+        url: `https://www.ab.gr${item.url}`,
+        categories: [item.categoryName || ""],
+      };
+    });
   } catch (err) {
     console.error(`[AB] Failed for ${categoryId}:`, err);
     return [];

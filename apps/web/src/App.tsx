@@ -1,83 +1,125 @@
-import { useState } from 'react';
-import type { HealthResponse } from '@shared/index';
+import { useState, useEffect, useMemo } from 'react';
 
-const apiBase = import.meta.env.VITE_API_BASE_URL || '/api';
+const API_URL = "http://127.0.0.1:3001/products";
 
 function App() {
-  const [result, setResult] = useState<HealthResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStore, setFilterStore] = useState<"ALL" | "SKL" | "AB">("ALL");
 
-  const checkApi = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(`${apiBase}/health`);
-      if (!res.ok) {
-        throw new Error(`API responded with status ${res.status}`);
+  useEffect(() => {
+    fetch(API_URL).then(r => r.json()).then(d => { setData(d); setLoading(false); });
+  }, []);
+
+  // Ομαδοποίηση και Φιλτράρισμα
+  const groupedAndFiltered = useMemo(() => {
+    const map: Record<string, any> = {};
+    
+    data.forEach(p => {
+      // Κανονικοποίηση ονόματος: αφαιρούμε κενά για να ταιριάξουν τα "κολλημένα" ονόματα του ΑΒ
+      const normalizedKey = p.name.toLowerCase().replace(/\s+/g, '');
+      
+      if (!map[normalizedKey]) {
+        map[normalizedKey] = { 
+          displayName: p.name, // Κρατάμε το όνομα για το UI
+          img: p.imageUrl, 
+          skl: null, 
+          ab: null 
+        };
       }
-      const data: HealthResponse = await res.json();
-      setResult(data);
-    } catch (err) {
-      setResult(null);
-      setError(err instanceof Error ? err.message : 'Unknown error');
-    } finally {
-      setLoading(false);
-    }
-  };
+      
+      const price = p.priceSnapshots[0]?.price;
+      if (p.store.name.toLowerCase().includes('ab')) {
+        map[normalizedKey].ab = price;
+      } else {
+        map[normalizedKey].skl = price;
+        // Αν ο Σκλαβενίτης έχει πιο ωραίο όνομα (με κενά), το κρατάμε αυτό για το UI
+        map[normalizedKey].displayName = p.name;
+      }
+    });
+
+    return Object.values(map).filter((item: any) => {
+      const matchesSearch = item.displayName.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      if (filterStore === "SKL") return matchesSearch && item.skl !== null;
+      if (filterStore === "AB") return matchesSearch && item.ab !== null;
+      return matchesSearch;
+    });
+  }, [data, searchTerm, filterStore]);
+
+  if (loading) return <div className="p-10 text-center font-bold">Φορτώνω δεδομένα...</div>;
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-white to-slate-100">
-      <div className="mx-auto flex max-w-xl flex-col gap-6 px-4 py-10">
-        <header className="flex items-center justify-between">
-          <div>
-            <p className="text-xs uppercase tracking-wide text-slate-500">Athens beta</p>
-            <h1 className="text-2xl font-semibold text-slate-900">SuperMarket Price Checker</h1>
-            <p className="text-sm text-slate-600">
-              Συγκρίνετε τιμές από Wolt, efood και αλυσίδες σούπερ μάρκετ.
-            </p>
+    <div className="p-4 md:p-8 bg-slate-50 min-h-screen font-sans text-slate-900">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-4xl font-black mb-2 text-center uppercase italic tracking-tighter text-indigo-900">Market Compare</h1>
+        <p className="text-center text-slate-500 mb-8 font-medium">Σύγκριση τιμών σε πραγματικό χρόνο</p>
+
+        {/* SEARCH & FILTERS BOX */}
+        <div className="bg-white p-4 rounded-3xl shadow-sm border border-slate-200 mb-8 flex flex-col md:flex-row gap-4 items-center">
+          <input 
+            type="text"
+            placeholder="Αναζήτηση προϊόντος..."
+            className="w-full md:flex-1 p-4 rounded-2xl bg-slate-100 border-none focus:ring-2 focus:ring-indigo-500 outline-none font-medium"
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          
+          <div className="flex bg-slate-100 p-1 rounded-2xl w-full md:w-auto">
+            {(["ALL", "SKL", "AB"] as const).map((s) => (
+              <button
+                key={s}
+                onClick={() => setFilterStore(s)}
+                className={`flex-1 md:px-6 py-3 rounded-xl text-xs font-black transition-all ${
+                  filterStore === s ? "bg-white shadow-sm text-indigo-600" : "text-slate-400"
+                }`}
+              >
+                {s === "ALL" ? "ΟΛΑ" : s === "SKL" ? "ΣΚΛΑΒΕΝΙΤΗΣ" : "ΑΒ"}
+              </button>
+            ))}
           </div>
-          <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-            MVP
-          </span>
-        </header>
+        </div>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900">Health check</h2>
-          <p className="text-sm text-slate-600">Βεβαιωθείτε ότι το API απαντά σωστά.</p>
-          <button
-            className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-500 disabled:cursor-not-allowed disabled:bg-slate-400"
-            onClick={checkApi}
-            disabled={loading}
-          >
-            {loading ? 'Επικοινωνία…' : 'Check API'}
-          </button>
+        {/* GRID */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {groupedAndFiltered.map((p: any, i) => (
+            <div key={i} className="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-md transition-shadow flex flex-col">
+              <div className="h-40 flex items-center justify-center mb-4">
+                <img src={p.img} className="max-h-full object-contain" alt={p.displayName} />
+              </div>
+              
+              <h3 className="font-bold text-xs h-10 line-clamp-2 mb-4 uppercase text-slate-700 leading-tight">
+                {p.displayName}
+              </h3>
+              
+              <div className="mt-auto space-y-2">
+                <div className={`flex justify-between items-center p-3 rounded-2xl ${p.skl ? 'bg-orange-50' : 'bg-slate-50 opacity-40'}`}>
+                  <span className="text-[9px] font-black text-orange-600">ΣΚΛΑΒΕΝΙΤΗΣ</span>
+                  <span className="font-black text-lg text-slate-800">{p.skl ? `${p.skl}€` : '-'}</span>
+                </div>
+                
+                <div className={`flex justify-between items-center p-3 rounded-2xl ${p.ab ? 'bg-blue-50' : 'bg-slate-50 opacity-40'}`}>
+                  <span className="text-[9px] font-black text-blue-600">ΑΒ ΒΑΣΙΛΟΠΟΥΛΟΣ</span>
+                  <span className="font-black text-lg text-slate-800">{p.ab ? `${p.ab}€` : '-'}</span>
+                </div>
+              </div>
 
-          {result && !error && (
-            <div className="mt-4 rounded-lg bg-emerald-50 p-4 text-sm text-emerald-800">
-              <p className="font-semibold">API OK</p>
-              <p className="mt-1">Timestamp: {result.ts}</p>
+              {p.skl && p.ab && (
+                <div className="mt-4 pt-4 border-t border-slate-50 text-center">
+                  <span className="text-[10px] font-bold text-indigo-500 bg-indigo-50 px-3 py-1 rounded-full uppercase">
+                    Διαφορά: {(Math.abs(p.skl - p.ab)).toFixed(2)}€
+                  </span>
+                </div>
+              )}
             </div>
-          )}
-
-          {error && (
-            <div className="mt-4 rounded-lg bg-rose-50 p-4 text-sm text-rose-800">
-              <p className="font-semibold">Κάτι πήγε στραβά</p>
-              <p className="mt-1">{error}</p>
-            </div>
-          )}
-        </section>
-
-        <section className="rounded-2xl border border-dashed border-slate-200 bg-white/60 p-5 text-sm text-slate-600">
-          <p className="font-semibold text-slate-900">Σύντομη προεπισκόπηση</p>
-          <p className="mt-2">
-            Η αρχική έκδοση θα επιτρέπει να επικολλήσετε λίστα αγορών, να δείτε τη φθηνότερη επιλογή
-            ανά κατάστημα και να λάβετε deep-links για Wolt/efood.
-          </p>
-          <p className="mt-2 text-xs text-slate-500">Πρόσθετα: €3 flat fee ανά αλυσίδα, disclaimer για μεταβολές τιμών.</p>
-        </section>
+          ))}
+        </div>
+        
+        {groupedAndFiltered.length === 0 && (
+          <div className="text-center py-20 text-slate-400 font-bold">Δεν βρέθηκαν προϊόντα...</div>
+        )}
       </div>
-    </main>
+    </div>
   );
 }
 

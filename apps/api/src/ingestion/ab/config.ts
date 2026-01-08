@@ -1,15 +1,16 @@
 // apps/api/src/ingestion/ab/config.ts
 
 export const AB_HEADERS = {
-  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
-  "Accept": "*/*",
-  "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8,pt;q=0.7",
-  "Content-Type": "application/json",
-  "apollographql-client-name": "gr-ab-web-stores",
-  "apollographql-client-version": "963cf53bdf82d4ea97406e2c4bd4e7843383f4e5",
-  "Cookie": `rxVisitor=17678697544109P2FPKF6G2U8U8AU2MJDVISRAHAK632M; _abck=4235A572101A1D4C6AD000D542AF4235~-1~YAAQIzMTAuzguJqbAQAAWrU/nQ9bUJwVIIDEO/GeeUcvvKkiWqQcFX941Sg2pLJzP2bAJzuhpm3+RHz9ZLpqV0NQNNSkFoVBpfB+t9b31Yak7K7inoYWHyTv+O/KwAwp4znLbZFOMIONAWEhfJwIMcsZmWVjsjv1SEmkSLuaVkll/iYCqmMsXQmqQfFJjlh/ZaBq/zbkNxTP2x+LbzSqcTYsPLdyDK9wzQJr+hFOUTRiyoIV0tpbP+FuSujhMdGmTQjRiQ36GwSKbSTzVoMLaSYtqqeoxrNgl5VHr5DWEtGpFKgzf+03vMxrDvWyBVv5q7eE7Hb72QmFyhKPSrGobHvpi14uGjdOw1MdrWe/dKqVWGL73VQjDI8Vnkg6Gg4mdj3QjKY35pWjxguCgOMAuIDTwABJs/W1fPctUxyfHTHASj61KHxseGnHTk2JfF9Nnu/7NKSk9ZDozDc3OCT6JlslMp7M5hydQpgVpVsimHM=~-1~-1~-1~-1~-1; groceryCookieLang=gr; ak_bmsc=03A44EBB8806E4F018AEDB9A11B1A577~000000000000000000000000000000~YAAQIzMTApThuJqbAQAA1r4/nR6Gv+LAFWzRY863Fp0L6jo5CzZjIM0jdr7AKlTKi6YSV+1iloNRo6AsQHpCNxd6E4iTq/QixmSKfOG5CIjizkKBY+tONtqUDlO4cI7CHT7tda0HAohBliEY6y0AGIBn/rwAwloyZmrzL3PzSdU8MW8X0PhV63/DlNUzPNaSpx8etJfb2Z150tZkmondHged9QXROAAKfrZrOWH12EvdhykQziXW/TAiWW8heIg+GLi1xoXHUYX1p3sXYKu6lZjTma1y1OdN61FxSC0VvoxDOsh4qRTLD0akFiilcMlE9cGK03ElXCQij0qg2KxivkSHXDRh1cBVICYJvRWgF29M5mD1ta5iTyvicw2rWg9kbkkO+poc1rtEW5EqOCYyxRDhyjgBquIZoY0B81XqTpdw+/xyL8T6hI5qj+UcydzAlA==; liquidFeeThreshold=0; deviceSessionId=01aeb4af-e1f4-4090-be27-e0c991c3c685; rxvt=1767871558053|1767869754414; dtPC=-27717$269754407_812h-vVSNUVRLKWEHDCIWUIGHBWDMULCFNJGEF-0e0; VersionedCookieConsent=v%3A2%2Cessential%3A1%2Canalytics%3A1%2Csocial%3A1%2Cperso_cont%3A1%2Cperso_ads%3A1%2Cads_external%3A1; at_check=true; s_pls=not%20logged; s_fid=0BA9769836F0638E-033C0FA9215DB930; gpv_loginStatus=not%20logged; s_cc=true; dtCookie=v_4_srv_9_sn_ND2HD1BLFDGIQLNVO3BGO4LLUTLC699E_perc_100000_ol_0_mul_1_app-3A440a591b5a5302d3_0; _fbp=fb.1.1767869760663.15952813198652901; _gcl_au=1.1.2040690038.1767869761; dtSa=true%7CC%7C-1%7C%CE%98%CE%AD%CE%BB%CF%89%20%CE%B5%CF%80%CE%B9%CF%83%CF%84%CF%81%CE%BF%CF%86%CE%AE%20%CF%87%CF%81%CE%B7%CE%BC%CE%AC%CF%84%CF%89%CE%BD%7C-%7C1767869761161%7C269754407_812%7Chttps%3A%2F%2Fwww.ab.gr%2F%7C%7C%7C%7C; AMCV_2A6E210654E74B040A4C98A7%40AdobeOrg=-1124106680%7CMCMID%7C90695809771182129466080934501909755183%7CMCAID%7CNONE%7CvVersion%7C5.2.0%7CMCIDTS%7C20462; kndctr_2A6E210654E74B040A4C98A7_AdobeOrg_identity=CiY5MDY5NTgwOTc3MTE4MjEyOTQ2NjA4MDkzNDUwMTkwOTc1NTE4M1IRCLHA_-m5MxgBKgRJUkwxMAPwAbHA_-m5Mw==; kndctr_2A6E210654E74B040A4C98A7_AdobeOrg_cluster=irl1; lkws_12158=684d7ac6-5e22-3e08-f4a4-da0f2e15ded8; s_sq=%5B%5BB%5D%5D; bm_sz=542D464232F447B4654F4E4379AC24B3~YAAQQjMTAjLso4+bAQAAMENbnR4Rf3gOtJ5Q0xvg9JKYYmf3QoF9Ku2smqhDeGlqZZqD8cP6QnIKxJRcQKS4GYOTU4WjyakupaiVwxb22FacwMW7Tw83Ux77/92YwpKLL5LL/G0Kdaz9PFWw2qzyYyIWd+eSLITijam4VZeU0WN5MmPZQdSkGAhauLEeTcA+Kr3nDdnmDRHcJTok+q3kM+WCxTMVcAGM+NJ/4a29ZVVrQbp6h/2N1D8Tc+jc/D+/b9J94ES/9fSr6k6regkGOYldIFnZPsupijXAR8Ekz6F69syVr8RGlIzIfMjsN177Qk92nkqjruHRxW7FiI+C0mxzMuz+KyM3izlaPUyzynNuUStXNq+JevLurr5X0GwtpfDXtwhAEkZvFPLpOv0C2h3EhXuceWkZXP6EOgh7MIxVYg==~4536120~3750201; mbox=session#4b5c82f11c8c4369a9e16bdce90f02c2#1767873423|PC#4b5c82f11c8c4369a9e16bdce90f02c2.37_0#1831116362; AWSALB=G/jvXHXK/g0vGOPZu8RqUiRLabJQh4vDdEzE3EwcfCopTN3PR6bKZiQ7FchlxgplJtGug6lQoB7Q7k5RyUL6OYOKYHv4UEvywHVY7PAmRSbuFhKIS72ip+CeixAI; AWSALBCORS=G/jvXHXK/g0vGOPZu8RqUiRLabJQh4vDdEzE3EwcfCopTN3PR6bKZiQ7FchlxgplJtGug6lQoB7Q7k5RyUL6OYOKYHv4UEvywHVY7PAmRSbuFhKIS72ip+CeixAI; bm_sv=42EC8736D7AC5A16FBCB43F6994D3BEF~YAAQQjMTArbso4+bAQAAyEtbnR5b+BfKLLMbfPnnCGlf+fm8b2t3so+WmMDl+G//NnvLUjBGEH7EbkSlCjyE06x6R06DCZNBX94wM4dLWBbMLyo1gwBtSdCYxUPQPanRnHDTAcqYKZcbK4+Icz3zwFz9P0ye50GNhPcvSAQKHbaeFhYr27V089JObMgPJUOMJDkZrAu7zULzapg6lsaI1BDyVj4+dfisK5aupTo9zrhHqkrO6x8ROmqgOyld+RHm~1; s_ppn=market%3Apagenotfound%3Aerrorpage-content-page`,
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+  "Accept": "application/json, text/plain, */*",
+  "Accept-Language": "el-GR,el;q=0.9,en-US;q=0.8,en;q=0.7",
+  "cookie": process.env.AB_COOKIE || "",
+  "x-csrf-token": process.env.AB_CSRF || "", // Αν το βρεις στα headers του browser
+  "sec-ch-ua": '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
+  "sec-ch-ua-mobile": "?0",
+  "sec-ch-ua-platform": '"Windows"',
+  "Referer": "https://www.ab.gr/el/search?q=:relevance:category:007",
   "Origin": "https://www.ab.gr",
-  "Referer": "https://www.ab.gr/",
   "Sec-Fetch-Dest": "empty",
   "Sec-Fetch-Mode": "cors",
   "Sec-Fetch-Site": "same-origin"

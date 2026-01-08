@@ -1,0 +1,3155 @@
+{
+  "data": {
+    "categoryProductSearch": {
+      "products": [
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "DOLE",
+          "manufacturerSubBrandName": null,
+          "code": "7063312",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hc6/h06/9678098464798.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h11/h46/9678098071582.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hc6/h06/9678098464798.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h95/h98/10125505822750.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Μπανάνες Dole Βιολογικής Γεωργίας Εισαγωγής",
+          "newProduct": null,
+          "onlineExclusive": false,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": [],
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€1,99",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "1,99 €/ κιλ",
+            "supplementaryPriceLabel2": "~1 κιλ",
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€1,99",
+            "discountedUnitPriceFormatted": "1,99 €/kg",
+            "unit": "kg",
+            "unitPriceFormatted": "1,99",
+            "unitCode": "kilogram",
+            "unitPrice": 1.99,
+            "value": 1.99,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Froyta/Mpananes/Mpananes-Dole-Viologikis-Georgias-Eisagogis/p/7063312",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": null,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 701,
+          "bestSellerScore": 18704,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "ΑΒ",
+          "manufacturerSubBrandName": null,
+          "code": "7434326",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [
+            {
+              "code": "badgeproductisab",
+              "image": {
+                "altText": null,
+                "format": null,
+                "galleryIndex": null,
+                "imageType": null,
+                "url": "/medias/sys_master/h02/h86/9938904088606.png",
+                "__typename": "Image"
+              },
+              "tooltipMessage": "AB",
+              "name": null,
+              "__typename": "ProductBadge"
+            }
+          ],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/hb8/hbc/10425252347934.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/ha6/he5/10425251954718.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/hb8/hbc/10425252347934.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/h96/h7a/10425252544542.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Καρότα Συσκευασμένα Ελληνικά 500 gr",
+          "newProduct": null,
+          "onlineExclusive": null,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": [],
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€0,74",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "1,48 €/ κιλ",
+            "supplementaryPriceLabel2": "500 γρ",
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€0,74",
+            "discountedUnitPriceFormatted": "0,74 €/ κιλ",
+            "unit": "Κομμάτι",
+            "unitPriceFormatted": "0,74",
+            "unitCode": "pieces",
+            "unitPrice": 0.74,
+            "value": 0.74,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Lachanika/Karota-Reves-Rapanakia/Karota-Syskeyasmena-Ellinika-500-gr/p/7434326",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": null,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 671,
+          "bestSellerScore": 15905,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "ΑΒ",
+          "manufacturerSubBrandName": null,
+          "code": "7064216",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [
+            {
+              "code": "badgeproductisab",
+              "image": {
+                "altText": null,
+                "format": null,
+                "galleryIndex": null,
+                "imageType": null,
+                "url": "/medias/sys_master/h02/h86/9938904088606.png",
+                "__typename": "Image"
+              },
+              "tooltipMessage": "AB",
+              "name": null,
+              "__typename": "ProductBadge"
+            }
+          ],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h83/h1d/9281427177502.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h39/h01/9281426784286.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h83/h1d/9281427177502.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hce/h4f/10129026416670.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Κρεμμύδια Ξερά Χονδρά Συσκευασμένα",
+          "newProduct": null,
+          "onlineExclusive": false,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": null,
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€1,38",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "0,92 €/ κιλ",
+            "supplementaryPriceLabel2": "~1,5 κιλ",
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€1,38",
+            "discountedUnitPriceFormatted": "0,92 €/kg",
+            "unit": "kg",
+            "unitPriceFormatted": "0,92",
+            "unitCode": "kilogram",
+            "unitPrice": 0.92,
+            "value": 1.38,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Lachanika/Patates-Kremmydia-Skorda/Kremmydia-Xera-Chondra-Syskeyasmena/p/7064216",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": null,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 621,
+          "bestSellerScore": 10950,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "ΑΒ",
+          "manufacturerSubBrandName": null,
+          "code": "7335940",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [
+            {
+              "code": "badgeproductisab",
+              "image": {
+                "altText": null,
+                "format": null,
+                "galleryIndex": null,
+                "imageType": null,
+                "url": "/medias/sys_master/h02/h86/9938904088606.png",
+                "__typename": "Image"
+              },
+              "tooltipMessage": "AB",
+              "name": null,
+              "__typename": "ProductBadge"
+            }
+          ],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hc0/hc8/9281392640030.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h7d/h44/9281392246814.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hc0/hc8/9281392640030.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hf2/h3c/10129029660702.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Πατάτες Χονδρές Συσκευασμένες",
+          "newProduct": null,
+          "onlineExclusive": null,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": null,
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€2,61",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "0,87 €/ κιλ",
+            "supplementaryPriceLabel2": "~3 κιλ",
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€2,61",
+            "discountedUnitPriceFormatted": "0,87 €/kg",
+            "unit": "kg",
+            "unitPriceFormatted": "0,87",
+            "unitCode": "kilogram",
+            "unitPrice": 0.87,
+            "value": 2.61,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Lachanika/Patates-Kremmydia-Skorda/Patates-Chondres-Syskeyasmenes/p/7335940",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": true,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 611,
+          "bestSellerScore": 9919,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "ΑΒ",
+          "manufacturerSubBrandName": null,
+          "code": "7444688",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [
+            {
+              "code": "badgeproductisab",
+              "image": {
+                "altText": null,
+                "format": null,
+                "galleryIndex": null,
+                "imageType": null,
+                "url": "/medias/sys_master/h02/h86/9938904088606.png",
+                "__typename": "Image"
+              },
+              "tooltipMessage": "AB",
+              "name": null,
+              "__typename": "ProductBadge"
+            }
+          ],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h1f/h76/9281432551454.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hd6/h57/9281432158238.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h1f/h76/9281432551454.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h88/h94/10134507094046.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Πατάτες Baby Πλυμένες 750g",
+          "newProduct": null,
+          "onlineExclusive": null,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": [],
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€1,99",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "1,99 €/ τεμ",
+            "supplementaryPriceLabel2": null,
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€1,99",
+            "discountedUnitPriceFormatted": "1,99 €/ τεμ",
+            "unit": "Κομμάτι",
+            "unitPriceFormatted": "1,99",
+            "unitCode": "pieces",
+            "unitPrice": 1.99,
+            "value": 1.99,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Lachanika/Patates-Kremmydia-Skorda/Patates-Baby-Plymenes-750g/p/7444688",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": null,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 591,
+          "bestSellerScore": 8734,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "-",
+          "manufacturerSubBrandName": null,
+          "code": "7150245",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h19/he9/9440929546270.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/heb/hd9/9440929153054.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h19/he9/9440929546270.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h19/h89/10129029595166.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Μύρτιλλα Εισαγωγής 125g",
+          "newProduct": null,
+          "onlineExclusive": false,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": null,
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€1,89",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "15,12 €/ κιλ",
+            "supplementaryPriceLabel2": "125 γρ",
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€1,89",
+            "discountedUnitPriceFormatted": "1,89 €/ κιλ",
+            "unit": "Κομμάτι",
+            "unitPriceFormatted": "1,89",
+            "unitCode": "pieces",
+            "unitPrice": 1.89,
+            "value": 1.89,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Froyta/Fraoyles-Vatomoyra/Myrtilla-Eisagogis-125g/p/7150245",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": null,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 591,
+          "bestSellerScore": 8582,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "ΑΒ ΒΙΟ",
+          "manufacturerSubBrandName": null,
+          "code": "7063666",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [
+            {
+              "code": "badgeproductisabbio",
+              "image": {
+                "altText": null,
+                "format": null,
+                "galleryIndex": null,
+                "imageType": null,
+                "url": "/medias/sys_master/haa/hb2/9938903859230.png",
+                "__typename": "Image"
+              },
+              "tooltipMessage": null,
+              "name": null,
+              "__typename": "ProductBadge"
+            }
+          ],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/hc0/h63/10425039388702.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/h7e/h82/10425038995486.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/hc0/h63/10425039388702.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/he2/ha5/10425039585310.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Αγγουράκια Τύπου Κνωσσού Βιολογικής Γεωργίας Ελληνικά",
+          "newProduct": null,
+          "onlineExclusive": false,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": [],
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€3,99",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "4,99 €/ κιλ",
+            "supplementaryPriceLabel2": "~800 γρ",
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€3,99",
+            "discountedUnitPriceFormatted": "4,99 €/kg",
+            "unit": "kg",
+            "unitPriceFormatted": "4,99",
+            "unitCode": "kilogram",
+            "unitPrice": 4.99,
+            "value": 3.99,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Lachanika/Aggoyria-Ntomates/Aggoyrakia-Typoy-Knossoy-Viologikis-Georgias-Ellinika/p/7063666",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": null,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 581,
+          "bestSellerScore": 8458,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "DULCE BUONA",
+          "manufacturerSubBrandName": null,
+          "code": "7514554",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hf3/hf4/9179375108126.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h6b/h72/9179374714910.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hf3/hf4/9179375108126.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hc2/ha0/10126930870302.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Μπανάνες Cavendish Εισαγωγής Συσκευασμένες",
+          "newProduct": null,
+          "onlineExclusive": null,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": null,
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€1,58",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "1,32 €/ κιλ",
+            "supplementaryPriceLabel2": "~1,2 κιλ",
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€1,58",
+            "discountedUnitPriceFormatted": "1,32 €/kg",
+            "unit": "kg",
+            "unitPriceFormatted": "1,32",
+            "unitCode": "kilogram",
+            "unitPrice": 1.32,
+            "value": 1.58,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Froyta/Mpananes/Mpananes-Cavendish-Eisagogis-Syskeyasmenes/p/7514554",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": true,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 581,
+          "bestSellerScore": 8189,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "ΑΒ",
+          "manufacturerSubBrandName": null,
+          "code": "7073105",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [
+            {
+              "code": "badgeproductisab",
+              "image": {
+                "altText": null,
+                "format": null,
+                "galleryIndex": null,
+                "imageType": null,
+                "url": "/medias/sys_master/h02/h86/9938904088606.png",
+                "__typename": "Image"
+              },
+              "tooltipMessage": "AB",
+              "name": null,
+              "__typename": "ProductBadge"
+            }
+          ],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/hd1/he7/10425046728734.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/h33/hdb/10425046335518.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/hd1/he7/10425046728734.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/hb0/ha5/10425046925342.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Έτοιμη Σαλάτα Τρίχρωμη Ελληνική 230 gr",
+          "newProduct": null,
+          "onlineExclusive": false,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": [],
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€1,58",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "6,87 €/ κιλ",
+            "supplementaryPriceLabel2": "230 γρ",
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€1,58",
+            "discountedUnitPriceFormatted": "1,58 €/ κιλ",
+            "unit": "Κομμάτι",
+            "unitPriceFormatted": "1,58",
+            "unitCode": "pieces",
+            "unitPrice": 1.58,
+            "value": 1.58,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Lachanika/Etoimes-salates-lachanikon/Etoimi-Salata-Trichromi-Elliniki-230-gr/p/7073105",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": null,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 561,
+          "bestSellerScore": 7539,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "ΑΒ ΒΙΟ",
+          "manufacturerSubBrandName": null,
+          "code": "7063933",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [
+            {
+              "code": "badgeproductisabbio",
+              "image": {
+                "altText": null,
+                "format": null,
+                "galleryIndex": null,
+                "imageType": null,
+                "url": "/medias/sys_master/haa/hb2/9938903859230.png",
+                "__typename": "Image"
+              },
+              "tooltipMessage": null,
+              "name": null,
+              "__typename": "ProductBadge"
+            }
+          ],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/h98/h02/10425171771422.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/h8f/hd0/10425171378206.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/h98/h02/10425171771422.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/h54/hb0/10425171968030.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Καρότα Ελληνικά",
+          "newProduct": null,
+          "onlineExclusive": false,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": [],
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€1,80",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "2,25 €/ κιλ",
+            "supplementaryPriceLabel2": "~800 γρ",
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€1,80",
+            "discountedUnitPriceFormatted": "2,25 €/kg",
+            "unit": "kg",
+            "unitPriceFormatted": "2,25",
+            "unitCode": "kilogram",
+            "unitPrice": 2.25,
+            "value": 1.8,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Lachanika/Karota-Reves-Rapanakia/Karota-Ellinika/p/7063933",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": null,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 561,
+          "bestSellerScore": 7523,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "ΑΒ",
+          "manufacturerSubBrandName": null,
+          "code": "7633877",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [
+            {
+              "code": "badgeproductisab",
+              "image": {
+                "altText": null,
+                "format": null,
+                "galleryIndex": null,
+                "imageType": null,
+                "url": "/medias/sys_master/h02/h86/9938904088606.png",
+                "__typename": "Image"
+              },
+              "tooltipMessage": "AB",
+              "name": null,
+              "__typename": "ProductBadge"
+            }
+          ],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h23/h98/9621218557982.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h28/h5b/9621218164766.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h23/h98/9621218557982.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h7c/haf/10127223980062.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 33,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Μήλα Στάρκινγκ Ελληνικά Συσκευασμένα",
+          "newProduct": null,
+          "onlineExclusive": null,
+          "potentialPromotions": [
+            {
+              "isMassFlashOffer": false,
+              "endDate": "14/01/2026 21:59:00",
+              "alternativePromotionMessage": null,
+              "alternativePromotionBadge": null,
+              "code": "GR11729992",
+              "priceToBurn": 0,
+              "promotionType": "Buy X Get Percentage Off All Products",
+              "pickAndMix": false,
+              "qualifyingCount": 1,
+              "freeCount": null,
+              "range": true,
+              "redemptionLevel": "MASS",
+              "toDisplay": true,
+              "description": "Κέρδος 15%",
+              "title": "Κέρδος 15%",
+              "promoBooster": false,
+              "simplePromotionMessage": "Προσφορά για όλους: Κερδίζεις 15% με κάθε προϊόν",
+              "offerType": null,
+              "restrictionType": null,
+              "priority": null,
+              "percentageDiscount": null,
+              "onlineOnly": null,
+              "promotionTypeCode": "BuyXGetPercentageOffAllProductsPromotion",
+              "points": null,
+              "__typename": "Promotion"
+            }
+          ],
+          "potentialActivatablePromotions": null,
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€1,55",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "1,55 €/ κιλ",
+            "supplementaryPriceLabel2": "~1 κιλ",
+            "showStrikethroughPrice": true,
+            "discountedPriceFormatted": "€1,32",
+            "discountedUnitPriceFormatted": "1,32 €/kg",
+            "unit": "kg",
+            "unitPriceFormatted": "1,55",
+            "unitCode": "kilogram",
+            "unitPrice": 1.55,
+            "value": 1.55,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Froyta/Mila/Mila-Starkingk-Ellinika-Syskeyasmena/p/7633877",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": true,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 556,
+          "bestSellerScore": 4879,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "ΑΒ",
+          "manufacturerSubBrandName": null,
+          "code": "7064162",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [
+            {
+              "code": "badgeproductisab",
+              "image": {
+                "altText": null,
+                "format": null,
+                "galleryIndex": null,
+                "imageType": null,
+                "url": "/medias/sys_master/h02/h86/9938904088606.png",
+                "__typename": "Image"
+              },
+              "tooltipMessage": "AB",
+              "name": null,
+              "__typename": "ProductBadge"
+            }
+          ],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h69/h92/9281461321758.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/he2/h8d/9281460928542.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h69/h92/9281461321758.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hce/hea/10125644005406.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Πατάτες Συσκευασμένες Κύπρου",
+          "newProduct": null,
+          "onlineExclusive": false,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": [],
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€4,47",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "1,49 €/ κιλ",
+            "supplementaryPriceLabel2": "~3 κιλ",
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€4,47",
+            "discountedUnitPriceFormatted": "1,49 €/kg",
+            "unit": "kg",
+            "unitPriceFormatted": "1,49",
+            "unitCode": "kilogram",
+            "unitPrice": 1.49,
+            "value": 4.47,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Lachanika/Patates-Kremmydia-Skorda/Patates-Syskeyasmenes-Kyproy/p/7064162",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": null,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 541,
+          "bestSellerScore": 6963,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "-",
+          "manufacturerSubBrandName": null,
+          "code": "7132187",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/h40/h7e/10095474507806.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/ha0/h86/10095474114590.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/h40/h7e/10095474507806.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/h61/hc0/10095474704414.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Αβοκάντο Ωριμασμένο Εισαγωγής 370g",
+          "newProduct": null,
+          "onlineExclusive": false,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": null,
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€3,49",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "3,49 €/ τεμ",
+            "supplementaryPriceLabel2": null,
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€3,49",
+            "discountedUnitPriceFormatted": "3,49 €/ τεμ",
+            "unit": "Κομμάτι",
+            "unitPriceFormatted": "3,49",
+            "unitCode": "pieces",
+            "unitPrice": 3.49,
+            "value": 3.49,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Froyta/Ananas-Mangko-Exotika-froyta/Avokanto-Orimasmeno-Eisagogis-370g/p/7132187",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": null,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 541,
+          "bestSellerScore": 6927,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "ΑΒ",
+          "manufacturerSubBrandName": null,
+          "code": "7073120",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [
+            {
+              "code": "badgeproductisab",
+              "image": {
+                "altText": null,
+                "format": null,
+                "galleryIndex": null,
+                "imageType": null,
+                "url": "/medias/sys_master/h02/h86/9938904088606.png",
+                "__typename": "Image"
+              },
+              "tooltipMessage": "AB",
+              "name": null,
+              "__typename": "ProductBadge"
+            }
+          ],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/hb8/h81/10425134219294.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/ha6/haa/10425133826078.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/hb8/h81/10425134219294.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/h83/h26/10425134415902.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Έτοιμη Σαλάτα Λάχανο Καρότο Ελληνική 250 gr",
+          "newProduct": null,
+          "onlineExclusive": false,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": [],
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€1,32",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "5,28 €/ κιλ",
+            "supplementaryPriceLabel2": "250 γρ",
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€1,32",
+            "discountedUnitPriceFormatted": "1,32 €/ κιλ",
+            "unit": "Κομμάτι",
+            "unitPriceFormatted": "1,32",
+            "unitCode": "pieces",
+            "unitPrice": 1.32,
+            "value": 1.32,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Lachanika/Etoimes-salates-lachanikon/Etoimi-Salata-Lachano-Karoto-Elliniki-250-gr/p/7073120",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": null,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 531,
+          "bestSellerScore": 6302,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "-",
+          "manufacturerSubBrandName": null,
+          "code": "7063679",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/haf/h20/9426658951198.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/he4/h65/9426658557982.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/haf/h20/9426658951198.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h24/h87/10129030381598.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Τομάτες Μεσαίες Ελληνικές Συσκευασμένες",
+          "newProduct": null,
+          "onlineExclusive": null,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": null,
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€1,85",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "1,85 €/ κιλ",
+            "supplementaryPriceLabel2": "~1 κιλ",
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€1,85",
+            "discountedUnitPriceFormatted": "1,85 €/kg",
+            "unit": "kg",
+            "unitPriceFormatted": "1,85",
+            "unitCode": "kilogram",
+            "unitPrice": 1.85,
+            "value": 1.85,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Lachanika/Aggoyria-Ntomates/Tomates-Mesaies-Ellinikes-Syskeyasmenes/p/7063679",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": true,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 531,
+          "bestSellerScore": 6251,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "DOLE",
+          "manufacturerSubBrandName": null,
+          "code": "7514505",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hee/hf5/9797850988574.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hf4/hb8/9797850595358.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hee/hf5/9797850988574.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h99/hf9/10126933655582.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Μπανάνες Dole Cavendish",
+          "newProduct": null,
+          "onlineExclusive": null,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": null,
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€1,87",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "1,85 €/ κιλ",
+            "supplementaryPriceLabel2": "~1,012 κιλ",
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€1,87",
+            "discountedUnitPriceFormatted": "1,85 €/kg",
+            "unit": "kg",
+            "unitPriceFormatted": "1,85",
+            "unitCode": "kilogram",
+            "unitPrice": 1.85,
+            "value": 1.87,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Froyta/Mpananes/Mpananes-Dole-Cavendish/p/7514505",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": null,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 521,
+          "bestSellerScore": 5756,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "ΑΒ",
+          "manufacturerSubBrandName": null,
+          "code": "7127226",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [
+            {
+              "code": "badgeproductisab",
+              "image": {
+                "altText": null,
+                "format": null,
+                "galleryIndex": null,
+                "imageType": null,
+                "url": "/medias/sys_master/h02/h86/9938904088606.png",
+                "__typename": "Image"
+              },
+              "tooltipMessage": "AB",
+              "name": null,
+              "__typename": "ProductBadge"
+            }
+          ],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hc8/h72/9281396572190.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h7b/h11/9281396178974.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hc8/h72/9281396572190.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hc2/hee/10126516453406.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Κρεμμυδάκια Χλωρά 140g",
+          "newProduct": null,
+          "onlineExclusive": false,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": null,
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€0,99",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "0,99 €/ τεμ",
+            "supplementaryPriceLabel2": null,
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€0,99",
+            "discountedUnitPriceFormatted": "0,99 €/ τεμ",
+            "unit": "Κομμάτι",
+            "unitPriceFormatted": "0,99",
+            "unitCode": "pieces",
+            "unitPrice": 0.99,
+            "value": 0.99,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Lachanika/Patates-Kremmydia-Skorda/Kremmydakia-Chlora-140g/p/7127226",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": null,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 521,
+          "bestSellerScore": 5651,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "ΑΒ",
+          "manufacturerSubBrandName": null,
+          "code": "7747741",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [
+            {
+              "code": "badgeproductisab",
+              "image": {
+                "altText": null,
+                "format": null,
+                "galleryIndex": null,
+                "imageType": null,
+                "url": "/medias/sys_master/h02/h86/9938904088606.png",
+                "__typename": "Image"
+              },
+              "tooltipMessage": "AB",
+              "name": null,
+              "__typename": "ProductBadge"
+            }
+          ],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hb4/h83/9477656805406.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h15/h8c/9477656412190.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/hb4/h83/9477656805406.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/ha7/h5d/10127288762398.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Λεμόνια Εισαγωγής Συσκευασμένα",
+          "newProduct": null,
+          "onlineExclusive": null,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": null,
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€2,69",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "2,69 €/ κιλ",
+            "supplementaryPriceLabel2": "1 κιλ",
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€2,69",
+            "discountedUnitPriceFormatted": "2,69 €/ κιλ",
+            "unit": "Κομμάτι",
+            "unitPriceFormatted": "2,69",
+            "unitCode": "pieces",
+            "unitPrice": 2.69,
+            "value": 2.69,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Froyta/Lemonia-Laims/Lemonia-Eisagogis-Syskeyasmena/p/7747741",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": null,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 521,
+          "bestSellerScore": 5559,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "ΑΒ",
+          "manufacturerSubBrandName": null,
+          "code": "7073113",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [
+            {
+              "code": "badgeproductisab",
+              "image": {
+                "altText": null,
+                "format": null,
+                "galleryIndex": null,
+                "imageType": null,
+                "url": "/medias/sys_master/h02/h86/9938904088606.png",
+                "__typename": "Image"
+              },
+              "tooltipMessage": "AB",
+              "name": null,
+              "__typename": "ProductBadge"
+            }
+          ],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/hf0/h8e/10425031720990.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/h18/ha3/10425031327774.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/hf0/h8e/10425031720990.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/products/hac/h21/10425031917598.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Έτοιμη Σαλάτα Καπριτσιόζα Ελληνική 160 gr",
+          "newProduct": null,
+          "onlineExclusive": false,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": [],
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€1,49",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "9,31 €/ κιλ",
+            "supplementaryPriceLabel2": "160 γρ",
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€1,49",
+            "discountedUnitPriceFormatted": "1,49 €/ κιλ",
+            "unit": "Κομμάτι",
+            "unitPriceFormatted": "1,49",
+            "unitCode": "pieces",
+            "unitPrice": 1.49,
+            "value": 1.49,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Lachanika/Etoimes-salates-lachanikon/Etoimi-Salata-Kapritsioza-Elliniki-160-gr/p/7073113",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": null,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 511,
+          "bestSellerScore": 5322,
+          "__typename": "Product"
+        },
+        {
+          "available": true,
+          "averageRating": null,
+          "numberOfReviews": null,
+          "manufacturerName": "ΑΒ",
+          "manufacturerSubBrandName": null,
+          "code": "7064279",
+          "deliveryType": "NEXT_DAY",
+          "country": null,
+          "countryFlagUrl": null,
+          "badges": [
+            {
+              "code": "badgeproductisab",
+              "image": {
+                "altText": null,
+                "format": null,
+                "galleryIndex": null,
+                "imageType": null,
+                "url": "/medias/sys_master/h02/h86/9938904088606.png",
+                "__typename": "Image"
+              },
+              "tooltipMessage": "AB",
+              "name": null,
+              "__typename": "ProductBadge"
+            }
+          ],
+          "badgeBrand": null,
+          "promoBadges": null,
+          "delivered": null,
+          "littleLion": null,
+          "firstLevelCategory": {
+            "code": "001",
+            "name": "Οπωροπωλείο",
+            "nameNonLocalized": "Fruit and Vegetables",
+            "url": "/el/eshop/Oporopoleio/c/001",
+            "__typename": "ProductCategory"
+          },
+          "freshnessDuration": null,
+          "freshnessDurationTipFormatted": null,
+          "frozen": null,
+          "recyclable": false,
+          "images": [
+            {
+              "format": "respListGrid",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h11/h0b/9445861785630.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "zoom",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h0c/h48/9445861392414.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "small",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h11/h0b/9445861785630.jpg",
+              "__typename": "Image"
+            },
+            {
+              "format": "xlarge",
+              "imageType": "PRIMARY",
+              "url": "/medias/sys_master/h38/h00/10129026744350.jpg",
+              "__typename": "Image"
+            }
+          ],
+          "isBundle": false,
+          "isProductWithOnlineExclusivePromo": null,
+          "isWine": null,
+          "maxOrderQuantity": 99,
+          "limitedAssortment": null,
+          "mobileFees": null,
+          "name": "Μανιτάρια Λευκά Agaricus Εισαγωγής 250 gr",
+          "newProduct": null,
+          "onlineExclusive": false,
+          "potentialPromotions": [],
+          "potentialActivatablePromotions": [],
+          "price": {
+            "approximatePriceSymbol": "~",
+            "currencySymbol": "€",
+            "formattedValue": "€1,35",
+            "priceType": "BUY",
+            "supplementaryPriceLabel1": "5,4 €/ κιλ",
+            "supplementaryPriceLabel2": "250 γρ",
+            "showStrikethroughPrice": false,
+            "discountedPriceFormatted": "€1,35",
+            "discountedUnitPriceFormatted": "1,35 €/ κιλ",
+            "unit": "Κομμάτι",
+            "unitPriceFormatted": "1,35",
+            "unitCode": "pieces",
+            "unitPrice": 1.35,
+            "value": 1.35,
+            "wasPrice": null,
+            "__typename": "Price"
+          },
+          "purchasable": null,
+          "productPackagingQuantity": null,
+          "productProposedPackaging": 1,
+          "productProposedPackaging2": null,
+          "promotionThemes": null,
+          "stock": {
+            "inStock": true,
+            "inStockBeforeMaxAdvanceOrderingDate": false,
+            "partiallyInStock": false,
+            "availableFromDate": null,
+            "__typename": "Stock"
+          },
+          "url": "/el/eshop/Oporopoleio/Lachanika/Manitaria/Manitaria-Leyka-Agaricus-Eisagogis-250-gr/p/7064279",
+          "previouslyBought": null,
+          "nutriScoreLetter": null,
+          "isLowPriceGuarantee": true,
+          "isHouseholdBasket": null,
+          "isPermanentPriceReduction": null,
+          "freeGift": null,
+          "plasticFee": null,
+          "score": 511,
+          "bestSellerScore": 5126,
+          "__typename": "Product"
+        }
+      ],
+      "breadcrumbs": [],
+      "categoryBreadcrumbs": [
+        {
+          "name": "Οπωροπωλείο",
+          "url": "/el/eshop/Oporopoleio/c/001?q=%3Arelevance",
+          "__typename": "CategoryBreadcrumb"
+        }
+      ],
+      "facets": [
+        {
+          "code": "allergyDoesNotContain",
+          "name": "Αλλεργιογόνα",
+          "category": false,
+          "facetUiType": null,
+          "values": [
+            {
+              "code": "GLUTEN",
+              "count": 3,
+              "name": "Χωρίς Γλουτένη",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:allergyDoesNotContain:GLUTEN",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "COFFEE",
+              "count": 2,
+              "name": "Χωρίς Καφές",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:allergyDoesNotContain:COFFEE",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "CRUSTACEANS",
+              "count": 2,
+              "name": "Χωρίς Καρκινοειδή",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:allergyDoesNotContain:CRUSTACEANS",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "EDULCORANT",
+              "count": 2,
+              "name": "Χωρίς Ασπαρτάμη / πηγή φαινυλαλανίνης",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:allergyDoesNotContain:EDULCORANT",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "EGGS",
+              "count": 2,
+              "name": "Χωρίς Αβγό",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:allergyDoesNotContain:EGGS",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "FISH",
+              "count": 2,
+              "name": "Χωρίς Ψάρι",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:allergyDoesNotContain:FISH",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "GLYCYR",
+              "count": 2,
+              "name": "Χωρίς Γλυκυρριζίνη",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:allergyDoesNotContain:GLYCYR",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "LUPIN",
+              "count": 2,
+              "name": "Χωρίς Λούπινο",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:allergyDoesNotContain:LUPIN",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "MILK",
+              "count": 2,
+              "name": "Χωρίς Γάλα",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:allergyDoesNotContain:MILK",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "MOLLUSCS",
+              "count": 2,
+              "name": "Χωρίς Μαλάκια",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:allergyDoesNotContain:MOLLUSCS",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "MUSTARD",
+              "count": 2,
+              "name": "Χωρίς Σινάπι",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:allergyDoesNotContain:MUSTARD",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "PEANUTS",
+              "count": 2,
+              "name": "Χωρίς Αραχίδες",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:allergyDoesNotContain:PEANUTS",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "SESAME",
+              "count": 2,
+              "name": "Χωρίς Σησάμι",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:allergyDoesNotContain:SESAME",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "SOYBEANS",
+              "count": 2,
+              "name": "Χωρίς Σόγια",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:allergyDoesNotContain:SOYBEANS",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "SULPHITE",
+              "count": 2,
+              "name": "Χωρίς Διοξείδιο του θείου ή Θειώδεις ενώσεις",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:allergyDoesNotContain:SULPHITE",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "TREENUTS",
+              "count": 2,
+              "name": "Χωρίς Καρποί με κέλυφος",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:allergyDoesNotContain:TREENUTS",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            }
+          ],
+          "__typename": "Facet"
+        },
+        {
+          "code": "offers",
+          "name": "Προσφορές",
+          "category": false,
+          "facetUiType": "QUICK_FILTER",
+          "values": [
+            {
+              "code": "true",
+              "count": 22,
+              "name": "true",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:offers:true",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            }
+          ],
+          "__typename": "Facet"
+        },
+        {
+          "code": "ownBrands",
+          "name": "Προϊόντα Ιδιωτικής Ετικέτας",
+          "category": false,
+          "facetUiType": "QUICK_FILTER",
+          "values": [
+            {
+              "code": "true",
+              "count": 162,
+              "name": "true",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:ownBrands:true",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            }
+          ],
+          "__typename": "Facet"
+        },
+        {
+          "code": "promotionDisplayTypes",
+          "name": "Top ευκαιρίες",
+          "category": false,
+          "facetUiType": null,
+          "values": [
+            {
+              "code": "REDUCTIONS",
+              "count": 19,
+              "name": "Έκπτωση τιμής",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:promotionDisplayTypes:REDUCTIONS",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            }
+          ],
+          "__typename": "Facet"
+        },
+        {
+          "code": "manufacturerNameFacet",
+          "name": "ΜΑΡΚΑ",
+          "category": false,
+          "facetUiType": null,
+          "values": [
+            {
+              "code": "-",
+              "count": 34,
+              "name": "-",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:-",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "AROMA",
+              "count": 11,
+              "name": "AROMA",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:AROMA",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "DOLE",
+              "count": 3,
+              "name": "DOLE",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:DOLE",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "DULCE BUONA",
+              "count": 1,
+              "name": "DULCE BUONA",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:DULCE+BUONA",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "EXCLUSIVE AB",
+              "count": 7,
+              "name": "EXCLUSIVE AB",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:EXCLUSIVE+AB",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "ZESPRI",
+              "count": 3,
+              "name": "ZESPRI",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:ZESPRI",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "ΑΒ",
+              "count": 108,
+              "name": "ΑΒ",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:%CE%91%CE%92",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "ΑΒ THINK BIO",
+              "count": 2,
+              "name": "ΑΒ THINK BIO",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:%CE%91%CE%92+THINK+BIO",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "ΑΒ ΒΙΟ",
+              "count": 47,
+              "name": "ΑΒ ΒΙΟ",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:%CE%91%CE%92+%CE%92%CE%99%CE%9F",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "ΑΒ ΕΠΙΛΟΓΗ",
+              "count": 4,
+              "name": "ΑΒ ΕΠΙΛΟΓΗ",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:%CE%91%CE%92+%CE%95%CE%A0%CE%99%CE%9B%CE%9F%CE%93%CE%97",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "ΑΒ ΚΟΝΤΑ ΣΤΗΝ ΕΛΛΗΝΙΚΗ ΓΗ",
+              "count": 1,
+              "name": "ΑΒ ΚΟΝΤΑ ΣΤΗΝ ΕΛΛΗΝΙΚΗ ΓΗ",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:%CE%91%CE%92+%CE%9A%CE%9F%CE%9D%CE%A4%CE%91+%CE%A3%CE%A4%CE%97%CE%9D+%CE%95%CE%9B%CE%9B%CE%97%CE%9D%CE%99%CE%9A%CE%97+%CE%93%CE%97",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "ΑΓΡΟΚΗΠΟΣ ΧΑΛΒΑΤΖΗ",
+              "count": 20,
+              "name": "ΑΓΡΟΚΗΠΟΣ ΧΑΛΒΑΤΖΗ",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:%CE%91%CE%93%CE%A1%CE%9F%CE%9A%CE%97%CE%A0%CE%9F%CE%A3+%CE%A7%CE%91%CE%9B%CE%92%CE%91%CE%A4%CE%96%CE%97",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "ΔΙΡΦΥΣ",
+              "count": 3,
+              "name": "ΔΙΡΦΥΣ",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:%CE%94%CE%99%CE%A1%CE%A6%CE%A5%CE%A3",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "ΖΑΓΟΡΙΝ",
+              "count": 1,
+              "name": "ΖΑΓΟΡΙΝ",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:%CE%96%CE%91%CE%93%CE%9F%CE%A1%CE%99%CE%9D",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "ΚΕΧΑΓΙΑΣ",
+              "count": 1,
+              "name": "ΚΕΧΑΓΙΑΣ",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:%CE%9A%CE%95%CE%A7%CE%91%CE%93%CE%99%CE%91%CE%A3",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "ΚΗΠΟΣ ΞΑΝΘΗΣ",
+              "count": 4,
+              "name": "ΚΗΠΟΣ ΞΑΝΘΗΣ",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:%CE%9A%CE%97%CE%A0%CE%9F%CE%A3+%CE%9E%CE%91%CE%9D%CE%98%CE%97%CE%A3",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "ΜΑΛΕΜΕ",
+              "count": 1,
+              "name": "ΜΑΛΕΜΕ",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:%CE%9C%CE%91%CE%9B%CE%95%CE%9C%CE%95",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "ΜΠΑΡΜΠΑ ΣΤΑΘΗΣ",
+              "count": 3,
+              "name": "ΜΠΑΡΜΠΑ ΣΤΑΘΗΣ",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:%CE%9C%CE%A0%CE%91%CE%A1%CE%9C%CE%A0%CE%91+%CE%A3%CE%A4%CE%91%CE%98%CE%97%CE%A3",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "ΠΕΡΙΒΟΛΙ ΒΕΖΥΡΟΓΛΟΥ",
+              "count": 4,
+              "name": "ΠΕΡΙΒΟΛΙ ΒΕΖΥΡΟΓΛΟΥ",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:%CE%A0%CE%95%CE%A1%CE%99%CE%92%CE%9F%CE%9B%CE%99+%CE%92%CE%95%CE%96%CE%A5%CE%A1%CE%9F%CE%93%CE%9B%CE%9F%CE%A5",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "ΦΡΕΣΚΟΥΛΗΣ",
+              "count": 9,
+              "name": "ΦΡΕΣΚΟΥΛΗΣ",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:manufacturerNameFacet:%CE%A6%CE%A1%CE%95%CE%A3%CE%9A%CE%9F%CE%A5%CE%9B%CE%97%CE%A3",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            }
+          ],
+          "__typename": "Facet"
+        },
+        {
+          "code": "budgetRangeFacet",
+          "name": "ΤΙΜΉ",
+          "category": false,
+          "facetUiType": "LONG_MULTI_SELECT_LIST",
+          "values": [
+            {
+              "code": "Από 0€ έως 5€",
+              "count": 251,
+              "name": "Από 0€ έως 5€",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:budgetRangeFacet:%CE%91%CF%80%CF%8C+0%E2%82%AC+%CE%AD%CF%89%CF%82+5%E2%82%AC",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "Από 5€ έως 10€",
+              "count": 15,
+              "name": "Από 5€ έως 10€",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:budgetRangeFacet:%CE%91%CF%80%CF%8C+5%E2%82%AC+%CE%AD%CF%89%CF%82+10%E2%82%AC",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            },
+            {
+              "code": "Από 10€ έως 20€",
+              "count": 1,
+              "name": "Από 10€ έως 20€",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:budgetRangeFacet:%CE%91%CF%80%CF%8C+10%E2%82%AC+%CE%AD%CF%89%CF%82+20%E2%82%AC",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            }
+          ],
+          "__typename": "Facet"
+        },
+        {
+          "code": "isBio",
+          "name": "Βιολογικά",
+          "category": false,
+          "facetUiType": "QUICK_FILTER",
+          "values": [
+            {
+              "code": "true",
+              "count": 61,
+              "name": "true",
+              "query": {
+                "query": {
+                  "value": "categoryIdentifier=001&searchQuery=:relevance:isBio:true",
+                  "__typename": "InternalPageQuery"
+                },
+                "__typename": "PageQuery"
+              },
+              "selected": false,
+              "__typename": "FacetValue"
+            }
+          ],
+          "__typename": "Facet"
+        }
+      ],
+      "sorts": [
+        {
+          "name": "Δημοφιλή",
+          "selected": true,
+          "code": "relevance",
+          "__typename": "Sort"
+        },
+        {
+          "name": "Κατηγορία",
+          "selected": false,
+          "code": "department",
+          "__typename": "Sort"
+        },
+        {
+          "name": "Τιμή ανά τεμάχιο",
+          "selected": false,
+          "code": "price-piece",
+          "__typename": "Sort"
+        },
+        {
+          "name": "Μάρκα",
+          "selected": false,
+          "code": "brand",
+          "__typename": "Sort"
+        },
+        {
+          "name": "Προϊόν",
+          "selected": false,
+          "code": "product",
+          "__typename": "Sort"
+        },
+        {
+          "name": "Top ευκαιρία",
+          "selected": false,
+          "code": "promotionType",
+          "__typename": "Sort"
+        }
+      ],
+      "pagination": {
+        "currentPage": 0,
+        "totalResults": 267,
+        "totalPages": 14,
+        "sort": "relevance",
+        "__typename": "Pagination"
+      },
+      "currentQuery": {
+        "query": {
+          "value": ":relevance",
+          "__typename": "InternalPageQuery"
+        },
+        "url": "/el/eshop/Oporopoleio/c/001?q=%3Arelevance",
+        "__typename": "PageQuery"
+      },
+      "categorySearchTree": [
+        {
+          "categoryDataList": [
+            {
+              "categoryCode": "001001",
+              "categoryData": {
+                "facetData": {
+                  "count": 96,
+                  "name": "Φρούτα",
+                  "nameNonLocalized": "Fruits",
+                  "query": {
+                    "query": {
+                      "value": ":relevance",
+                      "__typename": "InternalPageQuery"
+                    },
+                    "url": "/el/eshop/Oporopoleio/Froyta/c/001001?q=%3Arelevance",
+                    "__typename": "PageQuery"
+                  },
+                  "selected": false,
+                  "thumbnailUrl": "/medias/sys_master/hde/h2a/10274778906654.png",
+                  "__typename": "CategorySearchTreeFacetData"
+                },
+                "subCategories": [],
+                "__typename": "CategorySearchTreeData"
+              },
+              "__typename": "CategorySearchTreeLevelDataList"
+            },
+            {
+              "categoryCode": "001002",
+              "categoryData": {
+                "facetData": {
+                  "count": 168,
+                  "name": "Λαχανικά",
+                  "nameNonLocalized": "Vegetables",
+                  "query": {
+                    "query": {
+                      "value": ":relevance",
+                      "__typename": "InternalPageQuery"
+                    },
+                    "url": "/el/eshop/Oporopoleio/Lachanika/c/001002?q=%3Arelevance",
+                    "__typename": "PageQuery"
+                  },
+                  "selected": false,
+                  "thumbnailUrl": "/medias/sys_master/h63/hf8/10274779136030.png",
+                  "__typename": "CategorySearchTreeFacetData"
+                },
+                "subCategories": [],
+                "__typename": "CategorySearchTreeData"
+              },
+              "__typename": "CategorySearchTreeLevelDataList"
+            },
+            {
+              "categoryCode": "001003",
+              "categoryData": {
+                "facetData": {
+                  "count": 3,
+                  "name": "Νωποί ξηροί καρποί",
+                  "nameNonLocalized": "Fresh nuts",
+                  "query": {
+                    "query": {
+                      "value": ":relevance",
+                      "__typename": "InternalPageQuery"
+                    },
+                    "url": "/el/eshop/Oporopoleio/Nopoi-xiroi-karpoi/c/001003?q=%3Arelevance",
+                    "__typename": "PageQuery"
+                  },
+                  "selected": false,
+                  "thumbnailUrl": "/medias/sys_master/products/hf4/h95/10132116242462.png",
+                  "__typename": "CategorySearchTreeFacetData"
+                },
+                "subCategories": [],
+                "__typename": "CategorySearchTreeData"
+              },
+              "__typename": "CategorySearchTreeLevelDataList"
+            }
+          ],
+          "level": "1",
+          "__typename": "CategorySearchTreeLevel"
+        }
+      ],
+      "__typename": "CategoryProductSearchList"
+    }
+  }
+}

@@ -46,10 +46,106 @@ server.get("/debug/ingestion/ab/DISCOVERY", async () => {
   };
 });
 
+// Get all products
+server.get("/products", async (req, reply) => {
+  try {
+    const products = await prisma.product.findMany({
+      include: {
+        priceSnapshots: {
+          orderBy: {
+            // Αυτό είναι το σωστό όνομα από το schema σου!
+            collectedAt: "desc", 
+          },
+          take: 2,
+        },
+        store: true, 
+      },
+      orderBy: {
+        name: "asc",
+      },
+    });
+    
+    return products;
+  } catch (error) {
+    server.log.error(error);
+    return reply.status(500).send({ error: "Failed to fetch products" });
+  }
+});
+
+// Debug Endpoint: Force Ingestion for AB
+server.post("/debug/force-sync-ab", async (req, reply) => {
+  const { products } = req.body as any;
+  console.log(`📥 Λήφθηκαν ${products.length} προϊόντα από τον browser!`);
+
+  const store = await prisma.store.findFirst({ 
+    where: { name: { contains: "ab" } } 
+  });
+  
+  if (!store) return reply.status(404).send({ error: "AB Store not found" });
+
+  for (const item of products) {
+    const price = item.price?.current?.value || item.price?.unitPrice || 0;
+    
+    const dbProduct = await prisma.product.upsert({
+      where: { storeId_externalId: { storeId: store.id, externalId: item.code } },
+      update: { 
+        name: item.name, 
+        imageUrl: item.images?.[0]?.url || item.image 
+      },
+      create: {
+        storeId: store.id,
+        externalId: item.code,
+        name: item.name,
+        imageUrl: item.images?.[0]?.url || item.image,
+      }
+    });
+
+    await prisma.priceSnapshot.create({
+      data: { 
+        productId: dbProduct.id, 
+        price: price.toString(), 
+        collectedAt: new Date() 
+      }
+    });
+  }
+  
+  return { success: true, count: products.length };
+});
+
+server.post("/sync-ab", async (req, reply) => {
+  const { products } = req.body as any;
+  
+  const store = await prisma.store.findFirst({ where: { name: { contains: "ab" } } });
+  if (!store) return reply.status(404).send("Store not found");
+
+  for (const item of products) {
+    const priceValue = item.price?.current?.value || 0;
+    
+    const dbProduct = await prisma.product.upsert({
+      where: { storeId_externalId: { storeId: store.id, externalId: item.code } },
+      update: { name: item.name },
+      create: {
+        storeId: store.id,
+        externalId: item.code,
+        name: item.name,
+        imageUrl: item.images?.[0]?.url || ""
+      }
+    });
+
+    await prisma.priceSnapshot.create({
+      data: { productId: dbProduct.id, price: priceValue.toString() }
+    });
+  }
+  return { success: true, count: products.length };
+});
+
+
+
 const start = async () => {
   try {
-    await server.listen({ port: 3001, host: "0.0.0.0" });
-    console.log("🚀 Server running at http://localhost:3001");
+    // Χρησιμοποίησε 127.0.0.1 αντί για 0.0.0.0
+    await server.listen({ port: 3001, host: "127.0.0.1" });
+    console.log("🚀 API Server ready at http://localhost:3001");
   } catch (err) {
     server.log.error(err);
     process.exit(1);
