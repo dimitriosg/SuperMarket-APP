@@ -1,13 +1,51 @@
+# --- Dependencies ---
 node_modules
+.pnp
+.pnp.js
+
+# --- Bun ---
+# Το .bun φάκελο τον αγνοούμε, αλλά το bun.lockb ΚΑΛΟ ΕΙΝΑΙ να ανεβαίνει (όπως το package-lock.json)
 .bun
+# bun.lockb 
+
+# --- Testing ---
+coverage
+
+# --- Next.js production build output ---
+.next
+out
+build
+dist
+
+# --- Environment variables (ΚΡΙΣΙΜΟ: Ποτέ μην ανεβάζεις κωδικούς) ---
 .env
 .env.local
-.env.*.local
-.DS_Store
-dist
-.bun-build/
-build
-coverage
-.prisma
+.env.development.local
+.env.test.local
+.env.production.local
+.env*.local
+
+# --- Turborepo cache ---
+.turbo
+
+# --- Prisma ---
+# Αγνοούμε τα αρχεία της SQLite αν χρησιμοποιείς τέτοια τοπικά, όχι το schema!
+*.db
+*.db-journal
+
+# --- Debug logs ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+bun-debug.log*
+
+# --- IDEs & Editors ---
 .idea
 .vscode
+*.swp
+*.swo
+
+# --- OS Generated Files (Windows/Mac) ---
+.DS_Store
+Thumbs.db
+Desktop.ini

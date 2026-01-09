@@ -1,37 +1,49 @@
-// apps/api/src/routes/search.ts
 import { Elysia, t } from 'elysia';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+function normalizeText(text: string): string {
+  return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+}
+
 export const searchRoutes = new Elysia({ prefix: '/search' })
   .get('/', async ({ query }) => {
-    const searchTerm = query.q as string;
-    if (!searchTerm) return [];
+    const rawTerm = query.q as string;
+    if (!rawTerm || rawTerm.length < 2) return [];
+
+    // Καθαρίζουμε αυτό που έγραψε ο χρήστης (π.χ. "φέτα" -> "ΦΕΤΑ")
+    const searchTerm = normalizeText(rawTerm);
 
     const products = await prisma.product.findMany({
       where: {
-        name: { contains: searchTerm, mode: 'insensitive' }
+        // Ψάχνουμε στο normalizedName!
+        normalizedName: { 
+          contains: searchTerm 
+        },
+        isActive: true
       },
       include: {
-        PriceSnapshot: { 
-          orderBy: { collectedAt: 'desc' },
-          take: 1
-        },
-        store: true // Βεβαιώσου ότι στο schema.prisma υπάρχει το: store Store @relation(...)
-      }
+        prices: {
+          orderBy: { price: 'asc' },
+          include: { store: true }
+        }
+      },
+      take: 20
     });
 
-    // Χρησιμοποιούμε map με explicit typing για να δει το store και το PriceSnapshot
-    return products.map((p: any) => ({
+    return products.map(p => ({
       id: p.id,
       name: p.name,
-      price: p.PriceSnapshot?.[0]?.price || "0",
-      store: p.store?.name || "Άγνωστο",
-      image: p.imageUrl
+      image: p.imageUrl,
+      bestPrice: p.prices[0]?.price || 0,
+      offers: p.prices.map(price => ({
+        store: price.store.name,
+        price: price.price,
+        date: price.collectedAt
+      }))
     }));
+
   }, {
-    query: t.Object({
-      q: t.String()
-    })
+    query: t.Object({ q: t.String() })
   });

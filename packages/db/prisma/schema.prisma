@@ -1,4 +1,5 @@
-// Prisma schema file
+// packages/db/prisma/schema.prisma
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -31,44 +32,65 @@ model Store {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  chain    Chain     @relation(fields: [chainId], references: [id])
-  products Product[]
+  chain      Chain    @relation(fields: [chainId], references: [id])
+  
+  // Σχέσεις
+  prices     PriceSnapshot[]
+  productCodes StoreProductCode[]
 
   @@unique([chainId, externalId])
   @@index([chainId])
 }
 
+// ΤΟ ΚΕΝΤΡΙΚΟ ΠΡΟΪΟΝ (Master Product)
 model Product {
   id         String   @id @default(cuid())
-  storeId    String
-  externalId String
+  ean        String   @unique  // <--- ΑΥΤΟ ΕΙΝΑΙ ΤΟ ΚΛΕΙΔΙ ΓΙΑ ΤΟ E-KATANALOTIS
   name       String
+  imageUrl   String?
   brand      String?
   quantity   String?
-  ean        String?
-  imageUrl   String?
+
+  normalizedName String @default("")
+  
   isActive   Boolean  @default(true)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  store          Store           @relation(fields: [storeId], references: [id])
-  priceSnapshots PriceSnapshot[]
+  // Σχέσεις
+  prices     PriceSnapshot[]
+  storeCodes StoreProductCode[]
 
-  @@unique([storeId, externalId])
-  @@index([storeId])
   @@index([ean])
+  @@index([name])
+}
+
+// Κωδικοί καταστημάτων (π.χ. ο AB έχει τον κωδικό "123" για την Coca Cola)
+model StoreProductCode {
+  id        String   @id @default(cuid())
+  storeId   String
+  productId String
+  externalCode String 
+
+  store     Store    @relation(fields: [storeId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@unique([storeId, externalCode])
+  @@index([productId])
 }
 
 model PriceSnapshot {
   id         String   @id @default(cuid())
   productId  String
+  storeId    String
   price      Decimal  @db.Decimal(10, 2)
   promoPrice Decimal? @db.Decimal(10, 2)
   inStock    Boolean  @default(true)
   collectedAt DateTime @default(now())
 
-  product Product @relation(fields: [productId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id])
+  store      Store    @relation(fields: [storeId], references: [id])
 
-  @@index([productId, collectedAt(sort: Desc)])
+  @@index([productId, storeId, collectedAt(sort: Desc)])
   @@index([collectedAt])
 }
