@@ -1,7 +1,9 @@
-import { Link } from "react-router-dom"; // <--- ΝΕΟ Import
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { BasketItem, StoreComparisonStat } from "../types";
 import { DEFAULT_IMG } from "../services/api";
 import { BasketComparison } from "./BasketComparison";
+import { getRelativeTime } from "../utils/date";
 
 type Props = {
   isOpen: boolean;
@@ -18,6 +20,12 @@ export function BasketSidebar({
   isOpen, isPinned, basket, comparison, onClose, onTogglePin, onUpdateQty, onRemove
 }: Props) {
   
+  const [showStaleDetails, setShowStaleDetails] = useState(false);
+
+  // Υπολογισμός Recommended Store (Το φθηνότερο πλήρες, αλλιώς το καλύτερο ελλιπές)
+  const recommendedStore = comparison.full[0] || comparison.partial[0];
+  const hasStaleItems = recommendedStore && recommendedStore.staleCount > 0;
+
   if (!isOpen) return null;
 
   return (
@@ -53,6 +61,40 @@ export function BasketSidebar({
           </button>
         </div>
 
+        {/* PHASE 3: VOLATILITY BANNER */}
+        {hasStaleItems && (
+          <div className="mx-6 mt-4 p-4 bg-amber-50 border border-amber-200 rounded-xl animate-fade-in" role="status">
+            <div className="flex items-start gap-3">
+              <span className="text-xl">⚠️</span>
+              <div className="flex-1">
+                <p className="text-sm text-amber-900 font-bold leading-tight">
+                  Προσοχή: {recommendedStore.staleCount} προϊόντα στο καλάθι του <span className="underline">{recommendedStore.name}</span> έχουν παλιές τιμές (&gt;7 ημερών).
+                </p>
+                
+                <button 
+                  onClick={() => setShowStaleDetails(!showStaleDetails)}
+                  className="text-xs text-amber-700 font-bold mt-2 hover:underline focus:outline-none focus:ring-2 focus:ring-amber-500 rounded px-1"
+                >
+                  {showStaleDetails ? "Απόκρυψη λεπτομερειών" : "Δες ποια προϊόντα"}
+                </button>
+
+                {showStaleDetails && (
+                  <ul className="mt-3 space-y-2 border-t border-amber-200 pt-2">
+                    {recommendedStore.staleItems.map((item, idx) => (
+                      <li key={idx} className="flex justify-between text-xs text-amber-800">
+                        <span>{item.name}</span>
+                        <span className="font-mono text-amber-600 opacity-75">
+                          {getRelativeTime(item.date).text}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
           {basket.length === 0 && (
@@ -86,14 +128,13 @@ export function BasketSidebar({
           <BasketComparison comparison={comparison} basketSize={basket.length} />
         </div>
 
-        {/* Footer with Analysis Button (NEW) */}
+        {/* Footer with Analysis Button */}
         {basket.length > 0 && (
             <div className="p-4 border-t bg-white sticky bottom-0 z-10">
                 <Link 
                     to="/analysis"
                     className="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg hover:shadow-indigo-200"
                     onClick={() => {
-                        // Αν είναι σε mobile (όχι pinned), κλείσε το drawer όταν πατηθεί
                         if (!isPinned) onClose();
                     }}
                 >

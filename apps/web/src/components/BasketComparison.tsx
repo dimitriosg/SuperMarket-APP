@@ -32,9 +32,17 @@ export function BasketComparison({ comparison, basketSize }: Props) {
               }`}
             >
               <div className="flex flex-col">
-                <span className="font-black text-xs uppercase tracking-tight">
-                  {s.name}
-                </span>
+                <div className="flex items-center gap-2">
+                  <span className="font-black text-xs uppercase tracking-tight">
+                    {s.name}
+                  </span>
+                  {/* STALE BADGE */}
+                  {s.staleCount > 0 && (
+                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${i === 0 ? 'bg-indigo-500 text-indigo-100' : 'bg-amber-100 text-amber-700'}`} title={`${s.staleCount} προϊόντα έχουν παλιές τιμές`}>
+                      ⚠️ {s.staleCount}
+                    </span>
+                  )}
+                </div>
                 <span className={`text-[9px] font-bold ${i === 0 ? "text-indigo-200" : "text-slate-400"}`}>
                   ΟΛΑ ΤΑ ΕΙΔΗ ({basketSize})
                 </span>
@@ -55,9 +63,17 @@ export function BasketComparison({ comparison, basketSize }: Props) {
             {comparison.partial.map((s) => (
               <div key={s.name} className="flex flex-col gap-2 p-4 bg-slate-50 border border-slate-100 rounded-2xl">
                 <div className="flex justify-between items-center">
-                  <span className="font-black text-xs uppercase text-slate-600">
-                    {s.name}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-black text-xs uppercase text-slate-600">
+                      {s.name}
+                    </span>
+                    {/* STALE BADGE */}
+                    {s.staleCount > 0 && (
+                      <span className="text-[9px] font-bold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded" title={`${s.staleCount} προϊόντα έχουν παλιές τιμές`}>
+                        ⚠️ {s.staleCount}
+                      </span>
+                    )}
+                  </div>
                   <div className="flex flex-col items-end">
                     <span className="text-lg font-black text-slate-800">
                       {s.total.toFixed(2)}€
@@ -68,7 +84,6 @@ export function BasketComparison({ comparison, basketSize }: Props) {
                   </div>
                 </div>
                 
-                {/* Λίστα με προϊόντα που λείπουν και προτάσεις */}
                 <div className="space-y-1.5 mt-2">
                   {s.missing.map((m, idx) => (
                     <div key={idx} className="bg-white/60 p-2 rounded-xl border border-slate-100 flex justify-between items-center gap-2">

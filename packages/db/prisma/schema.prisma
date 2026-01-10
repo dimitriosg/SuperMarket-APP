@@ -37,9 +37,24 @@ model Store {
   // Σχέσεις
   prices     PriceSnapshot[]
   productCodes StoreProductCode[]
+  priceHistory   PriceHistory[]
 
   @@unique([chainId, externalId])
   @@index([chainId])
+}
+
+model PriceHistory {
+  id        String   @id @default(cuid())
+  price     Decimal
+  date      DateTime @default(now())
+  
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+  
+  store     Store    @relation(fields: [storeId], references: [id])
+  storeId   String
+
+  @@index([productId, storeId, date])
 }
 
 // ΤΟ ΚΕΝΤΡΙΚΟ ΠΡΟΪΟΝ (Master Product)
@@ -60,6 +75,7 @@ model Product {
   // Σχέσεις
   prices     PriceSnapshot[]
   storeCodes StoreProductCode[]
+  priceHistory   PriceHistory[]
 
   @@index([ean])
   @@index([name])

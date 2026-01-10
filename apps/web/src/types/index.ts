@@ -16,14 +16,14 @@ export type BasketItem = ProductResult & {
   quantity: number;
 };
 
-// Τύπος για τα στατιστικά σύγκρισης (για το BasketComparison)
-export type StoreComparisonStat = {
+export interface StoreComparisonStat {
   name: string;
   total: number;
   count: number;
   isFull: boolean;
-  missing: {
-    name: string;
-    bestAlternative: { store: string; price: number } | null;
-  }[];
-};
+  missing: { name: string; bestAlternative: { store: string; price: number } | null }[];
+  
+  // ΝΕΑ ΠΕΔΙΑ ΓΙΑ PHASE 3
+  staleCount: number; 
+  staleItems: { name: string; date: string }[];
+}

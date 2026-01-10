@@ -1,29 +1,13 @@
 import { ProductResult } from "../types";
 import { DEFAULT_IMG } from "../services/api";
 import { Link } from "react-router-dom";
+import { getRelativeTime } from "../utils/date";
 
 type Props = {
   product: ProductResult;
   isInBasket: boolean;
   onAdd: (product: ProductResult) => void;
   selectedStoreFilter: string | null;
-};
-
-// Helper για ημερομηνία
-const getRelativeTime = (dateStr: string) => {
-  if (!dateStr) return { text: "", isStale: false };
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffInMs = now.getTime() - date.getTime();
-  const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-  const diffInDays = Math.floor(diffInHours / 24);
-  const isStale = diffInDays > 7;
-
-  if (diffInHours < 1) return { text: "Μόλις τώρα", isStale };
-  if (diffInHours < 24) return { text: `Πριν ${diffInHours} ώρες`, isStale };
-  if (diffInDays === 1) return { text: "Χθες", isStale };
-  if (diffInDays < 30) return { text: `Πριν ${diffInDays} μέρες`, isStale };
-  return { text: "Πριν >1 μήνα", isStale };
 };
 
 export function ProductCard({ product, isInBasket, onAdd, selectedStoreFilter }: Props) {

@@ -1,11 +1,12 @@
 import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
 import { BasketItem, ProductResult, StoreComparisonStat } from '../types';
 import { getStoreIdByName, STORES_DATA } from '../services/api';
+import { isStale } from '../utils/date'; // Βεβαιώσου ότι έφτιαξες το αρχείο src/utils/date.ts
 
 type BasketContextType = {
   basket: BasketItem[];
   enabledStores: string[];
-  selectedLocation: string; // <--- ΝΕΟ
+  selectedLocation: string;
   isBasketOpen: boolean;
   isPinned: boolean;
   comparison: { full: StoreComparisonStat[]; partial: StoreComparisonStat[] };
@@ -17,7 +18,7 @@ type BasketContextType = {
   togglePin: () => void;
   setBasketOpen: (open: boolean) => void;
   toggleStoreFilter: (storeId: string) => void;
-  changeLocation: (locationId: string) => void; // <--- ΝΕΟ Action
+  changeLocation: (locationId: string) => void;
 };
 
 const BasketContext = createContext<BasketContextType | undefined>(undefined);
@@ -25,8 +26,7 @@ const BasketContext = createContext<BasketContextType | undefined>(undefined);
 export function BasketProvider({ children }: { children: ReactNode }) {
   const [basket, setBasket] = useState<BasketItem[]>([]);
   
-  // --- DEFAULT PINNED & OPEN (Αν μεγάλη οθόνη) ---
-  const isLargeScreen = typeof window !== "undefined" && window.innerWidth >= 1280;
+  // Default Pin Logic (1024px threshold)
   const [isPinned, setIsPinned] = useState(() => typeof window !== "undefined" && window.innerWidth >= 1024);
   const [isBasketOpen, setIsBasketOpen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 1024);
 
@@ -46,15 +46,11 @@ export function BasketProvider({ children }: { children: ReactNode }) {
   useEffect(() => { localStorage.setItem('market_basket', JSON.stringify(basket)); }, [basket]);
   useEffect(() => { localStorage.setItem('market_location', selectedLocation); }, [selectedLocation]);
 
-  // --- LOCATION CHANGE LOGIC ---
   const changeLocation = (locId: string) => {
     setSelectedLocation(locId);
-    
-    // Αυτόματη επιλογή καταστημάτων βάσει περιοχής
     const storesInRegion = STORES_DATA.filter(store => 
       store.regions.includes("all") || store.regions.includes(locId)
     ).map(s => s.id);
-
     setEnabledStores(storesInRegion);
   };
 
@@ -68,7 +64,6 @@ export function BasketProvider({ children }: { children: ReactNode }) {
     if (!basket.find(p => p.id === product.id)) {
       setBasket(prev => [...prev, { ...product, quantity: 1 }]);
     }
-    // Αν δεν είναι pinned, άνοιξέ το
     if (!isPinned) setIsBasketOpen(true);
   };
 
@@ -84,9 +79,10 @@ export function BasketProvider({ children }: { children: ReactNode }) {
   const toggleBasket = () => setIsBasketOpen(prev => !prev);
   const togglePin = () => setIsPinned(prev => !prev);
 
-  // --- SMART COMPARISON (ΙΔΙΟ) ---
+  // --- COMPARISON LOGIC (With Stale Check) ---
   const comparison = useMemo(() => {
     if (basket.length === 0) return { full: [], partial: [] };
+
     const storeStats: Record<string, StoreComparisonStat> = {};
     const relevantStoreNames = new Set<string>();
     
@@ -98,7 +94,7 @@ export function BasketProvider({ children }: { children: ReactNode }) {
     }));
 
     relevantStoreNames.forEach(s => {
-      storeStats[s] = { name: s, total: 0, count: 0, isFull: false, missing: [] };
+      storeStats[s] = { name: s, total: 0, count: 0, isFull: false, missing: [], staleCount: 0, staleItems: [] };
     });
 
     basket.forEach(item => {
@@ -107,6 +103,13 @@ export function BasketProvider({ children }: { children: ReactNode }) {
         if (offer) {
           storeStats[storeName].total += Number(offer.price) * item.quantity;
           storeStats[storeName].count += 1;
+
+          // PHASE 3: Check freshness
+          if (isStale(offer.date)) {
+            storeStats[storeName].staleCount += 1;
+            storeStats[storeName].staleItems.push({ name: item.name, date: offer.date });
+          }
+
         } else {
           let bestAlt: { store: string, price: number } | null = null;
           item.offers.forEach(altOffer => {
@@ -124,6 +127,7 @@ export function BasketProvider({ children }: { children: ReactNode }) {
     });
 
     const statsArray = Object.values(storeStats).map(stat => ({ ...stat, isFull: stat.count === basket.length }));
+    
     return {
       full: statsArray.filter(s => s.isFull).sort((a, b) => a.total - b.total),
       partial: statsArray.filter(s => !s.isFull).sort((a, b) => (b.count - a.count) || (a.total - b.total))

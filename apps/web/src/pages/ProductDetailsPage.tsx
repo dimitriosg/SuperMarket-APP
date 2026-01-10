@@ -3,26 +3,20 @@ import { useBasketContext } from "../context/BasketContext";
 import { ProductResult } from "../types";
 import { DEFAULT_IMG } from "../services/api";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { useEffect, useState } from "react";
+import { LoadingScreen } from "../components/LoadingScreen"; // <--- Import το Loading
 
-// --- MOCK HISTORY GENERATOR (Προσωρινό μέχρι να γίνει το Backend) ---
-
-// Δημιουργεί τυχαίο ιστορικό 30 ημερών γύρω από την τρέχουσα τιμή
+// Mock Generator (κρατάμε τον mock για fallback)
 const generateMockHistory = (currentPrice: number) => {
   const data = [];
   const today = new Date();
-  let price = currentPrice * 1.05; // Ξεκινάμε λίγο πιο ακριβά
-
+  let price = currentPrice * 1.05;
   for (let i = 30; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(date.getDate() - i);
-    
-    // Τυχαία αυξομείωση
     const change = (Math.random() - 0.5) * 0.5;
     price = Math.max(currentPrice * 0.8, price + change);
-
-    // Τις τελευταίες μέρες το φέρνουμε στην τωρινή τιμή
     if (i < 2) price = currentPrice;
-
     data.push({
       date: `${date.getDate()}/${date.getMonth() + 1}`,
       price: Number(price.toFixed(2))
@@ -36,18 +30,28 @@ export function ProductDetailsPage() {
   const navigate = useNavigate();
   const { addToBasket, basket } = useBasketContext();
 
-  // Παίρνουμε το προϊόν από το state του React Router (έρχεται από το Link)
+  // 1. SAFETY CHECK: Αν δεν υπάρχει product state, δείξε Loading και γύρνα πίσω
   const product = location.state as ProductResult;
 
-  // Αν κάποιος μπει απευθείας στο Link χωρίς state, τον γυρνάμε πίσω (προσωρινά)
+  useEffect(() => {
+    if (!product) {
+      // Αν ο χρήστης μπήκε με direct link και δεν έχουμε data, γύρνα τον σπίτι
+      // (Σε επόμενη φάση εδώ θα κάναμε fetchProductById)
+      const timer = setTimeout(() => navigate('/'), 2000); // Περίμενε 2 δευτ. να δει το μήνυμα
+      return () => clearTimeout(timer);
+    }
+  }, [product, navigate]);
+
   if (!product) {
     return (
-      <div className="p-10 text-center">
-        <p>Προϊόν δεν βρέθηκε.</p>
-        <button onClick={() => navigate('/')} className="text-indigo-600 font-bold mt-4">Επιστροφή</button>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50">
+        <LoadingScreen />
+        <p className="mt-4 text-red-500 font-bold z-50">Το προϊόν δεν βρέθηκε. Επιστροφή...</p>
       </div>
     );
   }
+
+  // --- Από εδώ και κάτω τρέχει μόνο αν έχουμε product ---
 
   const isInBasket = !!basket.find(b => b.id === product.id);
   const mockHistoryData = generateMockHistory(product.bestPrice);
@@ -55,7 +59,7 @@ export function ProductDetailsPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 p-4 md:p-8 pb-24">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto animate-fade-in">
         
         {/* Navigation */}
         <Link to="/" className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm text-slate-500 font-bold mb-6 hover:shadow-md transition-all">
@@ -91,14 +95,12 @@ export function ProductDetailsPage() {
               </button>
             </div>
 
-            {/* Freshness Info Box */}
             <div className="bg-blue-50 p-6 rounded-3xl border border-blue-100">
               <h3 className="font-bold text-blue-900 mb-2 flex items-center gap-2">
                 🕒 Έλεγχος Τιμής
               </h3>
               <p className="text-sm text-blue-700/80 leading-relaxed">
-                Η τελευταία ενημέρωση τιμής έγινε <strong>σήμερα</strong>. 
-                Οι τιμές ελέγχονται αυτόματα από το σύστημα καθημερινά.
+                Οι τιμές ελέγχονται αυτόματα από το σύστημα καθημερινά για να έχεις πάντα την πιο φρέσκια εικόνα.
               </p>
             </div>
           </div>
@@ -111,7 +113,7 @@ export function ProductDetailsPage() {
               <div className="flex justify-between items-center mb-6">
                 <h2 className="font-black text-slate-800 text-lg">📉 Ιστορικό Τιμής (30 Ημέρες)</h2>
                 <span className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full">
-                  Σταθερή Τάση
+                  Mock Data
                 </span>
               </div>
               
