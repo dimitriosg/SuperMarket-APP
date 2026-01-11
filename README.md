@@ -109,15 +109,11 @@ bun run dev
 ```
 
 🤝 Συνεισφορά
-Κάντε Fork το project.
-
-Δημιουργήστε Feature Branch (git checkout -b feature/NewFeature).
-
-Κάντε Commit (git commit -m 'Add NewFeature').
-
-Κάντε Push (git push origin feature/NewFeature).
-
-Ανοίξτε Pull Request.
+- Κάντε Fork το project.
+- Δημιουργήστε Feature Branch (git checkout -b feature/NewFeature).
+- Κάντε Commit (git commit -m 'Add NewFeature').
+- Κάντε Push (git push origin feature/NewFeature).
+- Ανοίξτε Pull Request.
 
 📄 Άδεια
 Διανέμεται υπό την άδεια MIT. Δείτε το αρχείο LICENSE για περισσότερες πληροφορίες.
