@@ -1,81 +1,55 @@
-# SuperMarket Price-Comparison Monorepo
+# 🛒 MarketWise
 
-Monorepo scaffold for the Greek supermarket price-comparison PWA. It uses Bun workspaces with a Fastify API, React + Vite frontend, shared packages, and local Postgres/Redis via Docker.
+> Ο έξυπνος βοηθός για τα ψώνια σου στο Σούπερ Μάρκετ. Σύγκρινε τιμές, δες ιστορικό και γλίτωσε χρήματα με έξυπνες στρατηγικές αγορών.
 
-## Prerequisites
-- Node 22 (see `.node-version`)
-- Bun >= 1.1.17 (`curl -fsSL https://bun.sh/install | bash`)
-- Docker for Postgres/Redis
+![Project Status](https://img.shields.io/badge/status-active-success.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-## Installation
+## 📖 Περιγραφή
+
+Το **MarketWise** είναι μια εφαρμογή που βοηθά τους καταναλωτές στην Ελλάδα να βρουν τις φθηνότερες επιλογές για το καλάθι του σούπερ μάρκετ. Δεν συγκρίνει απλά προϊόντα, αλλά ολόκληρα καλάθια, προτείνοντας αν συμφέρει να ψωνίσεις από ένα κατάστημα ή να κάνεις συνδυασμό (Mix & Match) για μέγιστη οικονομία.
+
+## ✨ Βασικές Λειτουργίες
+
+- **🔍 Live Smart Search:** Άμεση αναζήτηση προϊόντων με debouncing και tokenization.
+- **🧺 Έξυπνο Καλάθι:** Υπολογισμός συνόλου σε πραγματικό χρόνο.
+- **📍 Location-Based Filtering:** Φιλτράρισμα καταστημάτων ανά Περιφέρεια (π.χ. Κρήτη vs Αττική) για ρεαλιστικά αποτελέσματα.
+- **📊 Στρατηγική Ανάλυση (Split Strategy):**
+  - **Σενάριο Α:** Όλα από ένα κατάστημα (Ευκολία).
+  - **Σενάριο Β:** Συνδυασμός καταστημάτων (Οικονομία).
+- **🕒 Price Freshness UX:** Ειδοποιήσεις για "παλιές" τιμές (>7 ημερών) ώστε να μην παραπλανάται ο χρήστης.
+- **📉 Ιστορικό Τιμών:** Γραφήματα με την πορεία της τιμής τις τελευταίες 30 ημέρες.
+- **💾 Persistence:** Το καλάθι και οι προτιμήσεις αποθηκεύονται αυτόματα (Local Storage).
+
+## 🛠️ Τεχνολογίες
+
+Το project είναι στημένο ως Monorepo χρησιμοποιώντας σύγχρονα εργαλεία:
+
+### Frontend (`apps/web`)
+- **React 18** (Vite)
+- **TypeScript**
+- **Tailwind CSS** (Styling)
+- **Recharts** (Γραφήματα)
+- **React Router DOM** (Routing)
+- **Context API** (State Management)
+
+### Backend (`apps/api`) & Database (`packages/db`)
+- **Bun** / **Node.js**
+- **ElysiaJS** (ή Express ανάλογα την υλοποίηση)
+- **Prisma ORM**
+- **PostgreSQL**
+
+---
+
+## 🚀 Εγκατάσταση & Εκτέλεση
+
+Ακολουθήστε τα παρακάτω βήματα για να τρέξετε την εφαρμογή τοπικά.
+
+### Προαπαιτούμενα
+- [Bun](https://bun.sh/) (ή Node.js v18+)
+- PostgreSQL Database
+
+### 1. Κλωνοποίηση
 ```bash
-bun install
-```
-
-## Development
-Start both API (http://localhost:4000) and Web (http://localhost:5173):
-```bash
-bun run dev
-```
-
-### App-specific commands
-API:
-```bash
-bun run --cwd apps/api dev
-bun run --cwd apps/api lint
-bun run --cwd apps/api typecheck
-bun run --cwd apps/api format
-```
-
-Web:
-```bash
-bun run --cwd apps/web dev
-bun run --cwd apps/web lint
-bun run --cwd apps/web typecheck
-bun run --cwd apps/web format
-```
-
-## Database and cache
-Start Postgres + Redis:
-```bash
-bun run db:up
-```
-
-Run migrations (initial schema includes `IngestionRun`):
-```bash
-bun run db:migrate
-```
-
-Open Prisma Studio:
-```bash
-bun run db:studio
-```
-
-## Environment
-Copy `.env.example` to `.env` at the repo root and override as needed. Per-app examples live in `apps/api/.env.example` and `apps/web/.env.example`.
-
-## Project structure
-```
-.
-├── apps
-│   ├── api            # Fastify API with health endpoint, CORS, helmet, rate limiting
-│   └── web            # Vite + React + Tailwind PWA shell with API check button
-├── packages
-│   ├── db             # Prisma schema and client
-│   └── shared         # Shared types and Zod env schema
-├── docker-compose.yml # Postgres + Redis
-├── tsconfig.base.json # Shared TS config + path aliases
-├── eslint.config.mjs  # Flat ESLint config
-├── prettier.config.cjs
-├── .env.example
-└── README.md
-```
-
-## Acceptance checklist (implemented)
-- Bun workspaces with Node 22 engines
-- Dev command runs API + Web
-- API `/health` with CORS, helmet, and rate limiting
-- Vite frontend with Tailwind, mobile-first hero, and API check button (proxy or env-based URL)
-- Prisma schema + scripts for migrations/studio; Docker Compose for Postgres/Redis
-- Shared env schema and health response type
-- Lint/format/typecheck scripts
+git clone [https://github.com/your-username/marketwise.git](https://github.com/your-username/marketwise.git)
+cd marketwise
