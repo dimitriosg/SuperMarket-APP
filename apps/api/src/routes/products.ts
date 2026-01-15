@@ -4,48 +4,63 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export const productRoutes = new Elysia({ prefix: '/products' })
-  .get('/:id/history', async ({ params: { id }, query }) => {
-    const days = Number(query.days) || 30;
-    
-    // Υπολογισμός ημερομηνίας έναρξης
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
+  .get('/search', async ({ query: { q } }) => {
+    // 1. Validation
+    if (!q || q.length < 2) return [];
+    const searchTerm = q.trim();
 
-    // Fetch History
-    const historyData = await prisma.priceHistory.findMany({
+    console.log(`🔎 Searching for: "${searchTerm}"`);
+
+    const products = await prisma.product.findMany({
       where: {
-        productId: id,
-        date: { gte: startDate }
+        OR: [
+          // Αναζήτηση στο όνομα
+          { name: { contains: searchTerm, mode: 'insensitive' } },
+          { ean: { contains: searchTerm.trim() } }
+        ]
       },
-      include: { store: true },
-      orderBy: { date: 'asc' }
+      include: {
+        // Στο schema σου η σχέση ονομάζεται "prices" (τύπου PriceSnapshot[])
+        prices: {
+          include: { store: true },
+          // ΔΙΟΡΘΩΣΗ: Στο schema το πεδίο είναι "collectedAt", όχι "date"
+          orderBy: { collectedAt: 'desc' }, 
+          distinct: ['storeId'] 
+        }
+      },
+      take: 50
     });
+    
+    console.log(`✅ Found ${products.length} products`);
 
-    // Group by Store (Shape A - Per Store Series)
-    const groupedHistory: Record<string, { store: string, points: any[] }> = {};
-
-    historyData.forEach(record => {
-      const storeName = record.store.name;
+    // Mapping των αποτελεσμάτων
+    // Χρησιμοποιούμε 'any' στο map για να αποφύγουμε κολλήματα του editor,
+    // αλλά τα πεδία πλέον είναι τα σωστά βάσει του schema σου.
+    return products.map((p: any) => {
       
-      if (!groupedHistory[storeName]) {
-        groupedHistory[storeName] = {
-          store: storeName,
-          points: []
-        };
-      }
+      const prices = p.prices || [];
 
-      groupedHistory[storeName].points.push({
-        date: record.date.toISOString().split('T')[0], // YYYY-MM-DD
-        price: Number(record.price)
-      });
+      // Υπολογισμός χαμηλότερης τιμής
+      const bestPrice = prices.length > 0 
+        ? Math.min(...prices.map((pr: any) => Number(pr.price))) 
+        : 0;
+
+      // Διαμόρφωση προσφορών
+      const offers = prices.map((snapshot: any) => ({
+        store: snapshot.store ? snapshot.store.name : "Άγνωστο",
+        price: Number(snapshot.price),
+        // ΔΙΟΡΘΩΣΗ: Χρήση του collectedAt
+        date: snapshot.collectedAt ? new Date(snapshot.collectedAt).toISOString() : new Date().toISOString()
+      }));
+
+      return {
+        id: p.id,
+        name: p.name,
+        // Στο schema έχεις "imageUrl", όχι "image". Το front μάλλον περιμένει "image".
+        image: p.imageUrl || null, 
+        ean: p.ean,
+        bestPrice,
+        offers
+      };
     });
-
-    return {
-      productId: id,
-      days: days,
-      histories: Object.values(groupedHistory)
-    };
-
-  }, {
-    query: t.Object({ days: t.Optional(t.String()) })
-});
+  });

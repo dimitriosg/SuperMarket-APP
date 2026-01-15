@@ -8,6 +8,7 @@ export type ProductResult = {
   id: string;
   name: string;
   image: string | null;
+  ean?: string;
   bestPrice: number;
   offers: Offer[];
 };
@@ -26,4 +27,19 @@ export interface StoreComparisonStat {
   // ΝΕΑ ΠΕΔΙΑ ΓΙΑ PHASE 3
   staleCount: number; 
   staleItems: { name: string; date: string }[];
+}
+
+// ΝΕΟ: Η μορφή που στέλνει το Backend για το καλάθι
+export interface BasketComparisonResult {
+  storeName: string;
+  logo: string;
+  totalCost: number;
+  foundItems: number;
+  missingItems: number;
+  items: {
+    name: string;
+    price: number;
+    quantity: number;
+    subtotal: number;
+  }[];
 }

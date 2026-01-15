@@ -2,17 +2,18 @@ import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useBasketContext } from "../context/BasketContext";
 import { ProductResult } from "../types";
 import { DEFAULT_IMG } from "../services/api";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
-import { useEffect, useState } from "react";
-import { LoadingScreen } from "../components/LoadingScreen"; // <--- Import το Loading
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { useEffect } from "react";
+import { LoadingScreen } from "../components/LoadingScreen";
 
-// Mock Generator (κρατάμε τον mock για fallback)
-const generateMockHistory = (currentPrice: number) => {
+// --- GENERATOR (ΙΔΙΟΣ) ---
+const generateMockHistory = (currentPrice: number, referenceDateStr: string) => {
   const data = [];
-  const today = new Date();
+  const endDate = referenceDateStr ? new Date(referenceDateStr) : new Date();
   let price = currentPrice * 1.05;
+
   for (let i = 30; i >= 0; i--) {
-    const date = new Date(today);
+    const date = new Date(endDate);
     date.setDate(date.getDate() - i);
     const change = (Math.random() - 0.5) * 0.5;
     price = Math.max(currentPrice * 0.8, price + change);
@@ -30,14 +31,11 @@ export function ProductDetailsPage() {
   const navigate = useNavigate();
   const { addToBasket, basket } = useBasketContext();
 
-  // 1. SAFETY CHECK: Αν δεν υπάρχει product state, δείξε Loading και γύρνα πίσω
   const product = location.state as ProductResult;
 
   useEffect(() => {
     if (!product) {
-      // Αν ο χρήστης μπήκε με direct link και δεν έχουμε data, γύρνα τον σπίτι
-      // (Σε επόμενη φάση εδώ θα κάναμε fetchProductById)
-      const timer = setTimeout(() => navigate('/'), 2000); // Περίμενε 2 δευτ. να δει το μήνυμα
+      const timer = setTimeout(() => navigate('/'), 2000);
       return () => clearTimeout(timer);
     }
   }, [product, navigate]);
@@ -51,11 +49,37 @@ export function ProductDetailsPage() {
     );
   }
 
-  // --- Από εδώ και κάτω τρέχει μόνο αν έχουμε product ---
-
   const isInBasket = !!basket.find(b => b.id === product.id);
-  const mockHistoryData = generateMockHistory(product.bestPrice);
-  const sortedOffers = [...product.offers].sort((a, b) => Number(a.price) - Number(b.price));
+
+  // --- DEDUPLICATION LOGIC (ΝΕΟ) ---
+  // Φιλτράρουμε τα offers ώστε να έχουμε μόνο ΕΝΑ ανά κατάστημα (το φθηνότερο)
+  const uniqueOffersMap = new Map();
+
+  product.offers.forEach(offer => {
+    // Καθαρίζουμε το όνομα (π.χ. "My Market (Αθήνα)" -> "MY MARKET")
+    const storeName = offer.store.split('(')[0].trim().toUpperCase();
+    
+    const existing = uniqueOffersMap.get(storeName);
+
+    // Αν δεν υπάρχει ή αν το νέο offer είναι φθηνότερο, το κρατάμε
+    if (!existing || Number(offer.price) < Number(existing.price)) {
+      uniqueOffersMap.set(storeName, offer);
+    }
+    // Αν έχουν ίδια τιμή, κρατάμε το πιο πρόσφατο
+    else if (Number(offer.price) === Number(existing.price)) {
+      if (new Date(offer.date) > new Date(existing.date)) {
+        uniqueOffersMap.set(storeName, offer);
+      }
+    }
+  });
+
+  // Μετατρέπουμε το Map σε πίνακα και ταξινομούμε
+  const sortedOffers = Array.from(uniqueOffersMap.values())
+    .sort((a, b) => Number(a.price) - Number(b.price));
+  // -------------------------------
+
+  const latestDateStr = sortedOffers[0]?.date || new Date().toISOString();
+  const mockHistoryData = generateMockHistory(product.bestPrice, latestDateStr);
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-900 p-4 md:p-8 pb-24">
@@ -100,7 +124,9 @@ export function ProductDetailsPage() {
                 🕒 Έλεγχος Τιμής
               </h3>
               <p className="text-sm text-blue-700/80 leading-relaxed">
-                Οι τιμές ελέγχονται αυτόματα από το σύστημα καθημερινά για να έχεις πάντα την πιο φρέσκια εικόνα.
+                Τελευταία ενημέρωση: <strong>{new Date(latestDateStr).toLocaleDateString()}</strong>.
+                <br/>
+                Οι τιμές ελέγχονται αυτόματα από το σύστημα.
               </p>
             </div>
           </div>
@@ -108,18 +134,19 @@ export function ProductDetailsPage() {
           {/* --- RIGHT: HISTORY & OFFERS --- */}
           <div className="lg:col-span-2 space-y-8">
             
-            {/* PRICE HISTORY CHART */}
-            <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="font-black text-slate-800 text-lg">📉 Ιστορικό Τιμής (30 Ημέρες)</h2>
-                <span className="bg-green-100 text-green-700 text-xs font-bold px-3 py-1 rounded-full">
-                  Mock Data
-                </span>
-              </div>
-              
-              <div className="h-64 w-full">
+          {/* PRICE HISTORY CHART */}
+          <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-200">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="font-black text-slate-800 text-lg">📉 Ιστορικό Τιμής (30 Ημέρες)</h2>
+              <span className="bg-indigo-50 text-indigo-600 text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wide">
+                ΤΑΣΗ ΤΙΜΗΣ
+              </span>
+            </div>
+  
+              {/* ΠΡΟΣΘΗΚΗ: aspect-video και min-h για να έχει πάντα αρχικές διαστάσεις */}
+              <div className="w-full min-h-[300px] aspect-video">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={mockHistoryData}>
+                  <AreaChart data={mockHistoryData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.1}/>
@@ -139,7 +166,7 @@ export function ProductDetailsPage() {
                       axisLine={false} 
                       tickLine={false} 
                       tick={{fill: '#94a3b8', fontSize: 10}}
-                      width={30}
+                      width={40}
                     />
                     <Tooltip 
                       contentStyle={{borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)'}}
@@ -151,13 +178,14 @@ export function ProductDetailsPage() {
                       strokeWidth={3}
                       fillOpacity={1} 
                       fill="url(#colorPrice)" 
+                      animationDuration={1000}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
             </div>
 
-            {/* FULL OFFERS LIST */}
+            {/* FULL OFFERS LIST (ΤΩΡΑ ΧΩΡΙΣ ΔΙΠΛΟΤΥΠΑ) */}
             <div className="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
               <div className="p-6 border-b border-slate-100 bg-slate-50/50">
                 <h2 className="font-black text-slate-800 text-lg">🏪 Όλες οι Προσφορές ({sortedOffers.length})</h2>

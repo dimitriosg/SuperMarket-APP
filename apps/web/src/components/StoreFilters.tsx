@@ -1,8 +1,10 @@
+// apps/web/src/components/StoreFilters.tsx
 import { STORES_DATA, LOCATIONS } from "../services/api";
 import { useBasketContext } from "../context/BasketContext";
 
 export function StoreFilters() {
-  const { enabledStores, toggleStoreFilter, selectedLocation, changeLocation } = useBasketContext();
+  // Φέρνουμε και τις νέες συναρτήσεις
+  const { enabledStores, toggleStoreFilter, selectedLocation, changeLocation, selectAllStores, deselectAllStores } = useBasketContext();
 
   return (
     <div className="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 h-fit sticky top-24">
@@ -23,13 +25,29 @@ export function StoreFilters() {
         </select>
       </div>
 
-      <h3 className="font-black text-slate-800 mb-4 flex items-center gap-2 text-sm uppercase tracking-wide">
-        🏢 Καταστήματα
-      </h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="font-black text-slate-800 flex items-center gap-2 text-sm uppercase tracking-wide">
+          🏢 Καταστήματα
+        </h3>
+        {/* ΝΕΑ ΚΟΥΜΠΙΑ */}
+        <div className="flex gap-2">
+          <button 
+            onClick={selectAllStores}
+            className="text-[10px] font-bold text-indigo-600 hover:bg-indigo-50 px-2 py-1 rounded"
+          >
+            Όλα
+          </button>
+          <button 
+            onClick={deselectAllStores}
+            className="text-[10px] font-bold text-slate-400 hover:bg-slate-50 px-2 py-1 rounded"
+          >
+            Κανένα
+          </button>
+        </div>
+      </div>
       
-      <div className="space-y-2">
+      <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-1 custom-scrollbar">
         {STORES_DATA.map(store => {
-          // Αν έχουμε επιλέξει περιοχή και το μαγαζί δεν είναι διαθέσιμο εκεί, το κρύβουμε ή το κάνουμε disabled
           const isAvailableInRegion = store.regions.includes("all") || store.regions.includes(selectedLocation);
           
           if (!isAvailableInRegion && selectedLocation !== 'all') return null;
@@ -49,7 +67,7 @@ export function StoreFilters() {
                 onChange={() => toggleStoreFilter(store.id)}
                 className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
               />
-              <span className={`text-xs font-bold ${isChecked ? 'text-slate-700' : 'text-slate-400'}`}>
+              <span className={`text-xs font-bold ${isChecked ? 'text-slate-800' : 'text-slate-400'}`}>
                 {store.name}
               </span>
             </label>

@@ -1,7 +1,25 @@
-import { ProductResult } from "../types";
+// apps/web/src/services/api.ts
+import { BasketComparisonResult } from "../types";
 
-// Διάβασε από το .env, αλλιώς (για ασφάλεια) βάλε το localhost
+// Base URL για το API (Backend)
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+
+// ------------------------------------------------------------------
+// 🔧 ΡΥΘΜΙΣΕΙΣ ΕΙΚΟΝΩΝ (ΤΟ ΑΛΛΑΖΕΙΣ ΜΙΑ ΦΟΡΑ ΕΔΩ)
+// ------------------------------------------------------------------
+// Επειδή οι εικόνες είναι στο "apps/web/public/logos", 
+// στον browser το path είναι "/logos"
+const LOGOS_PATH = "/logos"; 
+const DEFAULT_IMG = "/logos/default.png";
+//const DEFAULT_IMG = "https://placehold.co/200x200?text=No+Image";
+
+// Helper για να φτιάχνουμε το full path εύκολα
+// Π.χ. getLogo("ab.png") -> "/logos/ab.png"
+const getLogo = (filename: string) => `${LOGOS_PATH}/${filename}`;
+
+// ------------------------------------------------------------------
+
+export { DEFAULT_IMG };
 
 // --- 1. ΟΙ 13 ΠΕΡΙΦΕΡΕΙΕΣ ΤΗΣ ΕΛΛΑΔΑΣ ---
 export const LOCATIONS = [
@@ -17,129 +35,149 @@ export const LOCATIONS = [
   { id: "western_macedonia", name: "Περιφέρεια Δυτικής Μακεδονίας" },
   { id: "central_greece", name: "Περιφέρεια Στερεάς Ελλάδας" },
   { id: "ionian", name: "Περιφέρεια Ιονίων Νήσων" },
-  { id: "north_aegean", name: "Περιφέρεια Βορείου Αιγαίου" },
-  { id: "south_aegean", name: "Περιφέρεια Νότιου Αιγαίου (Κυκλάδες/Δωδ/σα)" },
+  { id: "south_aegean", name: "Περιφέρεια Νοτίου Αιγαίου" },
+  { id: "north_aegean", name: "Περιφέρεια Βορείου Αιγαίου" }
 ];
 
-// --- 2. ΚΑΤΑΣΤΗΜΑΤΑ & ΓΕΩΓΡΑΦΙΚΗ ΚΑΛΥΨΗ ---
-// 'all' = Πανελλαδική κάλυψη (υπάρχουν σχεδόν σε όλες τις περιφέρειες)
+// --- 2. ΤΑ ΚΑΤΑΣΤΗΜΑΤΑ (ΜΕ ΔΥΝΑΜΙΚΑ LOGOS) ---
 export const STORES_DATA = [
-  // --- ΟΙ "ΜΕΓΑΛΟΙ" (ΠΑΝΕΛΛΑΔΙΚΑ) ---
+  // --- ΟΙ "ΜΕΓΑΛΟΙ" ---
   { 
     id: "sklavenitis", 
     name: "Σκλαβενίτης", 
     matcher: "ΣΚΛΑΒΕΝΙΤΗΣ", 
-    regions: ["all"] 
+    regions: ["all"],
+    logo: getLogo("sklavenitis.png") 
   },
   { 
     id: "ab", 
     name: "ΑΒ Βασιλόπουλος", 
     matcher: "ΑΒ ΒΑΣΙΛΟΠΟΥΛΟΣ", 
-    regions: ["all"] 
+    regions: ["all"],
+    logo: getLogo("ab.png")
   },
   { 
     id: "lidl", 
     name: "Lidl", 
     matcher: "LIDL", 
-    regions: ["all"] 
+    regions: ["all"],
+    logo: getLogo("lidl.png")
   },
   { 
-    id: "my market", 
+    id: "mymarket", 
     name: "My Market", 
     matcher: "MY MARKET", 
-    regions: ["all"] 
+    regions: ["all"],
+    logo: getLogo("mymarket.png")
   },
   { 
     id: "masoutis", 
     name: "Μασούτης", 
     matcher: "ΜΑΣΟΥΤΗΣ", 
-    // Πλέον πανελλαδικός (εξαγορά Προμηθευτικής, ΣΥΝΚΑ κλπ), αλλά με ελλείψεις σε συγκεκριμένα νησιά.
-    // Θα το βάλουμε 'all' για ασφάλεια, καθώς εξυπηρετεί τις περισσότερες περιφέρειες.
-    regions: ["all"] 
+    regions: ["all"],
+    logo: getLogo("masoutis.png")
   },
   
+  // --- ONLINE / ΕΙΔΙΚΟΙ ---
+  { 
+    id: "efresh", 
+    name: "e-Fresh", 
+    matcher: "EFRESH", 
+    regions: ["attica"],
+    logo: getLogo("efresh.png")
+  },
+
   // --- ΜΕΓΑΛΟΙ ΜΕ ΣΥΓΚΕΚΡΙΜΕΝΗ ΚΑΛΥΨΗ ---
   { 
     id: "galaxias", 
     name: "Γαλαξίας", 
     matcher: "GALAXIAS", 
-    // Κυρίως Ηπειρωτική Ελλάδα. Λείπει από Κρήτη, Β. Αιγαίο, Ιόνιο (σε μεγάλο βαθμό).
-    regions: [
-      "attica", "central_greece", "peloponnese", "western_greece", 
-      "thessaly", "central_macedonia", "western_macedonia", "eastern_macedonia_thrace", "epirus"
-    ] 
+    regions: ["attica", "central_greece", "peloponnese", "western_greece", "thessaly", "central_macedonia"],
+    logo: getLogo("galaxias.png")
   },
   { 
     id: "kritikos", 
     name: "Κρητικός", 
-    matcher: "ΚΡΗΤΙΚΟΣ", 
-    // Ισχυρός σε Αττική, Εύβοια, Κρήτη, Β. Ελλάδα, Αργοσαρωνικό.
-    regions: [
-      "attica", "central_greece", "crete", "central_macedonia", 
-      "eastern_macedonia_thrace", "western_macedonia", "thessaly", "peloponnese", 
-      "north_aegean", "south_aegean", "ionian"
-    ] 
+    matcher: "KRITIKOS", 
+    regions: ["all"],
+    logo: getLogo("kritikos.png")
   },
   { 
-    id: "market in", 
+    id: "marketin", 
     name: "Market In", 
     matcher: "MARKET IN", 
-    // Κυρίως Ηπειρωτική Ελλάδα & νησιά (όχι Κρήτη, όχι Β. Αιγαίο).
-    regions: [
-      "attica", "central_greece", "peloponnese", "western_greece", 
-      "thessaly", "central_macedonia", "western_macedonia", "epirus", "ionian", "south_aegean"
-    ] 
+    regions: ["all"],
+    logo: getLogo("marketin.png")
   },
   { 
     id: "bazaar", 
     name: "Bazaar", 
     matcher: "BAZAAR", 
-    regions: ["attica", "central_macedonia", "crete", "peloponnese", "central_greece", "thessaly", "south_aegean"] 
+    regions: ["all"],
+    logo: getLogo("bazaar.png")
   },
 
-  // --- ΤΟΠΙΚΟΙ "ΓΙΓΑΝΤΕΣ" ---
+  // --- ΤΟΠΙΚΟΙ ---
   { 
-    id: "chalkiadakis", 
-    name: "Χαλκιδάκης", 
+    id: "xalkiadakis", 
+    name: "Χαλκιαδάκης", 
     matcher: "XALKIADAKIS", 
-    regions: ["crete"] // ΜΟΝΟ ΚΡΗΤΗ
+    regions: ["crete"],
+    logo: getLogo("xalkiadakis.png")
   },
   { 
     id: "synka", 
     name: "SYNKA", 
     matcher: "SYNKA", 
-    // Κρήτη & Αιγαίο (αν και πολλά έγιναν Μασούτης, το brand υπάρχει ακόμα σε συνεταιριστική μορφή)
-    regions: ["crete", "south_aegean", "ionian"] // Ιόνιο μέσω Κέρκυρας
-  },
-  {
-    id: "discount markt",
-    name: "Discount Markt",
-    matcher: "DISCOUNT MARKT",
-    // Κυρίως Βόρεια Ελλάδα
-    regions: ["central_macedonia", "eastern_macedonia_thrace", "western_macedonia", "thessaly", "epirus", "ionian"]
+    regions: ["crete", "south_aegean", "ionian"],
+    logo: getLogo("synka.png")
   }
 ];
 
-// Helper Function
+// Helper: Βρίσκει το ID με βάση το όνομα (Clean & Normalize)
 export const getStoreIdByName = (apiName: string) => {
-  const clean = apiName.toUpperCase();
+  if (!apiName) return "other";
+  
+  const clean = apiName
+    .toUpperCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
+    .trim();
+
   const found = STORES_DATA.find(s => clean.includes(s.matcher));
+
   return found ? found.id : "other";
 };
 
-// API Call (ίδιο με πριν)
-export const api = {
-  searchProducts: async (query: string): Promise<ProductResult[]> => {
-    if (!query || query.length < 2) return [];
-    try {
-      const res = await fetch(`${API_BASE_URL}/search?q=${encodeURIComponent(query)}`);
-      if (!res.ok) throw new Error("Network response was not ok");
-      return await res.json();
-    } catch (error) {
-      console.error("API Search Error:", error);
-      return [];
-    }
-  },
-};
+// --- 3. ΤΟ API CALL ΠΟΥ ΣΥΝΔΥΑΖΕΙ ΤΑ ΔΕΔΟΜΕΝΑ ---
+export const compareBasketAPI = async (items: { ean: string; quantity: number }[]) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/basket/compare`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items }),
+    });
 
-export const DEFAULT_IMG = "https://e-katanalotis.gov.gr/assets/default_kalathi.png";
+    if (!response.ok) throw new Error("Basket API failed");
+
+    const json = await response.json();
+    const rawData = json.data as any[];
+
+    // Εμπλουτισμός των δεδομένων με το λογότυπο από το STORES_DATA
+    const enrichedData = rawData.map(result => {
+      const storeId = getStoreIdByName(result.storeName);
+      const storeInfo = STORES_DATA.find(s => s.id === storeId);
+      
+      // Αν βρούμε το store info, βάζουμε το logo του. Αλλιώς βάζουμε ένα default.
+      return {
+        ...result,
+        logo: storeInfo ? storeInfo.logo : "/logos/default.png" 
+      };
+    });
+
+    return enrichedData as BasketComparisonResult[];
+
+  } catch (error) {
+    console.error("Error comparing basket:", error);
+    return [];
+  }
+};

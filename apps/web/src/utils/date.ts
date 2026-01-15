@@ -2,27 +2,30 @@ export const STALE_THRESHOLD_DAYS = 7;
 
 export const isStale = (dateStr: string | undefined): boolean => {
   if (!dateStr) return false;
+  const diffInDays = getDaysDiff(dateStr);
+  return diffInDays > STALE_THRESHOLD_DAYS;
+};
+
+// Helper για να υπολογίζει καθαρά μέρες διαφοράς
+const getDaysDiff = (dateStr: string) => {
   const date = new Date(dateStr);
   const now = new Date();
-  const diffInMs = now.getTime() - date.getTime();
-  const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-  const diffInDays = Math.floor(diffInHours / 24);
-  return diffInDays > STALE_THRESHOLD_DAYS;
+  
+  // Μηδενίζουμε τις ώρες για να συγκρίνουμε ημερολογιακές μέρες
+  const utc1 = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+  const utc2 = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const msPerDay = 1000 * 60 * 60 * 24;
+  return Math.floor((utc2 - utc1) / msPerDay);
 };
 
 export const getRelativeTime = (dateStr: string | undefined) => {
   if (!dateStr) return { text: "", isStale: false };
   
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffInMs = now.getTime() - date.getTime();
-  const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-  const diffInDays = Math.floor(diffInHours / 24);
-
+  const diffInDays = getDaysDiff(dateStr);
   const isStaleCalc = diffInDays > STALE_THRESHOLD_DAYS;
 
-  if (diffInHours < 1) return { text: "Μόλις τώρα", isStale: isStaleCalc };
-  if (diffInHours < 24) return { text: `Πριν ${diffInHours} ώρες`, isStale: isStaleCalc };
+  if (diffInDays === 0) return { text: "Σήμερα", isStale: isStaleCalc };
   if (diffInDays === 1) return { text: "Χθες", isStale: isStaleCalc };
   if (diffInDays < 30) return { text: `Πριν ${diffInDays} μέρες`, isStale: isStaleCalc };
   

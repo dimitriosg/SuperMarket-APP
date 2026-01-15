@@ -1,7 +1,9 @@
-import { createContext, useContext, useState, useEffect, useMemo, ReactNode } from 'react';
-import { BasketItem, ProductResult, StoreComparisonStat } from '../types';
-import { getStoreIdByName, STORES_DATA } from '../services/api';
-import { isStale } from '../utils/date'; // Βεβαιώσου ότι έφτιαξες το αρχείο src/utils/date.ts
+// apps/web/src/context/BasketContext.tsx
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { BasketItem, ProductResult, BasketComparisonResult } from '../types';
+import { compareBasketAPI, STORES_DATA, getStoreIdByName } from '../services/api'; // Import STORES_DATA
+import { useDebounce } from '../hooks/useDebounce';
+
 
 type BasketContextType = {
   basket: BasketItem[];
@@ -9,7 +11,11 @@ type BasketContextType = {
   selectedLocation: string;
   isBasketOpen: boolean;
   isPinned: boolean;
-  comparison: { full: StoreComparisonStat[]; partial: StoreComparisonStat[] };
+  comparison: { 
+    full: BasketComparisonResult[]; 
+    partial: BasketComparisonResult[]; 
+    loading: boolean;
+  };
   addToBasket: (product: ProductResult) => void;
   removeFromBasket: (id: string) => void;
   updateQuantity: (id: string, delta: number) => void;
@@ -19,6 +25,9 @@ type BasketContextType = {
   setBasketOpen: (open: boolean) => void;
   toggleStoreFilter: (storeId: string) => void;
   changeLocation: (locationId: string) => void;
+  // ΝΕΕΣ ΣΥΝΑΡΤΗΣΕΙΣ
+  selectAllStores: () => void;
+  deselectAllStores: () => void;
 };
 
 const BasketContext = createContext<BasketContextType | undefined>(undefined);
@@ -26,119 +35,114 @@ const BasketContext = createContext<BasketContextType | undefined>(undefined);
 export function BasketProvider({ children }: { children: ReactNode }) {
   const [basket, setBasket] = useState<BasketItem[]>([]);
   
-  // Default Pin Logic (1024px threshold)
-  const [isPinned, setIsPinned] = useState(() => typeof window !== "undefined" && window.innerWidth >= 1024);
-  const [isBasketOpen, setIsBasketOpen] = useState(() => typeof window !== "undefined" && window.innerWidth >= 1024);
-
+  // ΑΛΛΑΓΗ 1: Ξεκινάμε με ΟΛΑ τα καταστήματα επιλεγμένα
   const [enabledStores, setEnabledStores] = useState<string[]>(STORES_DATA.map(s => s.id));
+  
   const [selectedLocation, setSelectedLocation] = useState("all");
+  const [isBasketOpen, setIsBasketOpen] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
+  
+  const [comparisonResults, setComparisonResults] = useState<BasketComparisonResult[]>([]);
+  const [isCalculating, setIsCalculating] = useState(false);
 
-  // Load Data
+  const debouncedBasket = useDebounce(basket, 500);
+
   useEffect(() => {
-    const savedBasket = localStorage.getItem('market_basket');
-    const savedLoc = localStorage.getItem('market_location');
+    if (debouncedBasket.length === 0) {
+      setComparisonResults([]);
+      return;
+    }
+
+    const fetchComparison = async () => {
+      setIsCalculating(true);
+      const apiPayload = debouncedBasket
+        .filter(item => item.ean)
+        .map(item => ({
+          ean: item.ean!,
+          quantity: item.quantity
+        }));
+
+      if (apiPayload.length > 0) {
+        const results = await compareBasketAPI(apiPayload);
+        setComparisonResults(results);
+      }
+      setIsCalculating(false);
+    };
+
+    fetchComparison();
+  }, [debouncedBasket]);
+
+  const comparison = {
+    loading: isCalculating,
     
-    if (savedBasket) try { setBasket(JSON.parse(savedBasket)); } catch (e) {}
-    if (savedLoc) setSelectedLocation(savedLoc);
-  }, []);
-
-  // Save Data
-  useEffect(() => { localStorage.setItem('market_basket', JSON.stringify(basket)); }, [basket]);
-  useEffect(() => { localStorage.setItem('market_location', selectedLocation); }, [selectedLocation]);
-
-  const changeLocation = (locId: string) => {
-    setSelectedLocation(locId);
-    const storesInRegion = STORES_DATA.filter(store => 
-      store.regions.includes("all") || store.regions.includes(locId)
-    ).map(s => s.id);
-    setEnabledStores(storesInRegion);
-  };
-
-  const toggleStoreFilter = (storeId: string) => {
-    setEnabledStores(prev => 
-      prev.includes(storeId) ? prev.filter(id => id !== storeId) : [...prev, storeId]
-    );
+    // Φιλτράρουμε τα αποτελέσματα με βάση τα enabledStores
+    full: comparisonResults
+      .filter(r => enabledStores.includes(getStoreIdByName(r.storeName))) // <--- ΤΟ ΦΙΛΤΡΟ
+      .filter(r => r.missingItems === 0),
+      
+    partial: comparisonResults
+      .filter(r => enabledStores.includes(getStoreIdByName(r.storeName))) // <--- ΤΟ ΦΙΛΤΡΟ
+      .filter(r => r.missingItems > 0)
   };
 
   const addToBasket = (product: ProductResult) => {
-    if (!basket.find(p => p.id === product.id)) {
-      setBasket(prev => [...prev, { ...product, quantity: 1 }]);
-    }
-    if (!isPinned) setIsBasketOpen(true);
+    setBasket(prev => {
+      const exists = prev.find(p => p.id === product.id);
+      if (exists) {
+        return prev.map(p => p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p);
+      }
+      return [...prev, { ...product, quantity: 1 }];
+    });
+    setIsBasketOpen(true);
   };
 
-  const removeFromBasket = (id: string) => setBasket(prev => prev.filter(p => p.id !== id));
+  const removeFromBasket = (id: string) => {
+    setBasket(prev => prev.filter(item => item.id !== id));
+  };
 
   const updateQuantity = (id: string, delta: number) => {
-    setBasket(prev => prev.map(item => 
-      item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
-    ));
+    setBasket(prev => prev.map(item => {
+      if (item.id === id) {
+        const newQty = Math.max(0, item.quantity + delta);
+        return { ...item, quantity: newQty };
+      }
+      return item;
+    }).filter(p => p.quantity > 0));
   };
 
   const clearBasket = () => setBasket([]);
   const toggleBasket = () => setIsBasketOpen(prev => !prev);
   const togglePin = () => setIsPinned(prev => !prev);
+  
+  const toggleStoreFilter = (storeId: string) => {
+     setEnabledStores(prev => prev.includes(storeId) ? prev.filter(id => id !== storeId) : [...prev, storeId]);
+  };
 
-  // --- COMPARISON LOGIC (With Stale Check) ---
-  const comparison = useMemo(() => {
-    if (basket.length === 0) return { full: [], partial: [] };
+  // ΑΛΛΑΓΗ 2: Υλοποίηση Select All / Deselect All
+  const selectAllStores = () => setEnabledStores(STORES_DATA.map(s => s.id));
+  const deselectAllStores = () => setEnabledStores([]);
 
-    const storeStats: Record<string, StoreComparisonStat> = {};
-    const relevantStoreNames = new Set<string>();
-    
-    basket.forEach(p => p.offers.forEach(o => {
-      const storeId = getStoreIdByName(o.store);
-      if (enabledStores.includes(storeId)) {
-        relevantStoreNames.add(o.store.split('(')[0].trim());
-      }
-    }));
+  const changeLocation = (loc: string) => {
+    setSelectedLocation(loc);
 
-    relevantStoreNames.forEach(s => {
-      storeStats[s] = { name: s, total: 0, count: 0, isFull: false, missing: [], staleCount: 0, staleItems: [] };
-    });
+    // Όταν αλλάζει η περιοχή, βρίσκουμε ποια καταστήματα είναι διαθέσιμα εκεί
+    const validStoresForRegion = STORES_DATA.filter(store => {
+      // Κρατάμε το κατάστημα αν είναι Πανελλαδικό ("all") 
+      // Ή αν η λίστα περιοχών του περιλαμβάνει τη νέα περιοχή (π.χ. "attica")
+      return store.regions.includes("all") || store.regions.includes(loc);
+    }).map(s => s.id);
 
-    basket.forEach(item => {
-      relevantStoreNames.forEach(storeName => {
-        const offer = item.offers.find(o => o.store.includes(storeName));
-        if (offer) {
-          storeStats[storeName].total += Number(offer.price) * item.quantity;
-          storeStats[storeName].count += 1;
-
-          // PHASE 3: Check freshness
-          if (isStale(offer.date)) {
-            storeStats[storeName].staleCount += 1;
-            storeStats[storeName].staleItems.push({ name: item.name, date: offer.date });
-          }
-
-        } else {
-          let bestAlt: { store: string, price: number } | null = null;
-          item.offers.forEach(altOffer => {
-            const altStoreId = getStoreIdByName(altOffer.store);
-            if (enabledStores.includes(altStoreId)) {
-              const altPrice = Number(altOffer.price) * item.quantity;
-              if (!bestAlt || altPrice < bestAlt.price) {
-                bestAlt = { store: altOffer.store.split('(')[0].trim(), price: altPrice };
-              }
-            }
-          });
-          storeStats[storeName].missing.push({ name: item.name, bestAlternative: bestAlt });
-        }
-      });
-    });
-
-    const statsArray = Object.values(storeStats).map(stat => ({ ...stat, isFull: stat.count === basket.length }));
-    
-    return {
-      full: statsArray.filter(s => s.isFull).sort((a, b) => a.total - b.total),
-      partial: statsArray.filter(s => !s.isFull).sort((a, b) => (b.count - a.count) || (a.total - b.total))
-    };
-  }, [basket, enabledStores]);
+    // Ενημερώνουμε τα enabledStores ώστε να περιέχουν ΜΟΝΟ τα έγκυρα
+    setEnabledStores(validStoresForRegion);
+  };
 
   return (
     <BasketContext.Provider value={{
-      basket, enabledStores, selectedLocation, isBasketOpen, isPinned, comparison,
+      basket, enabledStores, selectedLocation, isBasketOpen, isPinned, 
+      comparison, 
       addToBasket, removeFromBasket, updateQuantity, clearBasket,
-      toggleBasket, togglePin, setBasketOpen: setIsBasketOpen, toggleStoreFilter, changeLocation
+      toggleBasket, togglePin, setBasketOpen: setIsBasketOpen, toggleStoreFilter, changeLocation,
+      selectAllStores, deselectAllStores // <-- Export
     }}>
       {children}
     </BasketContext.Provider>
@@ -147,6 +151,6 @@ export function BasketProvider({ children }: { children: ReactNode }) {
 
 export function useBasketContext() {
   const context = useContext(BasketContext);
-  if (context === undefined) throw new Error('useBasketContext error');
+  if (!context) throw new Error("useBasketContext must be used within BasketProvider");
   return context;
 }

@@ -1,87 +1,80 @@
-import { Elysia, t } from 'elysia';
-import { PrismaClient } from '@prisma/client';
+// apps/api/src/routes/search.ts
+import { Elysia, t } from "elysia";
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-// Helper: Καθαρισμός κειμένου (αφαίρεση τόνων, κεφαλαία)
-function normalizeText(text: string): string {
+// Helper: Αφαιρεί τόνους (Normalization)
+const normalizeGreek = (text: string) => {
   return text
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toUpperCase()
-    .trim();
-}
+    .replace(/[\u0300-\u036f]/g, "") // Αφαιρεί τα diacritics (τόνους)
+    .toUpperCase();
+};
 
-export const searchRoutes = new Elysia({ prefix: '/search' })
-  .get('/', async ({ query }) => {
-    const rawTerm = query.q as string;
-    if (!rawTerm || rawTerm.length < 2) return [];
+export const searchRoutes = new Elysia({ prefix: "/products" })
+  .get("/search", async ({ query }) => {
+    const q = query.q;
+    if (!q || q.length < 2) return [];
 
-    // 1. Καθαρίζουμε τον όρο αναζήτησης
-    const normalizedTerm = normalizeText(rawTerm);
-    
-    // 2. Σπάμε σε λέξεις (tokens)
-    // Π.χ. "τυρι φετες" -> ["ΤΥΡΙ", "ΦΕΤΕΣ"]
-    const searchTokens = normalizedTerm.split(/\s+/).filter(token => token.length > 0);
+    // 1. Καθαρίζουμε το query (Αφαίρεση τόνων + Κεφαλαία)
+    // Π.χ. το "γάλα" γίνεται "ΓΑΛΑ"
+    const normalizedQuery = normalizeGreek(q);
 
-    // 3. Ψάχνουμε στη βάση
-    // Πρέπει το προϊόν να περιέχει ΟΛΑ τα tokens
+    console.log(`🔎 Searching for: "${q}" -> Normalized: "${normalizedQuery}"`);
+
     const products = await prisma.product.findMany({
       where: {
-        AND: searchTokens.map(token => ({
-          normalizedName: { contains: token }
-        })),
-        isActive: true
+        OR: [
+          // Ψάχνουμε στο normalizedName που (θεωρητικά) δεν έχει τόνους
+          { normalizedName: { contains: normalizedQuery } },
+          // Ψάχνουμε και στο κανονικό όνομα (insensitive) για σιγουριά
+          { name: { contains: q, mode: "insensitive" } },
+          { ean: { contains: normalizedQuery } }
+        ]
       },
       include: {
         prices: {
-          orderBy: { price: 'asc' },
-          include: { store: true }
+          include: {
+            store: {
+              include: { chain: true }
+            }
+          },
+          orderBy: { price: "asc" }
         }
       },
-      take: 100 // Παίρνουμε περισσότερα αρχικά για να τα ταξινομήσουμε εμείς
+      take: 20
     });
 
-    // 4. SMART SORTING (Relevancy Ranking)
-    const sortedProducts = products.sort((a, b) => {
-      const nameA = a.normalizedName;
-      const nameB = b.normalizedName;
+    // ... (το υπόλοιπο mapping code μένει ίδιο) ...
+    return products.map(p => {
+      const uniqueOffers = new Map();
+      p.prices.forEach(price => {
+        const storeName = price.store.chain.label; 
+        if (!uniqueOffers.has(storeName)) {
+            uniqueOffers.set(storeName, {
+                store: storeName,
+                price: Number(price.price).toFixed(2),
+                date: price.collectedAt.toISOString()
+            });
+        }
+      });
 
-      // Κριτήριο Α: Ακριβές Ταίριασμα (Exact Match)
-      if (nameA === normalizedTerm && nameB !== normalizedTerm) return -1;
-      if (nameB === normalizedTerm && nameA !== normalizedTerm) return 1;
+      const offers = Array.from(uniqueOffers.values());
+      const bestPrice = offers.length > 0 ? parseFloat(offers[0].price) : 0;
 
-      // Κριτήριο Β: Ξεκινάει με τον όρο (Starts With) - Π.χ. "ΦΕΤΑ" vs "ΤΥΡΟΠΙΤΑ ΜΕ ΦΕΤΑ"
-      const aStarts = nameA.startsWith(normalizedTerm);
-      const bStarts = nameB.startsWith(normalizedTerm);
-      if (aStarts && !bStarts) return -1;
-      if (bStarts && !aStarts) return 1;
-
-      // Κριτήριο Γ: Ξεκινάει με την πρώτη λέξη της αναζήτησης
-      const firstToken = searchTokens[0];
-      const aStartsToken = nameA.startsWith(firstToken);
-      const bStartsToken = nameB.startsWith(firstToken);
-      if (aStartsToken && !bStartsToken) return -1;
-      if (bStartsToken && !aStartsToken) return 1;
-
-      // Κριτήριο Δ: Μικρότερο όνομα (συνήθως πιο σχετικό)
-      // Π.χ. "ΦΕΤΑ ΔΩΔΩΝΗ" (πιο σχετικό) vs "ΦΕΤΑ ΔΩΔΩΝΗ ΤΡΙΜΜΑ ΣΕ ΣΥΣΚΕΥΑΣΙΑ..."
-      return nameA.length - nameB.length;
+      return {
+        id: p.id,
+        name: p.name,
+        image: p.imageUrl,
+        ean: p.ean,
+        bestPrice,
+        offers
+      };
     });
-
-    // Επιστρέφουμε τα top 24
-    return sortedProducts.slice(0, 24).map(p => ({
-      id: p.id,
-      name: p.name,
-      image: p.imageUrl,
-      bestPrice: p.prices[0]?.price || 0,
-      offers: p.prices.map(price => ({
-        store: price.store.name,
-        price: price.price,
-        date: price.collectedAt
-      }))
-    }));
 
   }, {
-    query: t.Object({ q: t.String() })
+    query: t.Object({
+      q: t.String()
+    })
   });

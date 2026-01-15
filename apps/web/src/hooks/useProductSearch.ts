@@ -1,72 +1,45 @@
-import { useState, useEffect } from 'react';
-import { api } from '../services/api';
-import { ProductResult } from '../types';
-import { useDebounce } from './useDebounce';
-
-const STORAGE_KEY_TERM = 'market_search_term';
-const STORAGE_KEY_RESULTS = 'market_search_results';
+import { useState, useEffect } from "react";
+import { ProductResult } from "../types";
 
 export function useProductSearch() {
-  // 1. Initialize State from SessionStorage (αν υπάρχει)
-  const [results, setResults] = useState<ProductResult[]>(() => {
-    const saved = sessionStorage.getItem(STORAGE_KEY_RESULTS);
-    return saved ? JSON.parse(saved) : [];
-  });
-  
-  const [searchTerm, setSearchTerm] = useState(() => {
-    return sessionStorage.getItem(STORAGE_KEY_TERM) || "";
-  });
-  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [results, setResults] = useState<ProductResult[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  // 2. Save Term to Storage when it changes
+  // Debounce 500ms
   useEffect(() => {
-    sessionStorage.setItem(STORAGE_KEY_TERM, searchTerm);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 500);
+    return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  // 3. Perform Search Logic
+  // API Call
   useEffect(() => {
-    // Αν δεν έχει αλλάξει ουσιαστικά το term (π.χ. είναι ίδιο με το saved), μην ξανακάνεις fetch
-    // Αλλά επειδή το debounced τρέχει στο mount, πρέπει να προσέξουμε.
-    // Εδώ κάνουμε fetch μόνο αν το term είναι διαφορετικό από αυτό που είχαμε αποθηκεύσει ως αποτελέσματα? 
-    // Για απλότητα: Αν υπάρχει term και τα αποτελέσματα είναι άδεια (ή άλλαξε το term), ψάξε.
-    
-    if (!debouncedSearchTerm || debouncedSearchTerm.length < 2) {
-      if (debouncedSearchTerm === "") {
-         setResults([]);
-         sessionStorage.removeItem(STORAGE_KEY_RESULTS);
-      }
+    if (!debouncedSearch || debouncedSearch.length < 2) {
+      setResults([]);
       return;
     }
 
-    const fetchProducts = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await api.searchProducts(debouncedSearchTerm);
+    console.log("🚀 Hook: Ψάχνω για:", debouncedSearch); // <--- Πρέπει να το δεις στο F12
+    setLoading(true);
+
+    fetch(`${import.meta.env.VITE_API_URL}/products/search?q=${debouncedSearch}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("API Error");
+        return res.json();
+      })
+      .then((data: any[]) => {
+        console.log("✅ Hook: Βρήκα", data.length, "προϊόντα"); // <--- Πρέπει να το δεις στο F12
         setResults(data);
-        // Save Results to Storage
-        sessionStorage.setItem(STORAGE_KEY_RESULTS, JSON.stringify(data));
-      } catch (err) {
-        setError("Απέτυχε η αναζήτηση.");
-        // Μην καθαρίζεις τα αποτελέσματα αν αποτύχει, κράτα τα παλιά ίσως?
-        // setResults([]); 
-      } finally {
-        setLoading(false);
-      }
-    };
+      })
+      .catch((err) => {
+        console.error("❌ Hook Error:", err);
+        setResults([]);
+      })
+      .finally(() => setLoading(false));
+  }, [debouncedSearch]);
 
-    fetchProducts();
-  }, [debouncedSearchTerm]);
-
-  return {
-    results,
-    loading,
-    error,
-    searchTerm,
-    setSearchTerm,
-  };
+  return { results, loading, searchTerm, setSearchTerm, debouncedSearch };
 }

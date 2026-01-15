@@ -9,6 +9,17 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// ---------------------------------------------------------
+// NEW: Enums για καθαρά δεδομένα
+// ---------------------------------------------------------
+enum UnitType {
+  KG
+  G
+  L
+  ML
+  ITEM // Τεμάχιο
+}
+
 model Chain {
   id        String   @id @default(cuid())
   slug      String   @unique
@@ -34,10 +45,9 @@ model Store {
 
   chain      Chain    @relation(fields: [chainId], references: [id])
   
-  // Σχέσεις
-  prices     PriceSnapshot[]
+  prices       PriceSnapshot[]
   productCodes StoreProductCode[]
-  priceHistory   PriceHistory[]
+  priceHistory PriceHistory[]
 
   @@unique([chainId, externalId])
   @@index([chainId])
@@ -45,7 +55,7 @@ model Store {
 
 model PriceHistory {
   id        String   @id @default(cuid())
-  price     Decimal
+  price     Decimal  @db.Decimal(10, 2) // Καλό είναι να ορίζουμε precision
   date      DateTime @default(now())
   
   product   Product  @relation(fields: [productId], references: [id])
@@ -57,35 +67,41 @@ model PriceHistory {
   @@index([productId, storeId, date])
 }
 
-// ΤΟ ΚΕΝΤΡΙΚΟ ΠΡΟΪΟΝ (Master Product)
+// ---------------------------------------------------------
+// REFACTORED: Product Model
+// ---------------------------------------------------------
 model Product {
-  id         String   @id @default(cuid())
-  ean        String   @unique  // <--- ΑΥΤΟ ΕΙΝΑΙ ΤΟ ΚΛΕΙΔΙ ΓΙΑ ΤΟ E-KATANALOTIS
-  name       String
-  imageUrl   String?
-  brand      String?
-  quantity   String?
+  id             String   @id @default(cuid())
+  ean            String   @unique
+  name           String
+  imageUrl       String?
+  brand          String?
+  
+  // Display Quantity (π.χ. "6x330ml") - Το κρατάμε για το Frontend
+  quantity       String? 
 
+  // Normalised Quantity (π.χ. 1980, ML) - Για τους υπολογισμούς
+  quantityValue  Float?
+  quantityUnit   UnitType?
+  
   normalizedName String @default("")
   
   isActive   Boolean  @default(true)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  // Σχέσεις
-  prices     PriceSnapshot[]
-  storeCodes StoreProductCode[]
-  priceHistory   PriceHistory[]
+  prices       PriceSnapshot[]
+  storeCodes   StoreProductCode[]
+  priceHistory PriceHistory[]
 
   @@index([ean])
   @@index([name])
 }
 
-// Κωδικοί καταστημάτων (π.χ. ο AB έχει τον κωδικό "123" για την Coca Cola)
 model StoreProductCode {
-  id        String   @id @default(cuid())
-  storeId   String
-  productId String
+  id           String   @id @default(cuid())
+  storeId      String
+  productId    String
   externalCode String 
 
   store     Store    @relation(fields: [storeId], references: [id])
@@ -95,18 +111,26 @@ model StoreProductCode {
   @@index([productId])
 }
 
+// ---------------------------------------------------------
+// REFACTORED: PriceSnapshot Model
+// ---------------------------------------------------------
 model PriceSnapshot {
-  id         String   @id @default(cuid())
-  productId  String
-  storeId    String
-  price      Decimal  @db.Decimal(10, 2)
-  promoPrice Decimal? @db.Decimal(10, 2)
-  inStock    Boolean  @default(true)
+  id          String   @id @default(cuid())
+  productId   String
+  storeId     String
+  price       Decimal  @db.Decimal(10, 2)
+  promoPrice  Decimal? @db.Decimal(10, 2)
+  inStock     Boolean  @default(true)
+  
+  // NEW: Flag για ύποπτες τιμές (Anomaly Detection)
+  isAnomaly   Boolean  @default(false)
+  
   collectedAt DateTime @default(now())
 
   product    Product  @relation(fields: [productId], references: [id])
   store      Store    @relation(fields: [storeId], references: [id])
 
+  // Optimization: Συχνά θα ψάχνουμε την "τελευταία τιμή" για ένα προϊόν σε ένα κατάστημα
   @@index([productId, storeId, collectedAt(sort: Desc)])
   @@index([collectedAt])
 }

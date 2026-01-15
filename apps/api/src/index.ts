@@ -1,20 +1,23 @@
+// apps/api/src/index.ts
 import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
-import { searchRoutes } from "./routes/search"; // <--- Αυτό φτιάξαμε πριν
+import { searchRoutes } from "./routes/search"; 
+// 1. IMPORT: Φέρνουμε τον νέο controller για το καλάθι
+import { basketController } from "./controllers/basket.controller";
 
 const app = new Elysia()
-  // 1. Ρύθμιση CORS για να μιλάει με το Frontend (Port 3000)
+  // Ρύθμιση CORS (επιτρέπει στο frontend να μιλάει με το API)
   .use(cors({
-    origin: true // Επιτρέπει όλα τα origins για development
+    origin: true 
   }))
 
-  // 2. Health Check (για να βλέπεις αν τρέχει)
+  // Health Check
   .get("/", () => "🚀 SuperMarket API is Running!")
 
-  // 3. Σύνδεση του Search Route
-  .use(searchRoutes)
+  // 2. ROUTES: Συνδέουμε τα κομμάτια της εφαρμογής
+  .use(searchRoutes)      // Αναζήτηση προϊόντων
+  .use(basketController)  // Υπολογισμός Καλαθιού & Σύγκριση Τιμών
 
-  // 4. Εκκίνηση στην πόρτα 3001
   .listen(3001);
 
 console.log(
