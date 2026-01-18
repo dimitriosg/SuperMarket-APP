@@ -1,12 +1,13 @@
+import { useState, useEffect } from "react";
 import { useBasketContext } from "../context/BasketContext";
-import { useProductSearch } from "../hooks/useProductSearch"; // <--- Χρησιμοποιούμε το Hook πάλι
+import { useProductSearch } from "../hooks/useProductSearch"; // Χρησιμοποιούμε το δικό σου hook!
 import { SearchHeader } from "../components/SearchHeader";
 import { ProductCard } from "../components/ProductCard";
 import { BasketSidebar } from "../components/BasketSidebar";
 import { StoreFilters } from "../components/StoreFilters";
-import { getStoreIdByName, ProductResult } from "../services/api";
+import { getStoreIdByName } from "../services/api";
 
-// --- WELCOME HERO COMPONENT ---
+// --- WELCOME HERO (Το κρατάμε ίδιο) ---
 type HeroProps = {
   onTagClick: (tag: string) => void;
 };
@@ -24,16 +25,16 @@ const WelcomeHero = ({ onTagClick }: HeroProps) => (
       Επίλεξε την περιοχή σου από αριστερά και ξεκίνα!
     </p>
     
-    <div className="space-y-3">
+    <div className="space-y-4">
       <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">ΔΗΜΟΦΙΛΕΙΣ ΑΝΑΖΗΤΗΣΕΙΣ</p>
-      <div className="flex flex-wrap justify-center gap-3 max-w-2xl">
-        {["Φέτα", "Γάλα", "Αυγά", "Καφές", "Απορρυπαντικό", "Ελαιόλαδο", "Γιαούρτι"].map(tag => (
+      <div className="flex flex-wrap justify-center gap-3">
+        {["Γάλα", "Φέτα", "Ελαιόλαδο", "Καφές", "Αυγά", "Γιαούρτι"].map(tag => (
           <button 
-            key={tag} 
+            key={tag}
             onClick={() => onTagClick(tag)}
-            className="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-600 text-sm font-bold shadow-sm hover:shadow-md hover:border-indigo-300 hover:text-indigo-600 hover:-translate-y-0.5 transition-all cursor-pointer active:scale-95"
+            className="px-4 py-2 bg-white border border-slate-200 rounded-full text-slate-600 font-bold text-sm hover:border-indigo-400 hover:text-indigo-600 hover:shadow-md transition-all active:scale-95"
           >
-            🔍 {tag}
+            {tag}
           </button>
         ))}
       </div>
@@ -42,130 +43,135 @@ const WelcomeHero = ({ onTagClick }: HeroProps) => (
 );
 
 export function HomePage() {
-  // 1. Χρήση του Hook (Σωστή Αρχιτεκτονική)
-  const { results, loading, searchTerm, setSearchTerm, debouncedSearch } = useProductSearch();
-  
   const { 
-    basket, isBasketOpen, isPinned, comparison, enabledStores, 
-    addToBasket, removeFromBasket, updateQuantity, toggleBasket, togglePin, setBasketOpen 
+    basket, 
+    comparison, 
+    isBasketOpen, 
+    isPinned, 
+    setBasketOpen, 
+    toggleBasket, 
+    enabledStores, 
+    addToBasket, 
+    removeFromBasket, 
+    updateQuantity, 
+    togglePin 
   } = useBasketContext();
 
-  // 2. Client-Side Filtering (για τα stores)
-  const filteredResultsOLD = results.map(product => {
-    const activeOffers = product.offers;
+  const { searchTerm, setSearchTerm, results, isSearching, performSearch } = useProductSearch();
 
-    // const activeOffers = product.offers.filter(o => 
-    //  enabledStores.includes(getStoreIdByName(o.store))
-    // );
-    
-    // if (activeOffers.length === 0) return null;
-    
-    // const newBestPrice = Math.min(...activeOffers.map(o => Number(o.price)));
+  // --- NEW: State για τα Φίλτρα (Collapsible) ---
+  const [isFiltersOpen, setIsFiltersOpen] = useState(true);
 
-    const newBestPrice = activeOffers.length > 0 
-      ? Math.min(...activeOffers.map(o => Number(o.price)))
-      : product.bestPrice;
-    
-    return {
-      ...product,
-      bestPrice: newBestPrice,
-      offers: activeOffers
-    };
-  }).filter((p): p is ProductResult => p !== null);
-
-  // Φιλτράρισμα αποτελεσμάτων βάσει των ΕΝΕΡΓΩΝ καταστημάτων
+  // Filter logic (Client side filtering of backend results based on store availability)
   const filteredResults = results.map(product => {
-    // 1. Φιλτράρουμε τις προσφορές βάσει των καταστημάτων που έχει επιλέξει ο χρήστης
-    const activeOffers = product.offers.filter(o => 
-      enabledStores.includes(getStoreIdByName(o.store))
+    // Φιλτράρουμε τις προσφορές βάσει των ενεργών καταστημάτων
+    const activeOffers = product.offers.filter(offer => 
+       enabledStores.includes(getStoreIdByName(offer.store))
     );
-
-    // 2. ΑΝ ΔΕΝ ΥΠΑΡΧΟΥΝ προσφορές στα επιλεγμένα καταστήματα, 
-    // επιστρέφουμε null για να μην φανεί καθόλου το προϊόν
-    if (activeOffers.length === 0) return null;
     
-    // 3. Υπολογίζουμε τη νέα καλύτερη τιμή ΜΟΝΟ από τα επιλεγμένα καταστήματα
-    const prices = activeOffers.map(o => Number(o.price));
-    const newBestPrice = Math.min(...prices);
+    // Αν δεν μείνει καμία προσφορά, ίσως θέλουμε να το κρύψουμε ή να το δείξουμε ως "unavailable"
+    // Εδώ το δείχνουμε, αλλά με recalculate του bestPrice
+    if (activeOffers.length === 0) return null;
+
+    // Recalculate best price based on filters
+    activeOffers.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
     
     return {
       ...product,
-      bestPrice: newBestPrice,
-      offers: activeOffers
+      offers: activeOffers,
+      bestPrice: parseFloat(activeOffers[0].price),
+      activeOffer: activeOffers[0]
     };
-  }).filter((p): p is ProductResult => p !== null);
+  }).filter(Boolean) as typeof results; // Remove nulls
+
 
   return (
-    <div className={`min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col transition-all duration-300 ${isPinned && isBasketOpen ? 'pr-[400px]' : ''}`}>
+    <div className="min-h-screen bg-[#F8FAFC] font-sans pb-20 flex flex-col">
       
-      {/* Header */}
-      <SearchHeader searchTerm={searchTerm} onSearchTermChange={setSearchTerm} loading={loading} />
+      {/* 1. HEADER */}
+      <SearchHeader 
+        searchTerm={searchTerm} 
+        onSearchChange={setSearchTerm} 
+        onSearchSubmit={() => performSearch(searchTerm)}
+        cartCount={basket.length}
+        onCartClick={toggleBasket}
+      />
 
-      <main className="max-w-[1400px] mx-auto p-4 md:p-6 w-full flex gap-6 items-start">
+      <main className="flex-1 max-w-[1920px] mx-auto w-full p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative">
         
-        {/* LEFT COLUMN: FILTERS */}
-        <div className="hidden lg:block w-64 flex-shrink-0 sticky top-24">
-          <StoreFilters />
+        {/* 2. LEFT COLUMN: FILTERS (Collapsible) */}
+        {/* Αν είναι ανοιχτό πιάνει 3 στήλες. Αν κλειστό πιάνει "auto" (όσο χρειάζεται το κλειστό component) */}
+        <div className={`transition-all duration-300 ${isFiltersOpen ? 'lg:col-span-3' : 'lg:col-span-1 lg:max-w-[80px]'}`}>
+          <StoreFilters 
+             isOpen={isFiltersOpen} 
+             onToggle={() => setIsFiltersOpen(!isFiltersOpen)} 
+          />
         </div>
 
-        {/* MIDDLE COLUMN: RESULTS or HERO */}
-        <div className="flex-1">
+        {/* 3. CENTER COLUMN: RESULTS / HERO */}
+        {/* Αν τα φίλτρα είναι κλειστά, μεγαλώνει (11 στήλες). Αν ανοιχτά, κανονικό (9 στήλες). Αν το καλάθι είναι pinned, μικραίνει κι άλλο. */}
+        <div className={`transition-all duration-300 ${
+            isFiltersOpen 
+              ? (isPinned && isBasketOpen ? 'lg:col-span-6' : 'lg:col-span-9') 
+              : (isPinned && isBasketOpen ? 'lg:col-span-8' : 'lg:col-span-11')
+        }`}>
           
-          {/* HERO (Όταν δεν ψάχνει) */}
-          {!debouncedSearch && results.length === 0 && (
-            <WelcomeHero onTagClick={setSearchTerm} />
+          {/* A. Welcome State */}
+          {!isSearching && results.length === 0 && (
+            <WelcomeHero onTagClick={(tag) => {
+              setSearchTerm(tag);
+              performSearch(tag);
+            }} />
           )}
 
-          {/* RESULTS */}
-          {debouncedSearch && (
+          {/* B. Results Grid */}
+          {(isSearching || results.length > 0) && (
             <>
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div className="flex justify-between items-end mb-6">
+                <h2 className="text-xl font-bold text-slate-800">
+                  {results.length > 0 ? `Βρέθηκαν ${results.length} προϊόντα` : 'Αποτελέσματα'}
+                </h2>
+                {filteredResults.length < results.length && (
+                   <span className="text-sm text-orange-500 font-medium">
+                     ⚠️ Μερικά προϊόντα κρύφτηκαν λόγω φίλτρων
+                   </span>
+                )}
+              </div>
+
+              {/* GRID ΠΡΟΪΟΝΤΩΝ */}
+              <div className={`grid gap-6 ${
+                  isFiltersOpen 
+                    ? (isPinned && isBasketOpen ? 'grid-cols-1 xl:grid-cols-2' : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3') 
+                    : (isPinned && isBasketOpen ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4')
+              }`}>
                 {filteredResults.map((product) => (
                   <ProductCard 
-                    key={product.id}
-                    product={product}
-                    isInBasket={!!basket.find(b => b.id === product.id)}
-                    onAdd={addToBasket}
-                    selectedStoreFilter={null}
+                    key={product.id} 
+                    product={product} 
+                    onAdd={() => addToBasket(product)} 
                   />
                 ))}
               </div>
 
-              {/* EMPTY STATE (Search returned 0) */}
-              {results.length === 0 && !loading && (
-                <div className="text-center py-20 animate-fade-in">
+              {/* EMPTY STATE */}
+              {results.length === 0 && !isSearching && searchTerm && (
+                <div className="text-center py-20">
                   <div className="text-6xl mb-4">🤷‍♂️</div>
                   <h3 className="text-xl font-bold text-slate-700">Δεν βρέθηκαν προϊόντα</h3>
-                  <p className="text-slate-400 mt-2">Δοκίμασε να ψάξεις με διαφορετικούς όρους ή Barcode.</p>
-                </div>
-              )}
-              
-              {/* FILTER EMPTY STATE (Filtered out by store) */}
-              {results.length > 0 && filteredResults.length === 0 && (
-                <div className="text-center py-20">
-                  <p className="text-slate-400 font-medium">Τα προϊόντα υπάρχουν, αλλά όχι στα επιλεγμένα καταστήματα.</p>
-                  <p className="text-sm text-indigo-500 mt-2 cursor-pointer hover:underline" onClick={() => window.location.reload()}>
-                    Καθαρισμός φίλτρων
-                  </p>
+                  <p className="text-slate-400">Δοκίμασε να ψάξεις με διαφορετικούς όρους (π.χ. "τυρί" αντί για "τυριά").</p>
                 </div>
               )}
             </>
           )}
         </div>
 
+        {/* 4. RIGHT COLUMN: BASKET SIDEBAR (Original Logic) */}
+        {/* Εδώ το βάζουμε "χύμα" στο τέλος του Grid ή absolute/fixed ανάλογα το BasketSidebar implementation.
+            Εφόσον το BasketSidebar έχει `fixed` positioning μέσα του, δεν επηρεάζει το grid flow άμεσα,
+            αλλά ελέγχουμε το πλάτος της κεντρικής στήλης παραπάνω με βάση το `isPinned`. 
+        */}
       </main>
 
-      {/* Floating Basket Button */}
-      {(!isPinned || !isBasketOpen) && (
-        <button 
-          onClick={toggleBasket}
-          className="fixed bottom-6 right-6 z-40 bg-indigo-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-all flex items-center gap-2"
-        >
-          <span className="font-bold">🛒 {basket.length}</span>
-        </button>
-      )}
-
-      {/* RIGHT COLUMN: BASKET SIDEBAR */}
       <BasketSidebar 
         isOpen={isBasketOpen}
         isPinned={isPinned}
@@ -176,6 +182,17 @@ export function HomePage() {
         onUpdateQty={updateQuantity}
         onRemove={removeFromBasket}
       />
+
+      {/* Floating Basket Button (Εμφανίζεται αν δεν είναι pinned ή αν είναι κλειστό) */}
+      {(!isPinned || !isBasketOpen) && (
+        <button 
+          onClick={toggleBasket}
+          className="fixed bottom-6 right-6 z-40 bg-indigo-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-all flex items-center gap-2"
+        >
+          <span className="font-bold">🛒 {basket.length}</span>
+        </button>
+      )}
+
     </div>
   );
 }

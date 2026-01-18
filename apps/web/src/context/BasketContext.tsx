@@ -1,9 +1,7 @@
-// apps/web/src/context/BasketContext.tsx
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { BasketItem, ProductResult, BasketComparisonResult } from '../types';
-import { compareBasketAPI, STORES_DATA, getStoreIdByName } from '../services/api'; // Import STORES_DATA
+import { compareBasketAPI, STORES_DATA, getStoreIdByName } from '../services/api';
 import { useDebounce } from '../hooks/useDebounce';
-
 
 type BasketContextType = {
   basket: BasketItem[];
@@ -25,7 +23,6 @@ type BasketContextType = {
   setBasketOpen: (open: boolean) => void;
   toggleStoreFilter: (storeId: string) => void;
   changeLocation: (locationId: string) => void;
-  // ΝΕΕΣ ΣΥΝΑΡΤΗΣΕΙΣ
   selectAllStores: () => void;
   deselectAllStores: () => void;
 };
@@ -33,11 +30,17 @@ type BasketContextType = {
 const BasketContext = createContext<BasketContextType | undefined>(undefined);
 
 export function BasketProvider({ children }: { children: ReactNode }) {
-  const [basket, setBasket] = useState<BasketItem[]>([]);
+  // 1. LOCAL STORAGE: Διαβάζουμε το καλάθι κατά την εκκίνηση
+  const [basket, setBasket] = useState<BasketItem[]>(() => {
+    try {
+      const saved = localStorage.getItem("my_basket");
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
   
-  // ΑΛΛΑΓΗ 1: Ξεκινάμε με ΟΛΑ τα καταστήματα επιλεγμένα
   const [enabledStores, setEnabledStores] = useState<string[]>(STORES_DATA.map(s => s.id));
-  
   const [selectedLocation, setSelectedLocation] = useState("all");
   const [isBasketOpen, setIsBasketOpen] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
@@ -46,6 +49,11 @@ export function BasketProvider({ children }: { children: ReactNode }) {
   const [isCalculating, setIsCalculating] = useState(false);
 
   const debouncedBasket = useDebounce(basket, 500);
+
+  // 2. LOCAL STORAGE: Αποθηκεύουμε κάθε αλλαγή
+  useEffect(() => {
+    localStorage.setItem("my_basket", JSON.stringify(basket));
+  }, [basket]);
 
   useEffect(() => {
     if (debouncedBasket.length === 0) {
@@ -74,14 +82,11 @@ export function BasketProvider({ children }: { children: ReactNode }) {
 
   const comparison = {
     loading: isCalculating,
-    
-    // Φιλτράρουμε τα αποτελέσματα με βάση τα enabledStores
     full: comparisonResults
-      .filter(r => enabledStores.includes(getStoreIdByName(r.storeName))) // <--- ΤΟ ΦΙΛΤΡΟ
+      .filter(r => enabledStores.includes(getStoreIdByName(r.storeName)))
       .filter(r => r.missingItems === 0),
-      
     partial: comparisonResults
-      .filter(r => enabledStores.includes(getStoreIdByName(r.storeName))) // <--- ΤΟ ΦΙΛΤΡΟ
+      .filter(r => enabledStores.includes(getStoreIdByName(r.storeName)))
       .filter(r => r.missingItems > 0)
   };
 
@@ -118,17 +123,13 @@ export function BasketProvider({ children }: { children: ReactNode }) {
      setEnabledStores(prev => prev.includes(storeId) ? prev.filter(id => id !== storeId) : [...prev, storeId]);
   };
 
-  // ΑΛΛΑΓΗ 2: Υλοποίηση Select All / Deselect All
   const selectAllStores = () => setEnabledStores(STORES_DATA.map(s => s.id));
   const deselectAllStores = () => setEnabledStores([]);
 
   const changeLocation = (loc: string) => {
     setSelectedLocation(loc);
-
-    // FIX: Αν η επιλογή είναι "all", τότε ΟΛΑ τα καταστήματα είναι ενεργά.
-    // Αλλιώς, κρατάμε όσα είναι πανελλαδικά ("all") ή ανήκουν στην περιοχή.
     const validStoresForRegion = STORES_DATA.filter(store => {
-      if (loc === "all") return true; // <--- Η ΔΙΟΡΘΩΣΗ
+      if (loc === "all") return true;
       return store.regions.includes("all") || store.regions.includes(loc);
     }).map(s => s.id);
 
@@ -141,7 +142,7 @@ export function BasketProvider({ children }: { children: ReactNode }) {
       comparison, 
       addToBasket, removeFromBasket, updateQuantity, clearBasket,
       toggleBasket, togglePin, setBasketOpen: setIsBasketOpen, toggleStoreFilter, changeLocation,
-      selectAllStores, deselectAllStores // <-- Export
+      selectAllStores, deselectAllStores
     }}>
       {children}
     </BasketContext.Provider>
