@@ -125,14 +125,13 @@ export function BasketProvider({ children }: { children: ReactNode }) {
   const changeLocation = (loc: string) => {
     setSelectedLocation(loc);
 
-    // Όταν αλλάζει η περιοχή, βρίσκουμε ποια καταστήματα είναι διαθέσιμα εκεί
+    // FIX: Αν η επιλογή είναι "all", τότε ΟΛΑ τα καταστήματα είναι ενεργά.
+    // Αλλιώς, κρατάμε όσα είναι πανελλαδικά ("all") ή ανήκουν στην περιοχή.
     const validStoresForRegion = STORES_DATA.filter(store => {
-      // Κρατάμε το κατάστημα αν είναι Πανελλαδικό ("all") 
-      // Ή αν η λίστα περιοχών του περιλαμβάνει τη νέα περιοχή (π.χ. "attica")
+      if (loc === "all") return true; // <--- Η ΔΙΟΡΘΩΣΗ
       return store.regions.includes("all") || store.regions.includes(loc);
     }).map(s => s.id);
 
-    // Ενημερώνουμε τα enabledStores ώστε να περιέχουν ΜΟΝΟ τα έγκυρα
     setEnabledStores(validStoresForRegion);
   };
 
