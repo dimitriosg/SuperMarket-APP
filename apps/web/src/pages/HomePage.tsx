@@ -91,8 +91,9 @@ export function HomePage() {
       {/* 1. HEADER */}
       <SearchHeader 
         searchTerm={searchTerm} 
-        onSearchChange={setSearchTerm} 
+        onSearchChange={(newValue) => setSearchTerm(newValue)} 
         onSearchSubmit={() => performSearch(searchTerm)}
+        loading={isSearching}
         cartCount={basket.length}
         onCartClick={toggleBasket}
       />

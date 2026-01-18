@@ -6,7 +6,7 @@ const globalForPrisma = global as unknown as { prisma: PrismaClient };
 export const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
-    log: ["query", "error", "warn"], // Για να βλέπουμε τι γίνεται
+    log: ["info", "error", "warn"], // Για να βλέπουμε τι γίνεται
   });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
