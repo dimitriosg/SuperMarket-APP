@@ -5,9 +5,11 @@ import { useBasketContext } from "../context/BasketContext";
 type Props = {
   isOpen: boolean;
   onToggle: () => void;
+  showOnboarding: boolean;
+  onDismissOnboarding: () => void;
 };
 
-export function StoreFilters({ isOpen, onToggle }: Props) {
+export function StoreFilters({ isOpen, onToggle, showOnboarding, onDismissOnboarding }: Props) {
   const { 
     enabledStores, toggleStoreFilter, selectedLocation, changeLocation, 
     selectAllStores, deselectAllStores 
@@ -49,6 +51,25 @@ export function StoreFilters({ isOpen, onToggle }: Props) {
   // --- 2. ΑΝΟΙΧΤΗ ΜΟΡΦΗ (FULL) ---
   return (
     <div className="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 h-fit sticky top-24 transition-all duration-300 relative group z-20 w-full">
+      {showOnboarding && (
+        <div className="absolute inset-4 z-40 pointer-events-none">
+          <div className="absolute -top-3 right-4 bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full shadow-md">
+            Πρώτο βήμα
+          </div>
+          <div className="bg-white border border-indigo-200 shadow-xl rounded-2xl p-4 text-sm text-slate-700 pointer-events-auto">
+            <p className="font-bold text-slate-900 mb-1">Επίλεξε περιοχή και καταστήματα</p>
+            <p className="text-slate-500 mb-3">
+              Φιλτράρισε τα αποτελέσματα ανάλογα με το πού ψωνίζεις.
+            </p>
+            <button
+              onClick={onDismissOnboarding}
+              className="w-full bg-indigo-600 text-white text-sm font-bold py-2 rounded-xl hover:bg-indigo-700 transition-colors"
+            >
+              Ξεκίνα
+            </button>
+          </div>
+        </div>
+      )}
       
       {/* Κουμπί Collapse */}
       <button 
@@ -60,7 +81,7 @@ export function StoreFilters({ isOpen, onToggle }: Props) {
       </button>
 
       {/* Περιοχή */}
-      <div className="mb-6">
+      <div className={`mb-6 ${showOnboarding ? "ring-2 ring-indigo-200 rounded-2xl p-2 -m-2" : ""}`}>
         <h3 className="font-black text-slate-800 mb-2 flex items-center gap-2 text-sm uppercase tracking-wide">
           📍 Περιοχή
         </h3>
@@ -78,7 +99,7 @@ export function StoreFilters({ isOpen, onToggle }: Props) {
       <div className="border-t border-slate-100 mb-4" />
 
       {/* Καταστήματα Toggle */}
-      <div className="flex justify-between items-center mb-2">
+      <div className={`flex justify-between items-center mb-2 ${showOnboarding ? "ring-2 ring-indigo-200 rounded-2xl p-2 -m-2" : ""}`}>
         <button 
             onClick={() => setIsStoresListExpanded(!isStoresListExpanded)}
             className="w-full flex items-center justify-between group focus:outline-none"
