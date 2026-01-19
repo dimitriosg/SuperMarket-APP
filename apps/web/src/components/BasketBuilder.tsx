@@ -1,40 +1,18 @@
 import { useState } from "react";
-import { BasketItemUI, ProductUI } from "../features/basketAnalysis/types";
+import { BasketItem, ProductResult } from "../types";
+import { DEFAULT_IMG } from "../services/api";
 import { ProductSearch } from "./ProductSearch";
 
-const DEFAULT_CATEGORY = "Λοιπά";
-
 type Props = {
-  basket: BasketItemUI[];
-  products: ProductUI[];
-  productLookup: Map<string, ProductUI>;
-  isSearching: boolean;
-  onSearch: (term: string) => void;
-  onUpdateQty: (productId: string, delta: number) => void;
-  onRemove: (productId: string) => void;
+  basket: BasketItem[];
+  onUpdateQty: (id: string, delta: number) => void;
+  onRemove: (id: string) => void;
   onClear: () => void;
-  onAdd: (product: ProductUI) => void;
+  onAdd: (product: ProductResult) => void;
 };
 
-export function BasketBuilder({
-  basket,
-  products,
-  productLookup,
-  isSearching,
-  onSearch,
-  onUpdateQty,
-  onRemove,
-  onClear,
-  onAdd
-}: Props) {
+export function BasketBuilder({ basket, onUpdateQty, onRemove, onClear, onAdd }: Props) {
   const [isAddingOpen, setIsAddingOpen] = useState(true);
-
-  const handleClear = () => {
-    if (basket.length === 0) return;
-    if (window.confirm("Είσαι σίγουρος ότι θέλεις να αδειάσεις το καλάθι;")) {
-      onClear();
-    }
-  };
 
   return (
     <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-6">
@@ -45,7 +23,7 @@ export function BasketBuilder({
         </div>
         {basket.length > 0 && (
           <button
-            onClick={handleClear}
+            onClick={onClear}
             className="rounded-full border border-red-200 px-3 py-2 text-[10px] font-bold uppercase text-red-500 hover:bg-red-50"
           >
             Εκκαθάριση
@@ -59,47 +37,46 @@ export function BasketBuilder({
         </div>
       ) : (
         <div className="space-y-3">
-          {basket.map((item) => {
-            const product = productLookup.get(item.productId);
-            return (
-              <div
-                key={item.productId}
-                className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm"
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-slate-700 line-clamp-2">
-                    {product?.name || "Άγνωστο προϊόν"}
-                  </p>
-                  <p className="text-[11px] text-slate-400">
-                    {(product?.category || DEFAULT_CATEGORY) + (product?.unit ? ` • ${product.unit}` : "")}
-                  </p>
-                  <div className="mt-2 flex items-center gap-2">
-                    <div className="flex items-center rounded-lg bg-slate-100">
-                      <button
-                        onClick={() => onUpdateQty(item.productId, -1)}
-                        className="px-2 py-1 text-sm font-black text-indigo-600 hover:bg-white rounded-md"
-                      >
-                        -
-                      </button>
-                      <span className="w-6 text-center text-xs font-bold text-slate-700">{item.quantity}</span>
-                      <button
-                        onClick={() => onUpdateQty(item.productId, 1)}
-                        className="px-2 py-1 text-sm font-black text-indigo-600 hover:bg-white rounded-md"
-                      >
-                        +
-                      </button>
-                    </div>
+          {basket.map((item) => (
+            <div
+              key={item.id}
+              className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm"
+            >
+              <div className="h-12 w-12 rounded-xl bg-slate-50 p-2">
+                <img
+                  src={item.image || DEFAULT_IMG}
+                  alt={item.name}
+                  className="h-full w-full object-contain"
+                />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-bold text-slate-700 line-clamp-2">{item.name}</p>
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="flex items-center rounded-lg bg-slate-100">
                     <button
-                      onClick={() => onRemove(item.productId)}
-                      className="text-[10px] font-bold uppercase text-red-400 hover:text-red-500"
+                      onClick={() => onUpdateQty(item.id, -1)}
+                      className="px-2 py-1 text-sm font-black text-indigo-600 hover:bg-white rounded-md"
                     >
-                      Αφαίρεση
+                      -
+                    </button>
+                    <span className="w-6 text-center text-xs font-bold text-slate-700">{item.quantity}</span>
+                    <button
+                      onClick={() => onUpdateQty(item.id, 1)}
+                      className="px-2 py-1 text-sm font-black text-indigo-600 hover:bg-white rounded-md"
+                    >
+                      +
                     </button>
                   </div>
+                  <button
+                    onClick={() => onRemove(item.id)}
+                    className="text-[10px] font-bold uppercase text-red-400 hover:text-red-500"
+                  >
+                    Αφαίρεση
+                  </button>
                 </div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       )}
 
@@ -113,13 +90,7 @@ export function BasketBuilder({
         </button>
         {isAddingOpen && (
           <div className="border-t border-slate-200 px-4 py-4">
-            <ProductSearch
-              basket={basket}
-              products={products}
-              isLoading={isSearching}
-              onSearch={onSearch}
-              onAdd={onAdd}
-            />
+            <ProductSearch basket={basket} onAdd={onAdd} />
           </div>
         )}
       </div>

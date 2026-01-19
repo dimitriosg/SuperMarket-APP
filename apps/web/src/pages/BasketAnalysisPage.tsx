@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useBasketContext } from "../context/BasketContext";
+import { BasketBuilder } from "../components/BasketBuilder";
 import { DEFAULT_IMG, getStoreIdByName } from "../services/api";
 
 export function BasketAnalysisPage() {
@@ -9,7 +10,9 @@ export function BasketAnalysisPage() {
     comparison,
     updateQuantity,
     removeFromBasket,
-    enabledStores
+    enabledStores,
+    addToBasket,
+    clearBasket
   } = useBasketContext();
 
   const bestSingleStore = comparison.full[0];
@@ -122,6 +125,14 @@ export function BasketAnalysisPage() {
                  <div className="text-slate-400 text-sm font-medium">Δεν βρέθηκε κατάστημα με πλήρη διαθεσιμότητα.</div>
                )}
             </div>
+
+            <BasketBuilder
+              basket={basket}
+              onUpdateQty={updateQuantity}
+              onRemove={removeFromBasket}
+              onClear={clearBasket}
+              onAdd={addToBasket}
+            />
 
           </div>
 
