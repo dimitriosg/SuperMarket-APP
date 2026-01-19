@@ -18,7 +18,7 @@ const app = new Elysia()
   .use(basketController)  
   .use(adminRoutes)
   
-  // ✅ NEW: AI Suggestions routes (πριν το .onError)
+  // ✅ AI Suggestions routes (μόνο AI route plugin, πριν το .onError)
   .use(aiSuggestionsRoutes)
 
   // ✅ Error handler
