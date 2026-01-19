@@ -13,11 +13,14 @@ export const ShoppingList: React.FC = () => {
     return (
         <div className="container mx-auto px-4 py-8">
         <h1 className="text-4xl font-bold mb-8">🛒 Λίστα Αγορών</h1>
+        <div className="mb-8 rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm text-blue-700">
+            Ξεκίνα με 2-3 προϊόντα ώστε οι AI προτάσεις να γίνουν πιο στοχευμένες.
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main content */}
             <div className="lg:col-span-2">
-            <ShoppingListContent items={items} />
+            <ShoppingListContent items={items} addItem={addItem} />
             </div>
 
             {/* Sidebar with AI suggestions */}

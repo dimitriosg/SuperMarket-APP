@@ -65,6 +65,28 @@ export function ProductDetailsPage() {
   const sortedOffers = product ? [...product.offers].sort((a, b) => Number(a.price) - Number(b.price)) : [];
   const bestPrice = sortedOffers.length > 0 ? Number(sortedOffers[0].price) : 0;
 
+  useEffect(() => {
+    if (!product) return;
+
+    const storageKey = "recently_viewed_products";
+    const recentEntry = {
+      id: product.id,
+      name: product.name,
+      image: product.image || DEFAULT_IMG,
+      bestPrice,
+    };
+
+    try {
+      const stored = localStorage.getItem(storageKey);
+      const parsed = stored ? (JSON.parse(stored) as typeof recentEntry[]) : [];
+      const filtered = parsed.filter((item) => item.id !== product.id);
+      const updated = [recentEntry, ...filtered].slice(0, 6);
+      localStorage.setItem(storageKey, JSON.stringify(updated));
+    } catch (error) {
+      console.warn("Failed to store recently viewed products", error);
+    }
+  }, [product, bestPrice]);
+
   // FIX: Χρήση useMemo για να μην "χορεύει" το γράφημα σε κάθε render
   const historyData = useMemo(() => {
     if (!product) return [];

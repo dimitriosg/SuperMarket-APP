@@ -1,5 +1,28 @@
 // apps/api/src/services/productService.ts
+import type { Prisma } from "@prisma/client";
 import { prisma } from "../db";
+
+type ProductWithPrices = Prisma.ProductGetPayload<{
+  include: {
+    prices: {
+      include: {
+        store: {
+          include: {
+            chain: true;
+          };
+        };
+      };
+    };
+  };
+}>;
+
+type ProductPrice = ProductWithPrices["prices"][number];
+
+interface ProductOffer {
+  store: string;
+  price: string;
+  date: string;
+}
 
 const normalizeGreek = (text: string) => {
   return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
@@ -68,9 +91,9 @@ export const productService = {
 };
 
 // Helper για να μην γράφουμε διπλό κώδικα mapping
-function mapProductToFrontend(p: any) {
-  const uniqueOffers = new Map();
-  p.prices.forEach((price: any) => {
+function mapProductToFrontend(p: ProductWithPrices) {
+  const uniqueOffers = new Map<string, ProductOffer>();
+  p.prices.forEach((price: ProductPrice) => {
     const storeName = price.store?.chain?.label || price.store?.name || "Unknown";
     if (!uniqueOffers.has(storeName)) {
         uniqueOffers.set(storeName, {
@@ -81,7 +104,7 @@ function mapProductToFrontend(p: any) {
     }
   });
 
-  const offers: any[] = Array.from(uniqueOffers.values());
+  const offers = Array.from(uniqueOffers.values());
   offers.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
   const bestPrice = offers.length > 0 ? parseFloat(offers[0].price) : 0;
 

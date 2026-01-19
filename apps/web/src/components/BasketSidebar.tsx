@@ -27,6 +27,7 @@ export function BasketSidebar({
   const [showStaleDetails, setShowStaleDetails] = useState(false);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
   const [quickListsData, setQuickListsData] = useState<{ student: any[], family: any[], healthy: any[] } | null>(null);
+  const [recentlyViewed, setRecentlyViewed] = useState<{ id: string; name: string; image?: string; bestPrice?: number }[]>([]);
 
   const recommendedStore = comparison.full[0] || comparison.partial[0];
   // FIX: Χρήση optional chaining γιατί το recommendedStore μπορεί να είναι undefined στην αρχή
@@ -48,7 +49,20 @@ export function BasketSidebar({
     };
 
     if (isOpen && basket.length === 0 && !quickListsData) {
-        fetchSuggestions();
+      fetchSuggestions();
+    }
+  }, [isOpen, basket.length, quickListsData]);
+
+  useEffect(() => {
+    if (!isOpen || basket.length > 0) return;
+
+    try {
+      const stored = localStorage.getItem("recently_viewed_products");
+      const parsed = stored ? (JSON.parse(stored) as typeof recentlyViewed) : [];
+      setRecentlyViewed(Array.isArray(parsed) ? parsed : []);
+    } catch (error) {
+      console.warn("Failed to load recently viewed products", error);
+      setRecentlyViewed([]);
     }
   }, [isOpen, basket.length]);
 
@@ -66,6 +80,13 @@ export function BasketSidebar({
 
   const handleAddList = (listItems: any[]) => {
       listItems.forEach(item => addToBasket({ ...item, quantity: 1 }));
+  };
+
+  const handleContinueShopping = () => {
+    onClose();
+    window.setTimeout(() => {
+      document.getElementById("product-search-input")?.focus();
+    }, 0);
   };
 
   if (!isOpen) return null;
@@ -150,13 +171,24 @@ export function BasketSidebar({
                <div className="text-5xl animate-bounce">🧺</div>
                <div>
                  <p className="font-bold text-slate-800 text-lg">Είναι άδειο εδώ!</p>
+                 <p className="text-sm text-slate-500">Βρες προϊόντα και πάτα Προσθήκη.</p>
                  <p className="text-sm text-slate-400">Διάλεξε μια γρήγορη λίστα:</p>
                </div>
+
+               <button
+                 onClick={handleContinueShopping}
+                 className="inline-flex items-center justify-center gap-2 rounded-full bg-indigo-600 px-5 py-2 text-sm font-bold text-white shadow-md shadow-indigo-200 transition-all hover:bg-indigo-700"
+               >
+                 Συνέχισε τις αγορές
+               </button>
 
                {loadingSuggestions ? (
                    <div className="animate-pulse text-indigo-400 font-bold">Φόρτωση προτάσεων...</div>
                ) : (
                    <div className="w-full space-y-3">
+                      <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 text-left">
+                        Εξοικονομείς χρόνο με έτοιμες λίστες
+                      </div>
                       {quickLists.map((list, idx) => (
                           list.items.length > 0 && (
                              <button 
@@ -174,6 +206,39 @@ export function BasketSidebar({
                           )
                       ))}
                    </div>
+               )}
+
+               {recentlyViewed.length > 0 && (
+                 <div className="w-full pt-4 border-t border-slate-100 text-left space-y-3">
+                   <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
+                     Recently viewed
+                   </div>
+                   <div className="space-y-2">
+                     {recentlyViewed.slice(0, 3).map((item) => (
+                       <Link
+                         key={item.id}
+                         to={`/product/${item.id}`}
+                         onClick={() => { if (!isPinned) onClose(); }}
+                         className="flex items-center gap-3 rounded-xl border border-slate-100 bg-white p-2 hover:border-indigo-200 hover:bg-indigo-50 transition-colors"
+                       >
+                         <div className="h-10 w-10 rounded-lg bg-slate-50 p-1 flex items-center justify-center">
+                           <img src={item.image || DEFAULT_IMG} alt={item.name} className="max-h-full object-contain" />
+                         </div>
+                         <div className="flex-1 min-w-0">
+                           <div className="text-xs font-bold text-slate-700 line-clamp-2">
+                             {item.name}
+                           </div>
+                           {item.bestPrice !== undefined && (
+                             <div className="text-[10px] text-slate-400">
+                               Από {item.bestPrice.toFixed(2)}€
+                             </div>
+                           )}
+                         </div>
+                         <span className="text-indigo-400 text-sm">→</span>
+                       </Link>
+                     ))}
+                   </div>
+                 </div>
                )}
              </div>
           ) : (
