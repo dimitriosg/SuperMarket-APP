@@ -41,5 +41,17 @@ export function useProductSearch() {
       .finally(() => setLoading(false));
   }, [debouncedSearch]);
 
-  return { results, loading, searchTerm, setSearchTerm, debouncedSearch };
+  const performSearch = (term: string) => {
+    setSearchTerm(term);
+    setDebouncedSearch(term);
+  };
+
+  return {
+    results,
+    isSearching: loading,
+    searchTerm,
+    setSearchTerm,
+    debouncedSearch,
+    performSearch
+  };
 }
