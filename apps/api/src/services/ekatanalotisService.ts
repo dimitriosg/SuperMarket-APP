@@ -18,8 +18,55 @@ const MERCHANT_MAP: Record<number, string> = {
 const BASE_URL = "https://warply.s3.amazonaws.com/applications/ed840ad545884deeb6c6b699176797ed/basket-retailers/prices.json";
 const IMAGE_BASE_URL = "https://warply.s3.amazonaws.com/applications/ed840ad545884deeb6c6b699176797ed/products/";
 
+type RemotePrice = {
+  merchant_uuid: number;
+  price: number | string;
+};
+
+type RemoteProduct = {
+  barcode: string;
+  name: string;
+  image?: string | null;
+  prices?: RemotePrice[];
+};
+
 function normalizeText(text: string): string {
   return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+}
+
+function isRemotePrice(value: unknown): value is RemotePrice {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as RemotePrice;
+  if (typeof candidate.merchant_uuid !== "number") return false;
+  if (typeof candidate.price !== "number" && typeof candidate.price !== "string") return false;
+  return true;
+}
+
+function isRemoteProduct(value: unknown): value is RemoteProduct {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as RemoteProduct;
+  if (typeof candidate.barcode !== "string") return false;
+  if (typeof candidate.name !== "string") return false;
+  if (
+    typeof candidate.image !== "undefined" &&
+    candidate.image !== null &&
+    typeof candidate.image !== "string"
+  ) {
+    return false;
+  }
+  if (typeof candidate.prices !== "undefined" && !Array.isArray(candidate.prices)) return false;
+  return true;
+}
+
+function parseRemoteProducts(value: unknown): RemoteProduct[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item, index) => {
+    if (!isRemoteProduct(item)) {
+      console.warn(`⚠️ Invalid product payload at index ${index}.`);
+      return false;
+    }
+    return true;
+  });
 }
 
 export const ekatanalotisService = {
@@ -41,7 +88,7 @@ export const ekatanalotisService = {
       if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
       
       const json = await response.json();
-      const products = json.context?.MAPP_PRODUCTS?.result?.products || [];
+      const products = parseRemoteProducts(json.context?.MAPP_PRODUCTS?.result?.products);
 
       if (products.length === 0) throw new Error("No products found.");
 
@@ -64,48 +111,77 @@ export const ekatanalotisService = {
           const cleanName = normalizeText(item.name);
           const finalImageUrl = item.image ? `${IMAGE_BASE_URL}${encodeURIComponent(item.image)}` : null;
 
-          // A. Product
-          const product = await prisma.product.upsert({
-            where: { ean: item.barcode },
-            update: {
-              name: item.name,
-              normalizedName: cleanName,
-              imageUrl: finalImageUrl || undefined 
-            },
-            create: {
-              ean: item.barcode,
-              name: item.name,
-              normalizedName: cleanName,
-              imageUrl: finalImageUrl || "",
-            }
-          });
-          
-          stats.productsUpserted++;
+          await prisma.$transaction(async (tx) => {
+            // A. Product
+            const product = await tx.product.upsert({
+              where: { ean: item.barcode },
+              update: {
+                name: item.name,
+                normalizedName: cleanName,
+                imageUrl: finalImageUrl || undefined 
+              },
+              create: {
+                ean: item.barcode,
+                name: item.name,
+                normalizedName: cleanName,
+                imageUrl: finalImageUrl || "",
+              }
+            });
+            
+            stats.productsUpserted++;
 
-          // B. Prices
-          if (item.prices && Array.isArray(item.prices)) {
-            for (const p of item.prices) {
-              const storeId = MERCHANT_MAP[p.merchant_uuid];
-              
-              if (storeId) {
-                // Χρήση parseFloat για να σιγουρέψουμε ότι είναι αριθμός για το Decimal
-                const priceVal = typeof p.price === 'string' ? parseFloat(p.price) : p.price;
+            // B. Prices
+            if (item.prices && Array.isArray(item.prices)) {
+              const priceRows = item.prices.reduce<
+                { price: number; date: Date; productId: string; storeId: string }[]
+              >((acc, priceItem) => {
+                if (!isRemotePrice(priceItem)) {
+                  console.warn(
+                    `⚠️ Invalid price payload for ean=${item.barcode} merchant=${String(
+                      (priceItem as RemotePrice | undefined)?.merchant_uuid
+                    )}`
+                  );
+                  stats.errors++;
+                  return acc;
+                }
 
-                await prisma.priceHistory.create({
-                  data: {
-                    price: priceVal,
-                    date: today,
-                    productId: product.id,
-                    storeId: storeId
-                  }
+                const storeId = MERCHANT_MAP[priceItem.merchant_uuid];
+                if (!storeId) {
+                  console.warn(
+                    `⚠️ Unknown merchant for ean=${item.barcode} merchant=${priceItem.merchant_uuid}`
+                  );
+                  stats.errors++;
+                  return acc;
+                }
+
+                const priceVal =
+                  typeof priceItem.price === "string" ? parseFloat(priceItem.price) : priceItem.price;
+                if (Number.isNaN(priceVal)) {
+                  console.warn(
+                    `⚠️ Invalid price value for ean=${item.barcode} merchant=${priceItem.merchant_uuid}`
+                  );
+                  stats.errors++;
+                  return acc;
+                }
+
+                acc.push({
+                  price: priceVal,
+                  date: today,
+                  productId: product.id,
+                  storeId
                 });
-                stats.pricesAdded++;
+                return acc;
+              }, []);
+
+              if (priceRows.length > 0) {
+                const created = await tx.priceHistory.createMany({ data: priceRows });
+                stats.pricesAdded += created.count;
               }
             }
-          }
-
+          });
         } catch (err) {
-            stats.errors++;
+          stats.errors++;
+          console.error(`❌ Failed item ean=${item.barcode}:`, err);
         }
       }
 

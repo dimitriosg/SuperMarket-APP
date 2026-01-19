@@ -1,24 +1,54 @@
-// apps/api/src/routes/ai-suggestions.ts
+// apps/api/src/routes/ai-suggestions.route.ts
 import { Elysia, t } from "elysia";
-import { generateSuggestions } from "../services/ai-suggestions.service"
+import {
+  generateSuggestions,
+  type Suggestion,
+  type SuggestionsResponse,
+} from "../services/ai-suggestions.service";
 import { validateSuggestionsRequest } from "../utils/validation";
 import { db } from "../db";
 
+const suggestionsRequestSchema = t.Object({
+  items: t.Array(t.String({ maxLength: 100 }), { minItems: 1, maxItems: 50 }),
+  budget: t.Optional(t.Number({ minimum: 0, maximum: 1000 })),
+  preferences: t.Optional(t.Array(t.String(), { maxItems: 5 })),
+});
+
+type ValidationError = {
+  field: string;
+  message: string;
+};
+
+const formatValidationErrors = (error: unknown): ValidationError[] => {
+  if (error && typeof error === "object" && "all" in error && Array.isArray(error.all)) {
+    return error.all.map((issue: { path?: string; message?: string }) => ({
+      field: issue.path?.replace("/", "") || "body",
+      message: issue.message || "Invalid value",
+    }));
+  }
+
+  if (error instanceof Error) {
+    return [{ field: "body", message: error.message }];
+  }
+
+  return [{ field: "body", message: "Invalid request body" }];
+};
+
 export const aiSuggestionsRoutes = new Elysia({ prefix: "/api/ai" })
+  .onError(({ code, error, set }) => {
+    if (code === "VALIDATION") {
+      set.status = 400;
+      return {
+        error: "INVALID_INPUT",
+        message: "Request validation failed",
+        details: formatValidationErrors(error),
+      };
+    }
+  })
   .post(
     "/suggestions",
     async ({ body, set }) => {
       const startTime = Date.now();
-
-      // ✅ Validate request
-      const validation = validateSuggestionsRequest(body);
-      if (!validation.isValid) {
-        set.status = 400;
-        return {
-          error: "INVALID_INPUT",
-          details: validation.errors,
-        };
-      }
 
       const { items, budget, preferences } = body;
 
@@ -43,9 +73,13 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: "/api/ai" })
 
         // ✅ Return response
         if (result.error) {
+          const errorMessage =
+            result.error.error === "AI_TIMEOUT" ? "AI request timed out" : "AI provider error";
+
           set.status = 503;
           return {
             error: result.error.error,
+            message: errorMessage,
             fallback_suggestions: result.error.fallback_suggestions,
             metadata: result.metadata,
           };
@@ -67,20 +101,22 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: "/api/ai" })
       }
     },
     {
-      body: t.Object({
-        items: t.Array(t.String()),
-        budget: t.Optional(t.Number()),
-        preferences: t.Optional(t.Array(t.String())),
-      }),
+      body: suggestionsRequestSchema,
     }
   );
+
+interface SuggestionResultLog {
+  data?: SuggestionsResponse;
+  error?: { error: string; fallback_suggestions: Suggestion[] };
+  metadata: { model: string; latency_ms: number; aiTimeout: boolean };
+}
 
 // ✅ Helper: Log to database
 async function logSuggestionRequest(data: {
   items: string[];
   budget?: number;
   preferences?: string[];
-  result: any;
+  result: SuggestionResultLog;
 }) {
   try {
     await db.aISuggestionsLog.create({

@@ -43,8 +43,24 @@ const WelcomeHero = ({ onTagClick }: HeroProps) => (
       Ο έξυπνος βοηθός σου για το σούπερ μάρκετ. <br className="hidden md:block" />
       Επίλεξε την περιοχή σου από αριστερά και ξεκίνα!
     </p>
-
-    <PopularSearches onTagClick={onTagClick} />
+    <p className="text-slate-400 text-sm md:text-base max-w-lg mb-8">
+      Βήμα 1: επίλεξε περιοχή/κατάστημα για να δεις τις καλύτερες επιλογές.
+    </p>
+    
+    <div className="space-y-4">
+      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">ΔΗΜΟΦΙΛΕΙΣ ΑΝΑΖΗΤΗΣΕΙΣ</p>
+      <div className="flex flex-wrap justify-center gap-3">
+        {["Γάλα", "Φέτα", "Ελαιόλαδο", "Καφές", "Αυγά", "Γιαούρτι"].map(tag => (
+          <button 
+            key={tag}
+            onClick={() => onTagClick(tag)}
+            className="px-4 py-2 bg-white border border-slate-200 rounded-full text-slate-600 font-bold text-sm hover:border-indigo-400 hover:text-indigo-600 hover:shadow-md transition-all active:scale-95"
+          >
+            {tag}
+          </button>
+        ))}
+      </div>
+    </div>
   </div>
 );
 
@@ -68,6 +84,18 @@ export function HomePage() {
 
   // --- NEW: State για τα Φίλτρα (Collapsible) ---
   const [isFiltersOpen, setIsFiltersOpen] = useState(true);
+  const [isFirstVisit, setIsFirstVisit] = useState(false);
+  const firstVisitKey = "marketwise_has_seen_filters_hint";
+
+  useEffect(() => {
+    const hasSeenHint = localStorage.getItem(firstVisitKey);
+    setIsFirstVisit(!hasSeenHint);
+  }, []);
+
+  const handleDismissOnboarding = () => {
+    localStorage.setItem(firstVisitKey, "true");
+    setIsFirstVisit(false);
+  };
 
   // Filter logic (Client side filtering of backend results based on store availability)
   const filteredResults = results.map(product => {
@@ -113,6 +141,8 @@ export function HomePage() {
           <StoreFilters 
              isOpen={isFiltersOpen} 
              onToggle={() => setIsFiltersOpen(!isFiltersOpen)} 
+             showOnboarding={isFirstVisit}
+             onDismissOnboarding={handleDismissOnboarding}
           />
         </div>
 

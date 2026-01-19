@@ -153,7 +153,17 @@ Budget: €${request.budget || "χωρίς όριο"}
 
   const data = await response.json();
   const content = data.choices[0].message.content;
-  const parsed = JSON.parse(content);
+  let parsed: SuggestionsResponse;
+
+  try {
+    parsed = JSON.parse(content);
+  } catch (parseError) {
+    throw new Error("AI_PARSE_ERROR", { cause: parseError });
+  }
+
+  if (!parsed?.suggestions || !Array.isArray(parsed.suggestions)) {
+    throw new Error("AI_PARSE_ERROR");
+  }
 
   return {
     suggestions: parsed.suggestions,
@@ -202,10 +212,11 @@ export async function generateSuggestions(
     const fallback = generateFallbackSuggestions(request.items);
 
     const isTimeout = error instanceof Error && error.name === "AbortError";
+    const isParseError = error instanceof Error && error.message === "AI_PARSE_ERROR";
 
     return {
       error: {
-        error: isTimeout ? "AI_TIMEOUT" : "AI_ERROR",
+        error: isTimeout ? "AI_TIMEOUT" : isParseError ? "AI_PARSE_ERROR" : "AI_ERROR",
         fallback_suggestions: fallback,
       },
       metadata: {
