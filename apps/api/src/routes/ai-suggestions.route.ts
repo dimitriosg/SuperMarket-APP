@@ -1,4 +1,4 @@
-// apps/api/src/routes/ai-suggestions.ts
+// apps/api/src/routes/ai-suggestions.route.ts
 import { Elysia, t } from "elysia";
 import {
   generateSuggestions,
