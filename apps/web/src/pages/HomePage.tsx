@@ -62,6 +62,42 @@ export function HomePage() {
   // --- NEW: State για τα Φίλτρα (Collapsible) ---
   const [isFiltersOpen, setIsFiltersOpen] = useState(true);
 
+  useEffect(() => {
+    const handleGlobalKeys = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const isTypingTarget =
+        target?.tagName === "INPUT" ||
+        target?.tagName === "TEXTAREA" ||
+        target?.isContentEditable;
+
+      if (isTypingTarget || event.metaKey || event.ctrlKey || event.altKey) {
+        return;
+      }
+
+      if (event.key === "/") {
+        event.preventDefault();
+        const searchInput = document.getElementById("search-input") as HTMLInputElement | null;
+        searchInput?.focus();
+        searchInput?.select();
+        return;
+      }
+
+      if (event.key.toLowerCase() === "b") {
+        event.preventDefault();
+        toggleBasket();
+        return;
+      }
+
+      if (event.key.toLowerCase() === "f") {
+        event.preventDefault();
+        setIsFiltersOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeys);
+    return () => window.removeEventListener("keydown", handleGlobalKeys);
+  }, [toggleBasket]);
+
   // Filter logic (Client side filtering of backend results based on store availability)
   const filteredResults = results.map(product => {
     // Φιλτράρουμε τις προσφορές βάσει των ενεργών καταστημάτων

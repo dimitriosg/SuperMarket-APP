@@ -27,21 +27,25 @@ export function SearchHeader({
           MARKETWISE
         </h1>
 
-        <div className="flex-1 max-w-2xl relative">
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && onSearchSubmit()} // Για να δουλεύει το Enter
-            placeholder="Ψάξε προϊόντα (π.χ. φέτα, γάλα)..."
-            className="w-full p-3 pl-5 bg-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium transition-all"
-          />
-          
-          {loading && (
-            <div className="absolute right-3 top-3 flex items-center">
-              <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-          )}
+        <div className="flex-1 max-w-2xl">
+          <div className="relative">
+            <input
+              id="search-input"
+              type="text"
+              value={searchTerm}
+              onChange={(e) => onSearchChange(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && onSearchSubmit()} // Για να δουλεύει το Enter
+              placeholder="Ψάξε προϊόντα (π.χ. φέτα, γάλα)..."
+              className="w-full p-3 pl-5 bg-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium transition-all"
+            />
+            
+            {loading && (
+              <div className="absolute right-3 top-3 flex items-center">
+                <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+              </div>
+            )}
+          </div>
+          <div className="mt-1 text-xs text-slate-400 font-medium">/ για αναζήτηση</div>
         </div>
 
         {/* ΚΟΥΜΠΙ ΚΑΛΑΘΙΟΥ ΣΤΟ HEADER */}
