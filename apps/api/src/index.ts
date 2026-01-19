@@ -23,9 +23,47 @@ const app = new Elysia()
 
   // ✅ Error handler
   .onError(({ error, code, set }) => {
-    console.error(code, error);
-    set.status = 500;
-    return { error: "Internal Server Error" };
+    const requestErrorCodes = new Set([
+      "VALIDATION",
+      "PARSE",
+      "INVALID_COOKIE_SIGNATURE",
+      "INVALID_COOKIE",
+    ]);
+
+    const isNotFound = code === "NOT_FOUND";
+    const isRequestError = requestErrorCodes.has(code);
+
+    const status = isNotFound ? 404 : isRequestError ? 400 : 500;
+    set.status = status;
+
+    if (status >= 500) {
+      console.error(code, error);
+    } else {
+      console.warn(code, error);
+    }
+
+    const message =
+      status >= 500
+        ? "Internal Server Error"
+        : isNotFound
+          ? "Not Found"
+          : error instanceof Error
+            ? error.message
+            : "Bad Request";
+
+    const details =
+      code === "VALIDATION" && error && typeof error === "object"
+        ? ("all" in error ? (error as { all?: unknown }).all : undefined) ??
+          ("errors" in error ? (error as { errors?: unknown }).errors : undefined)
+        : undefined;
+
+    return {
+      error: {
+        code,
+        message,
+        ...(details ? { details } : {}),
+      },
+    };
   })
   
   // ✅ Listen LAST
