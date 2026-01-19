@@ -29,6 +29,7 @@ export function SearchHeader({
 
         <div className="flex-1 max-w-2xl relative">
           <input
+            id="product-search-input"
             type="text"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
