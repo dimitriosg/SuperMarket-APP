@@ -4,7 +4,13 @@ import { useBasketContext } from "../context/BasketContext";
 import { DEFAULT_IMG, getStoreIdByName } from "../services/api";
 
 export function BasketAnalysisPage() {
-  const { basket, comparison, updateQuantity, removeFromBasket, enabledStores } = useBasketContext();
+  const {
+    basket,
+    comparison,
+    updateQuantity,
+    removeFromBasket,
+    enabledStores
+  } = useBasketContext();
 
   const bestSingleStore = comparison.full[0];
 
