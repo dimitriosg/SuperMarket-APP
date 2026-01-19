@@ -24,6 +24,9 @@ const WelcomeHero = ({ onTagClick }: HeroProps) => (
       Ο έξυπνος βοηθός σου για το σούπερ μάρκετ. <br className="hidden md:block" />
       Επίλεξε την περιοχή σου από αριστερά και ξεκίνα!
     </p>
+    <p className="text-slate-400 text-sm md:text-base max-w-lg mb-8">
+      Βήμα 1: επίλεξε περιοχή/κατάστημα για να δεις τις καλύτερες επιλογές.
+    </p>
     
     <div className="space-y-4">
       <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">ΔΗΜΟΦΙΛΕΙΣ ΑΝΑΖΗΤΗΣΕΙΣ</p>
@@ -61,6 +64,18 @@ export function HomePage() {
 
   // --- NEW: State για τα Φίλτρα (Collapsible) ---
   const [isFiltersOpen, setIsFiltersOpen] = useState(true);
+  const [isFirstVisit, setIsFirstVisit] = useState(false);
+  const firstVisitKey = "marketwise_has_seen_filters_hint";
+
+  useEffect(() => {
+    const hasSeenHint = localStorage.getItem(firstVisitKey);
+    setIsFirstVisit(!hasSeenHint);
+  }, []);
+
+  const handleDismissOnboarding = () => {
+    localStorage.setItem(firstVisitKey, "true");
+    setIsFirstVisit(false);
+  };
 
   // Filter logic (Client side filtering of backend results based on store availability)
   const filteredResults = results.map(product => {
@@ -106,6 +121,8 @@ export function HomePage() {
           <StoreFilters 
              isOpen={isFiltersOpen} 
              onToggle={() => setIsFiltersOpen(!isFiltersOpen)} 
+             showOnboarding={isFirstVisit}
+             onDismissOnboarding={handleDismissOnboarding}
           />
         </div>
 
