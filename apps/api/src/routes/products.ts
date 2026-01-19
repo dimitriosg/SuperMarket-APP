@@ -1,7 +1,5 @@
 import { Elysia, t } from 'elysia';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { db } from '../db';
 
 export const productRoutes = new Elysia({ prefix: '/products' })
   .get('/search', async ({ query: { q } }) => {
@@ -11,7 +9,7 @@ export const productRoutes = new Elysia({ prefix: '/products' })
 
     console.log(`🔎 Searching for: "${searchTerm}"`);
 
-    const products = await prisma.product.findMany({
+    const products = await db.product.findMany({
       where: {
         OR: [
           // Αναζήτηση στο όνομα
