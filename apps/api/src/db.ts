@@ -9,4 +9,7 @@ export const prisma =
     log: ["info", "error", "warn"], // Για να βλέπουμε τι γίνεται
   });
 
+// ✅ Add alias for consistency
+export const db = prisma;
+
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;

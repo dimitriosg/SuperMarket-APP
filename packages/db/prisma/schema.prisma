@@ -134,3 +134,30 @@ model PriceSnapshot {
   @@index([productId, storeId, collectedAt(sort: Desc)])
   @@index([collectedAt])
 }
+
+// for AI suggestions
+model AISuggestionsLog {
+  id        String   @id @default(cuid())
+  userId    String   @db.Uuid
+  
+  // Request data
+  requestPayload    Json
+  requestItemsCount Int
+  requestBudget     Float?
+  
+  // Response data
+  responsePayload   Json
+  suggestionsCount  Int
+  
+  // Metadata
+  modelUsed         String   // "gpt-5.2", "perplexity-sonar", "fallback-rule"
+  latencyMs         Int
+  aiTimeout         Boolean  @default(false)
+  errorMessage      String?
+  
+  // Timestamps
+  createdAt         DateTime @default(now())
+  
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, aiTimeout])
+}
