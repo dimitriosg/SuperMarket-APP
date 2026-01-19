@@ -25,15 +25,15 @@ const app = new Elysia()
 
   // ✅ Error handler
   .onError(({ error, code, set }) => {
-    const requestErrorCodes = new Set([
-      "VALIDATION",
-      "PARSE",
-      "INVALID_COOKIE_SIGNATURE",
-      "INVALID_COOKIE",
-    ]);
+  const requestErrorCodes = new Set([
+    "VALIDATION",
+    "PARSE",
+    "INVALID_COOKIE_SIGNATURE",
+    "INVALID_COOKIE",
+  ]);
 
     const isNotFound = code === "NOT_FOUND";
-    const isRequestError = requestErrorCodes.has(code);
+    const isRequestError = requestErrorCodes.has(code.toString());
 
     const status = isNotFound ? 404 : isRequestError ? 400 : 500;
     set.status = status;
