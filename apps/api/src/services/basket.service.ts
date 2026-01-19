@@ -1,7 +1,5 @@
 // apps/api/src/services/basket.service.ts
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { db } from "../db";
 
 type BasketItem = {
   ean: string;
@@ -16,7 +14,7 @@ export class BasketService {
     const eans = items.map(i => i.ean);
 
     // 1. Φέρνουμε τα προϊόντα
-    const products = await prisma.product.findMany({
+    const products = await db.product.findMany({
       where: { ean: { in: eans } },
       select: { id: true, ean: true, name: true, imageUrl: true }
     });
@@ -27,7 +25,7 @@ export class BasketService {
     const productIds = products.map(p => p.id);
     
     // 2. Φέρνουμε τις τιμές
-    const prices = await prisma.priceSnapshot.findMany({
+    const prices = await db.priceSnapshot.findMany({
       where: {
         productId: { in: productIds }
       },
