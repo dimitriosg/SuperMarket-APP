@@ -3,7 +3,7 @@ import { Elysia, t } from 'elysia';
 import { BasketService } from '../services/basket.service';
 
 export const basketController = new Elysia({ prefix: '/basket' })
-  .post('/compare', async ({ body, set }) => {
+  .post('/analyze', async ({ body, set }) => {
     try {
       // body.items = [{ ean: "...", quantity: 1 }, ...]
       const result = await BasketService.calculateBasket(body.items);
