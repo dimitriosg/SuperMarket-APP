@@ -1,4 +1,4 @@
-// apps/api/src/controllers/basket.controller.ts
+// apps/api/src/routes/basket.route.ts
 import { Elysia, t } from 'elysia';
 import { BasketService } from '../services/basket.service';
 

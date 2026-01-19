@@ -1,4 +1,4 @@
-// apps/api/src/routes/search.ts
+// apps/api/src/routes/search.route.ts
 import { Elysia, t } from "elysia";
 import { productService } from "../services/productService";
 

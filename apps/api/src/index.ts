@@ -3,10 +3,10 @@ import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { CronJob } from "cron";
 import { ekatanalotisService } from "./services/ekatanalotisService";
-import { searchRoutes } from "./routes/search"; 
-import { basketController } from "./controllers/basket.controller"; 
-import { adminRoutes } from "./routes/admin";
-import { aiSuggestionsRoutes } from "./routes/ai-suggestions"; // ✅ Import as plugin
+import { searchRoutes } from "./routes/search.route";
+import { basketController } from "./routes/basket.route";
+import { adminRoutes } from "./routes/admin.route";
+import { aiSuggestionsRoutes } from "./routes/ai-suggestions.route"; // ✅ Import as plugin
 
 
 const app = new Elysia()
