@@ -12,6 +12,25 @@ type HeroProps = {
   onTagClick: (tag: string) => void;
 };
 
+const popularSearches = ["Γάλα", "Φέτα", "Ελαιόλαδο", "Καφές", "Αυγά", "Γιαούρτι"];
+
+const PopularSearches = ({ onTagClick }: HeroProps) => (
+  <div className="space-y-4">
+    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">ΔΗΜΟΦΙΛΕΙΣ ΑΝΑΖΗΤΗΣΕΙΣ</p>
+    <div className="flex flex-wrap justify-center gap-3">
+      {popularSearches.map(tag => (
+        <button 
+          key={tag}
+          onClick={() => onTagClick(tag)}
+          className="px-4 py-2 bg-white border border-slate-200 rounded-full text-slate-600 font-bold text-sm hover:border-indigo-400 hover:text-indigo-600 hover:shadow-md transition-all active:scale-95"
+        >
+          {tag}
+        </button>
+      ))}
+    </div>
+  </div>
+);
+
 const WelcomeHero = ({ onTagClick }: HeroProps) => (
   <div className="flex flex-col items-center justify-center py-10 md:py-20 text-center animate-fade-in">
     <div className="bg-indigo-50 p-6 rounded-full mb-6 shadow-sm border border-indigo-100">
@@ -24,21 +43,8 @@ const WelcomeHero = ({ onTagClick }: HeroProps) => (
       Ο έξυπνος βοηθός σου για το σούπερ μάρκετ. <br className="hidden md:block" />
       Επίλεξε την περιοχή σου από αριστερά και ξεκίνα!
     </p>
-    
-    <div className="space-y-4">
-      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">ΔΗΜΟΦΙΛΕΙΣ ΑΝΑΖΗΤΗΣΕΙΣ</p>
-      <div className="flex flex-wrap justify-center gap-3">
-        {["Γάλα", "Φέτα", "Ελαιόλαδο", "Καφές", "Αυγά", "Γιαούρτι"].map(tag => (
-          <button 
-            key={tag}
-            onClick={() => onTagClick(tag)}
-            className="px-4 py-2 bg-white border border-slate-200 rounded-full text-slate-600 font-bold text-sm hover:border-indigo-400 hover:text-indigo-600 hover:shadow-md transition-all active:scale-95"
-          >
-            {tag}
-          </button>
-        ))}
-      </div>
-    </div>
+
+    <PopularSearches onTagClick={onTagClick} />
   </div>
 );
 
@@ -54,7 +60,8 @@ export function HomePage() {
     addToBasket, 
     removeFromBasket, 
     updateQuantity, 
-    togglePin 
+    togglePin,
+    selectAllStores
   } = useBasketContext();
 
   const { searchTerm, setSearchTerm, results, isSearching, performSearch } = useProductSearch();
@@ -139,20 +146,43 @@ export function HomePage() {
                 )}
               </div>
 
-              {/* GRID ΠΡΟΪΟΝΤΩΝ */}
-              <div className={`grid gap-6 ${
-                  isFiltersOpen 
-                    ? (isPinned && isBasketOpen ? 'grid-cols-1 xl:grid-cols-2' : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3') 
-                    : (isPinned && isBasketOpen ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4')
-              }`}>
-                {filteredResults.map((product) => (
-                  <ProductCard 
-                    key={product.id} 
-                    product={product} 
-                    onAdd={() => addToBasket(product)} 
-                  />
-                ))}
-              </div>
+              {filteredResults.length > 0 ? (
+                <div className={`grid gap-6 ${
+                    isFiltersOpen 
+                      ? (isPinned && isBasketOpen ? 'grid-cols-1 xl:grid-cols-2' : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3') 
+                      : (isPinned && isBasketOpen ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4')
+                }`}>
+                  {filteredResults.map((product) => (
+                    <ProductCard 
+                      key={product.id} 
+                      product={product} 
+                      onAdd={() => addToBasket(product)} 
+                    />
+                  ))}
+                </div>
+              ) : (
+                results.length > 0 && !isSearching && (
+                  <div className="text-center py-20">
+                    <div className="text-6xl mb-4">🤷‍♂️</div>
+                    <h3 className="text-xl font-bold text-slate-700">Δεν βρέθηκαν προϊόντα με αυτά τα φίλτρα</h3>
+                    <p className="text-slate-400 mt-2">
+                      Τα φίλτρα μπορεί να κρύβουν διαθέσιμα προϊόντα. Δοκίμασε να τα καθαρίσεις ή άλλαξε αναζήτηση.
+                    </p>
+                    <div className="flex flex-col items-center gap-4 mt-6">
+                      <button
+                        onClick={selectAllStores}
+                        className="px-6 py-3 bg-indigo-600 text-white rounded-full font-bold shadow-md hover:bg-indigo-500 transition-all"
+                      >
+                        Καθάρισε φίλτρα
+                      </button>
+                      <PopularSearches onTagClick={(tag) => {
+                        setSearchTerm(tag);
+                        performSearch(tag);
+                      }} />
+                    </div>
+                  </div>
+                )
+              )}
 
               {/* EMPTY STATE */}
               {results.length === 0 && !isSearching && searchTerm && (
