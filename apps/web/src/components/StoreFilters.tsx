@@ -24,10 +24,13 @@ export function StoreFilters({ isOpen, onToggle, showOnboarding, onDismissOnboar
         {/* Κουμπί για Άνοιγμα - Πιο έντονο */}
         <button 
           onClick={onToggle}
-          className="w-10 h-10 flex items-center justify-center bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors shadow-md cursor-pointer z-50"
-          title="Εμφάνιση Φίλτρων"
+          className="relative w-10 h-10 flex items-center justify-center bg-indigo-600 text-white rounded-full hover:bg-indigo-700 transition-colors shadow-md cursor-pointer z-50"
+          title="Εμφάνιση Φίλτρων (F)"
         >
           »
+          <span className="absolute -top-1 -right-1 bg-white text-indigo-700 text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow">
+            F
+          </span>
         </button>
 
         {/* Vertical Text */}
@@ -75,9 +78,12 @@ export function StoreFilters({ isOpen, onToggle, showOnboarding, onDismissOnboar
       <button 
         onClick={onToggle}
         className="absolute -right-3 top-6 w-8 h-8 bg-white border border-slate-200 text-slate-400 rounded-full flex items-center justify-center shadow-md hover:text-indigo-600 hover:border-indigo-300 transition-all z-30 cursor-pointer"
-        title="Απόκρυψη Φίλτρων"
+        title="Απόκρυψη Φίλτρων (F)"
       >
         «
+        <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+          F
+        </span>
       </button>
 
       {/* Περιοχή */}
