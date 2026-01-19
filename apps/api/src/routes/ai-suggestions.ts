@@ -1,6 +1,11 @@
 // apps/api/src/routes/ai-suggestions.ts
 import { Elysia, t } from "elysia";
-import { generateSuggestions } from "../services/ai-suggestions.service";
+import {
+  generateSuggestions,
+  type Suggestion,
+  type SuggestionsResponse,
+} from "../services/ai-suggestions.service";
+import { validateSuggestionsRequest } from "../utils/validation";
 import { db } from "../db";
 
 const suggestionsRequestSchema = t.Object({
@@ -100,12 +105,18 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: "/api/ai" })
     }
   );
 
+interface SuggestionResultLog {
+  data?: SuggestionsResponse;
+  error?: { error: string; fallback_suggestions: Suggestion[] };
+  metadata: { model: string; latency_ms: number; aiTimeout: boolean };
+}
+
 // ✅ Helper: Log to database
 async function logSuggestionRequest(data: {
   items: string[];
   budget?: number;
   preferences?: string[];
-  result: any;
+  result: SuggestionResultLog;
 }) {
   try {
     await db.aISuggestionsLog.create({

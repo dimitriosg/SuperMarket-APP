@@ -3,7 +3,7 @@ import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { CronJob } from "cron";
 import { ekatanalotisService } from "./services/ekatanalotisService";
-import { searchRoutes } from "./routes/search"; 
+import { productRoutes } from "./routes/products"; 
 import { basketController } from "./controllers/basket.controller"; 
 import { adminRoutes } from "./routes/admin";
 import { aiSuggestionsRoutes } from "./routes/ai-suggestions"; // ✅ Import as plugin
@@ -14,7 +14,7 @@ const app = new Elysia()
   .get("/", () => "🚀 SuperMarket API is Running!")
 
   // ✅ Existing routes
-  .use(searchRoutes)      
+  .use(productRoutes)      
   .use(basketController)  
   .use(adminRoutes)
   
