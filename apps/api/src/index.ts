@@ -6,7 +6,8 @@ import { ekatanalotisService } from "./services/ekatanalotisService";
 import { searchRoutes } from "./routes/search.route";
 import { basketController } from "./routes/basket.route";
 import { adminRoutes } from "./routes/admin.route";
-import { aiSuggestionsRoutes } from "./routes/ai-suggestions.route"; // ✅ Import as plugin
+import { aiSuggestionsRoutes } from "./routes/ai-suggestions.route"; 
+import { productRoutes } from "./routes/products.route";
 
 
 const app = new Elysia()
@@ -15,6 +16,7 @@ const app = new Elysia()
 
   // ✅ Existing routes
   .use(productRoutes)      
+  .use(searchRoutes)
   .use(basketController)  
   .use(adminRoutes)
   
