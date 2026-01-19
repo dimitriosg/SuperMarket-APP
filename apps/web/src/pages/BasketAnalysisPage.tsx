@@ -4,21 +4,20 @@ import { useBasketContext } from "../context/BasketContext";
 import { DEFAULT_IMG, getStoreIdByName } from "../services/api";
 
 export function BasketAnalysisPage() {
-  const { basket, comparison, updateQuantity, removeFromBasket, enabledStores, addToBasket } = useBasketContext();
+  const { basket, comparison, updateQuantity, removeFromBasket, enabledStores } = useBasketContext();
 
   const bestSingleStore = comparison.full[0];
 
-  // FIX: Χρήση useMemo για να μην υπολογίζει ξανά σε κάθε render (Performance)
+  // --- 1. Υπολογισμός Mix & Match Στρατηγικής ---
   const mixMatchStrategy = useMemo(() => {
     return basket.map(item => {
-      // 1. Φιλτράρισμα offers με βάση τα enabledStores
-      const validOffers = item.offers.filter(offer => {
+      // Ασφαλές φιλτράρισμα προσφορών
+      const validOffers = (item.offers || []).filter(offer => {
         const storeId = getStoreIdByName(offer.store);
         return enabledStores.includes(storeId);
       });
 
-      // FIX: Αν δεν υπάρχει προσφορά στα επιλεγμένα καταστήματα, ΔΕΝ κάνουμε fallback σε όλα.
-      // Επιστρέφουμε null στο activeOffer για να δείξουμε ότι δεν υπάρχει.
+      // Εύρεση καλύτερης τιμής
       const bestOffer = validOffers.length > 0 
         ? [...validOffers].sort((a, b) => Number(a.price) - Number(b.price))[0]
         : null;
@@ -36,74 +35,145 @@ export function BasketAnalysisPage() {
 
   const savings = bestSingleStore ? (bestSingleStore.totalCost - mixMatchTotal) : 0;
 
-// --- SMART EMPTY STATE ---
-  if (basket.length === 0) {
-    
-    // Έτοιμες λίστες για γρήγορο γέμισμα (Mock Data με πραγματικά IDs/EANs αν έχεις, αλλιώς mock)
-    const quickLists = [
-      {
-        title: "👔 Φοιτητικό",
-        icon: "🎓",
-        items: [
-          { ean: "5201004033013", name: "Τοστ Σίτου", image: DEFAULT_IMG, offers: [], activeOffer: null, quantity: 1, id: "q1" },
-          { ean: "5201263092225", name: "Γάλα Πλήρες", image: DEFAULT_IMG, offers: [], activeOffer: null, quantity: 2, id: "q2" },
-          { ean: "5204239123456", name: "Καφές Nescafe", image: DEFAULT_IMG, offers: [], activeOffer: null, quantity: 1, id: "q3" }
-        ]
-      },
-      {
-        title: "🏠 Οικογενειακό",
-        icon: "👨‍👩‍👧‍👦",
-        items: [
-          { ean: "5201263092225", name: "Γάλα 1L (x4)", image: DEFAULT_IMG, offers: [], activeOffer: null, quantity: 4, id: "f1" },
-          { ean: "5201999999999", name: "Χαρτί Υγείας", image: DEFAULT_IMG, offers: [], activeOffer: null, quantity: 1, id: "f2" },
-          { ean: "5203333333333", name: "Απορρυπαντικό", image: DEFAULT_IMG, offers: [], activeOffer: null, quantity: 1, id: "f3" }
-        ]
-      },
-      {
-        title: "🥦 Veggie",
-        icon: "🥗",
-        items: [
-            { ean: "520000000001", name: "Γάλα Αμυγδάλου", image: DEFAULT_IMG, offers: [], activeOffer: null, quantity: 2, id: "v1" },
-            { ean: "520000000002", name: "Φακές", image: DEFAULT_IMG, offers: [], activeOffer: null, quantity: 1, id: "v2" }
-        ]
-      }
-    ];
-
-    const handleAddList = (listItems: any[]) => {
-        // Προσθέτουμε κάθε προϊόν στο καλάθι
-        listItems.forEach(item => {
-            // Προσοχή: Εδώ ιδανικά θα έπρεπε να κάνουμε fetch τα real data από το API
-            // Αλλά για το Demo, τα προσθέτουμε mock και το Basket Logic θα τα "βρει"
-            addToBasket(item);
-        });
-    };
-
+  // --- 2. EMPTY STATE ---
+  if (!basket || basket.length === 0) {
     return (
       <div className="min-h-screen bg-slate-50 p-6 flex flex-col items-center justify-center text-center">
-        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-100 max-w-lg w-full">
-            <div className="text-6xl mb-6 animate-bounce">🛒</div>
-            <h1 className="text-2xl font-black text-slate-800 mb-2">Το καλάθι σου είναι άδειο</h1>
-            <p className="text-slate-400 mb-8">Ξεκίνα μια αναζήτηση ή διάλεξε μια έτοιμη λίστα:</p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                {quickLists.map((list, idx) => (
-                    <button 
-                        key={idx}
-                        onClick={() => handleAddList(list.items)}
-                        className="flex flex-col items-center justify-center p-4 bg-slate-50 hover:bg-indigo-50 border-2 border-transparent hover:border-indigo-200 rounded-xl transition-all group"
-                    >
-                        <span className="text-3xl mb-2 group-hover:scale-110 transition-transform">{list.icon}</span>
-                        <span className="font-bold text-slate-700 text-sm">{list.title}</span>
-                        <span className="text-[10px] text-slate-400 mt-1">{list.items.length} προϊόντα</span>
-                    </button>
-                ))}
-            </div>
-
-            <Link to="/" className="inline-flex items-center justify-center w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200">
-                🔍 Αναζήτηση Προϊόντων
+        <div className="bg-white p-12 rounded-3xl shadow-sm border border-slate-100 max-w-md w-full">
+            <div className="text-7xl mb-6">🛒</div>
+            <h1 className="text-2xl font-black text-slate-800 mb-2">Το καλάθι είναι άδειο</h1>
+            <p className="text-slate-400 mb-8">Δεν υπάρχουν προϊόντα για ανάλυση.</p>
+            <Link to="/" className="inline-flex items-center justify-center w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
+                🔍 Επιστροφή στην Αναζήτηση
             </Link>
         </div>
       </div>
     );
   }
+
+  // --- 3. MAIN RENDER (To design από το main branch) ---
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-20">
+      <div className="max-w-6xl mx-auto px-4 pt-8">
+        
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+          <div>
+            <Link to="/" className="text-indigo-600 font-bold text-sm hover:underline mb-2 inline-block">← Πίσω στην αναζήτηση</Link>
+            <h1 className="text-4xl font-black tracking-tight text-slate-900">Έξυπνη Ανάλυση</h1>
+            <p className="text-slate-500 mt-1 font-medium">Βρήκαμε τον βέλτιστο συνδυασμό για τα {basket.length} προϊόντα σας.</p>
+          </div>
+          
+          <div className="bg-white p-1 rounded-2xl shadow-sm border border-slate-200 flex">
+             <div className="px-6 py-3 text-center border-r border-slate-100">
+                <div className="text-[10px] uppercase tracking-widest font-black text-slate-400 mb-1">Καλύτερο Store</div>
+                <div className="text-xl font-black text-slate-800">{bestSingleStore ? `${bestSingleStore.totalCost.toFixed(2)}€` : '--'}</div>
+             </div>
+             <div className="px-6 py-3 text-center bg-indigo-600 rounded-xl shadow-lg shadow-indigo-200">
+                <div className="text-[10px] uppercase tracking-widest font-black text-indigo-200 mb-1 text-center">Mix & Match</div>
+                <div className="text-xl font-black text-white">{mixMatchTotal.toFixed(2)}€</div>
+             </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          {/* LEFT: STRATEGY CARDS */}
+          <div className="lg:col-span-4 space-y-6">
+            
+            {/* Savings Badge */}
+            {savings > 0 && (
+              <div className="bg-green-500 text-white p-6 rounded-3xl shadow-xl shadow-green-100 relative overflow-hidden group">
+                <div className="relative z-10">
+                  <div className="text-xs font-black uppercase tracking-widest opacity-80">Συνολικό Κέρδος</div>
+                  <div className="text-4xl font-black mt-1">-{savings.toFixed(2)}€</div>
+                  <p className="text-xs mt-2 font-bold text-green-100">Επιλέγοντας την Mix & Match στρατηγική έναντι ενός καταστήματος.</p>
+                </div>
+                <div className="absolute -right-4 -bottom-4 text-8xl opacity-20 group-hover:scale-110 transition-transform">💰</div>
+              </div>
+            )}
+
+            {/* Best Store Card */}
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+               <h3 className="font-black text-slate-800 uppercase text-xs tracking-widest mb-4">Νικητής: 1 Κατάστημα</h3>
+               {bestSingleStore ? (
+                 <div>
+                    <div className="flex items-center gap-4 mb-4">
+                       <div className="w-12 h-12 bg-slate-50 rounded-xl p-2 border border-slate-100 flex items-center justify-center">
+                          <span className="font-black text-indigo-600 text-xl">{bestSingleStore.storeName[0]}</span>
+                       </div>
+                       <div>
+                          <div className="font-black text-slate-900">{bestSingleStore.storeName}</div>
+                          <div className="text-xs font-bold text-slate-400">Όλα τα προϊόντα διαθέσιμα</div>
+                       </div>
+                    </div>
+                    <div className="flex items-center justify-between bg-slate-50 p-4 rounded-2xl">
+                       <span className="text-sm font-bold text-slate-500">Σύνολο:</span>
+                       <span className="text-2xl font-black text-slate-900">{bestSingleStore.totalCost.toFixed(2)}€</span>
+                    </div>
+                 </div>
+               ) : (
+                 <div className="text-slate-400 text-sm font-medium">Δεν βρέθηκε κατάστημα με πλήρη διαθεσιμότητα.</div>
+               )}
+            </div>
+
+          </div>
+
+          {/* RIGHT: MIX & MATCH LIST */}
+          <div className="lg:col-span-8">
+            <div className="bg-indigo-900 rounded-[2.5rem] p-8 shadow-2xl shadow-indigo-200">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-2xl font-black text-white">Η Mix & Match Λίστα σου</h2>
+                  <p className="text-indigo-300 text-sm font-medium">Τα φθηνότερα προϊόντα από κάθε κατάστημα</p>
+                </div>
+                <div className="text-right">
+                   <div className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mb-1">Σύνολο</div>
+                   <div className="text-3xl font-black text-white">{mixMatchTotal.toFixed(2)}€</div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+              {mixMatchStrategy.map((item) => (
+                <div key={item.id} className="bg-indigo-800/50 hover:bg-indigo-800 border border-indigo-700/50 rounded-2xl p-4 flex items-center gap-4 transition-colors group">
+                   <div className="w-14 h-14 bg-white rounded-xl p-2 flex-shrink-0">
+                      <img src={item.image || DEFAULT_IMG} className="w-full h-full object-contain" alt={item.name} />
+                   </div>
+                   
+                   <div className="flex-1 min-w-0">
+                     <div className="font-bold text-sm text-indigo-100 truncate">{item.name}</div>
+                     
+                     {/* Controls */}
+                     <div className="flex items-center gap-3 mt-1">
+                        <div className="flex items-center bg-indigo-950 rounded-lg">
+                          <button onClick={() => updateQuantity(item.id, -1)} className="px-2 text-indigo-400 hover:text-white">-</button>
+                          <span className="text-xs font-bold w-4 text-center text-white">{item.quantity}</span>
+                          <button onClick={() => updateQuantity(item.id, 1)} className="px-2 text-indigo-400 hover:text-white">+</button>
+                        </div>
+                        <button onClick={() => removeFromBasket(item.id)} className="text-[10px] font-bold text-red-400 hover:text-red-300 uppercase tracking-tighter">Διαγραφή</button>
+                     </div>
+                   </div>
+
+                   <div className="text-right">
+                     <div className="font-black text-green-400 text-lg">
+                       {item.activeOffer ? (Number(item.activeOffer.price) * item.quantity).toFixed(2) : '0.00'}€
+                     </div>
+                     <div className="text-[10px] font-black bg-white text-indigo-900 px-3 py-1 rounded-full inline-block mt-1 uppercase tracking-tighter">
+                       {item.activeOffer ? item.activeOffer.store.split('(')[0] : 'N/A'}
+                     </div>
+                   </div>
+                </div>
+              ))}
+              </div>
+
+              <button className="w-full bg-white text-indigo-900 font-black py-5 rounded-2xl mt-10 hover:bg-indigo-50 transition-colors shadow-xl text-lg uppercase tracking-wide">
+                 Ολοκλήρωση & Αγορά
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
 }

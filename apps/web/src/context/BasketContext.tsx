@@ -30,7 +30,6 @@ type BasketContextType = {
 const BasketContext = createContext<BasketContextType | undefined>(undefined);
 
 export function BasketProvider({ children }: { children: ReactNode }) {
-  // 1. LOCAL STORAGE: Διαβάζουμε το καλάθι κατά την εκκίνηση
   const [basket, setBasket] = useState<BasketItem[]>(() => {
     try {
       const saved = localStorage.getItem("my_basket");
@@ -80,14 +79,20 @@ export function BasketProvider({ children }: { children: ReactNode }) {
     fetchComparison();
   }, [debouncedBasket]);
 
-  const comparison = {
+const comparison = {
     loading: isCalculating,
-    full: comparisonResults
-      .filter(r => enabledStores.includes(getStoreIdByName(r.storeName)))
-      .filter(r => r.missingItems === 0),
-    partial: comparisonResults
-      .filter(r => enabledStores.includes(getStoreIdByName(r.storeName)))
-      .filter(r => r.missingItems > 0)
+    full: Array.isArray(comparisonResults) 
+      ? comparisonResults.filter(r => {
+          const storeId = getStoreIdByName(r.storeName || "");
+          return enabledStores.includes(storeId) && r.missingItems === 0;
+        })
+      : [],
+    partial: Array.isArray(comparisonResults)
+      ? comparisonResults.filter(r => {
+          const storeId = getStoreIdByName(r.storeName || "");
+          return enabledStores.includes(storeId) && r.missingItems > 0;
+        })
+      : []
   };
 
   const addToBasket = (product: ProductResult) => {
@@ -136,10 +141,10 @@ export function BasketProvider({ children }: { children: ReactNode }) {
     setEnabledStores(validStoresForRegion);
   };
 
-  return (
+return (
     <BasketContext.Provider value={{
       basket, enabledStores, selectedLocation, isBasketOpen, isPinned, 
-      comparison, 
+      comparison, // ✅ Πλέον είναι ασφαλές
       addToBasket, removeFromBasket, updateQuantity, clearBasket,
       toggleBasket, togglePin, setBasketOpen: setIsBasketOpen, toggleStoreFilter, changeLocation,
       selectAllStores, deselectAllStores

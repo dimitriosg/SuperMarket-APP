@@ -93,14 +93,25 @@ export const STORES_DATA = [
 ];
 
 // Helper Function (Την κρατάμε γιατί τη χρησιμοποιεί το Context)
-export const getStoreIdByName = (apiName: string) => {
+export const getStoreIdByName_OLD = (apiName: string) => {
   const clean = apiName.toUpperCase();
   const found = STORES_DATA.find(s => clean.includes(s.name.toUpperCase())); // Απλοποιημένο matching
   return found ? found.id : "other";
 };
 
-// --- 3. API OBJECT (ΕΔΩ ΓΙΝΕΤΑΙ Η ΜΑΓΕΙΑ) ---
-// Συνδέουμε το παλιό `api.search` με το νέο Backend Fetch
+export const getStoreIdByName = (apiName: string) => {
+  // ✅ Προσθήκη ελέγχου για null/undefined
+  if (!apiName) return "other"; 
+  
+  const clean = apiName.toUpperCase();
+  const found = STORES_DATA.find(s => 
+    // ✅ Ασφαλής σύγκριση
+    s.name && clean.includes(s.name.toUpperCase())
+  );
+  return found ? found.id : "other";
+};
+
+// --- 3. API OBJECT ---
 export const api = {
   search: async (query: string): Promise<ProductResult[]> => {
     if (!query) return [];
@@ -115,16 +126,19 @@ export const api = {
     }
   },
 
-  // Κρατάμε και το basket API
-  compareBasket: async (items: any[]) => {
+compareBasket: async (items: any[]) => {
     try {
       const res = await fetch(`${API_BASE_URL}/basket/analyze`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ items }),
       });
+      
       if (!res.ok) return [];
-      return await res.json();
+      
+      const json = await res.json();
+      
+      return Array.isArray(json.data) ? json.data : [];
     } catch (error) {
       console.error("Basket Analysis Error:", error);
       return [];
