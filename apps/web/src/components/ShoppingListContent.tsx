@@ -1,6 +1,9 @@
 //apps/web/src/components/ShoppingListContent.tsx
 import React, { useState } from "react";
 import { ShoppingItem } from "../hooks/useShoppingList";
+import { Button } from "./ui/Button";
+import { Card } from "./ui/Card";
+import { Input } from "./ui/Input";
 
 interface ShoppingListContentProps {
   items: ShoppingItem[];
@@ -27,7 +30,7 @@ export const ShoppingListContent: React.FC<ShoppingListContentProps> = ({ items,
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
+    <Card className="p-6 shadow-md">
       <h2 className="text-2xl font-bold mb-4">Το Καλάθι μου</h2>
       {items.length === 0 ? (
         <div className="space-y-4">
@@ -39,33 +42,37 @@ export const ShoppingListContent: React.FC<ShoppingListContentProps> = ({ items,
               handleAddItem();
             }}
           >
-            <input
+            <Input
               type="text"
+              label="Πρόσθεσε προϊόν"
+              hideLabel
               value={newItemName}
               onChange={(event) => setNewItemName(event.target.value)}
               placeholder="Πρόσθεσε προϊόν"
-              className="flex-1 rounded-md border border-gray-200 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+              wrapperClassName="flex-1"
             />
-            <button
+            <Button
               type="submit"
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-blue-300"
+              size="sm"
               disabled={newItemName.trim().length === 0}
             >
               Πρόσθεσε προϊόν
-            </button>
+            </Button>
           </form>
           <div>
             <p className="text-sm text-gray-500 mb-2">Δοκίμασε κάτι από αυτά:</p>
             <div className="flex flex-wrap gap-2">
               {suggestedItems.map((item) => (
-                <button
+                <Button
                   key={item}
                   type="button"
                   onClick={() => handleAddItem(item)}
-                  className="rounded-full border border-gray-200 bg-gray-50 px-3 py-1 text-sm text-gray-700 transition hover:border-blue-200 hover:bg-blue-50"
+                  variant="secondary"
+                  size="sm"
+                  className="rounded-full bg-gray-50 text-gray-700 hover:border-blue-200 hover:bg-blue-50"
                 >
                   {item}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -79,6 +86,6 @@ export const ShoppingListContent: React.FC<ShoppingListContentProps> = ({ items,
           ))}
         </ul>
       )}
-    </div>
+    </Card>
   );
 };

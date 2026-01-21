@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { BasketItem, ProductResult } from "../types";
 import { useProductSearch } from "../hooks/useProductSearch";
 import { DEFAULT_IMG } from "../services/api";
+import { Button } from "./ui/Button";
+import { Input } from "./ui/Input";
 
 type Props = {
   basket: BasketItem[];
@@ -26,11 +28,13 @@ export function ProductSearch({ basket, onAdd }: Props) {
         className="relative"
       >
         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
-        <input
+        <Input
+          label="Αναζήτηση προϊόντων"
+          hideLabel
           value={searchTerm}
           onChange={(event) => setSearchTerm(event.target.value)}
           placeholder="Αναζήτηση προϊόντων..."
-          className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm font-medium text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+          className="rounded-2xl py-3 pl-11 pr-4"
         />
       </form>
 
@@ -74,12 +78,13 @@ export function ProductSearch({ basket, onAdd }: Props) {
                   Στο καλάθι ({quantityInBasket})
                 </span>
               ) : (
-                <button
+                <Button
                   onClick={() => onAdd(product)}
-                  className="rounded-full bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-indigo-500"
+                  size="sm"
+                  className="rounded-full text-xs font-bold shadow-sm hover:bg-indigo-500"
                 >
                   Προσθήκη
-                </button>
+                </Button>
               )}
             </div>
           );
