@@ -9,6 +9,7 @@ import { db } from "../db";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { rateLimitMiddleware } from "../middleware/rateLimitMiddleware";
 import { redis } from "../redis";
+import { createRequestLogger, getRequestId, logger } from "../utils/logger";
 
 const suggestionsRequestSchema = t.Object({
   items: t.Array(t.String({ maxLength: 100 }), { minItems: 1, maxItems: 50 }),
@@ -17,6 +18,13 @@ const suggestionsRequestSchema = t.Object({
 });
 
 const CACHE_TTL_SECONDS = 5 * 60;
+const ERROR_WINDOW_MS = 10 * 60 * 1000;
+const ERROR_RATE_THRESHOLD = 0.05;
+const ALERT_COOLDOWN_MS = 60 * 1000;
+
+const aiRequestTimestamps: number[] = [];
+const aiErrorTimestamps: number[] = [];
+let lastErrorRateAlertAt = 0;
 
 const getUserId = (ctx: any): string => {
   const userId = ctx?.user?.id;
@@ -55,6 +63,36 @@ const formatValidationErrors = (error: unknown): ValidationError[] => {
 const normalizeList = (values: string[] | undefined) => {
   if (!values) return [];
   return values.map((value) => value.trim()).filter(Boolean).sort();
+};
+
+const trackAiErrorRate = (isError: boolean, requestLogger: ReturnType<typeof createRequestLogger>) => {
+  const now = Date.now();
+  aiRequestTimestamps.push(now);
+  if (isError) {
+    aiErrorTimestamps.push(now);
+  }
+
+  while (aiRequestTimestamps.length > 0 && aiRequestTimestamps[0] < now - ERROR_WINDOW_MS) {
+    aiRequestTimestamps.shift();
+  }
+  while (aiErrorTimestamps.length > 0 && aiErrorTimestamps[0] < now - ERROR_WINDOW_MS) {
+    aiErrorTimestamps.shift();
+  }
+
+  const totalRequests = aiRequestTimestamps.length;
+  if (totalRequests === 0) return;
+
+  const errorRate = aiErrorTimestamps.length / totalRequests;
+  if (errorRate > ERROR_RATE_THRESHOLD && now - lastErrorRateAlertAt > ALERT_COOLDOWN_MS) {
+    lastErrorRateAlertAt = now;
+    requestLogger.error("AI_ERROR_RATE_ALERT", {
+      event: "AI_ERROR_RATE_ALERT",
+      error_rate: errorRate,
+      window_minutes: 10,
+      total_requests: totalRequests,
+      error_requests: aiErrorTimestamps.length,
+    });
+  }
 };
 
 const hashRequest = async (payload: string): Promise<string> => {
@@ -109,13 +147,29 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: "/api/ai" })
       const startTime = Date.now();
 
       const { items, budget, preferences } = body;
-      const userId = getUserId({ headers });
+      const resolvedUserId = userId ?? getUserId({ headers });
+      const requestId = getRequestId(headers);
+      const requestLogger = createRequestLogger({ requestId, userId: resolvedUserId });
+      let didError = false;
 
       try {
-        if (!userId) {
+        if (!resolvedUserId) {
           set.status = 401;
           return { error: "UNAUTHORIZED", message: "Unauthorized" };
-        const cacheKey = await buildCacheKey({ userId, items, budget, preferences });
+        }
+
+        requestLogger.info("AI_SUGGESTION_REQUEST", {
+          event: "AI_SUGGESTION_REQUEST",
+          items_count: items.length,
+          budget: budget ?? null,
+        });
+
+        const cacheKey = await buildCacheKey({
+          userId: resolvedUserId,
+          items,
+          budget,
+          preferences,
+        });
 
         try {
           const cached = await redis.get(cacheKey);
@@ -124,7 +178,10 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: "/api/ai" })
             return JSON.parse(cached) as SuggestionsResponse;
           }
         } catch (cacheError) {
-          console.warn("[AI Suggestions Cache] Redis unavailable", cacheError);
+          requestLogger.warn("AI_SUGGESTIONS_CACHE_UNAVAILABLE", {
+            event: "AI_SUGGESTIONS_CACHE_UNAVAILABLE",
+            error: cacheError instanceof Error ? cacheError.message : "Unknown error",
+          });
         }
 
         // ✅ Get API key from env
@@ -139,15 +196,32 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: "/api/ai" })
 
         // ✅ Log to database (non-blocking)
         logSuggestionRequest({
-          userId,
+          userId: resolvedUserId,
           items,
           budget,
           preferences,
           result,
-        }).catch(console.error);
+        }).catch((error) => {
+          requestLogger.error("AI_LOG_ERROR", {
+            event: "AI_LOG_ERROR",
+            error: error instanceof Error ? error.message : "Unknown error",
+          });
+        });
 
         // ✅ Return response
         if (result.error) {
+          didError = true;
+          if (result.error.error === "AI_TIMEOUT") {
+            requestLogger.warn("AI_TIMEOUT", {
+              event: "AI_TIMEOUT",
+              latency_ms: 8000,
+            });
+          } else {
+            requestLogger.error("AI_ERROR", {
+              event: "AI_ERROR",
+              error_type: result.error.error,
+            });
+          }
           const errorMessage =
             result.error.error === "AI_TIMEOUT" ? "AI request timed out" : "AI provider error";
 
@@ -168,13 +242,20 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: "/api/ai" })
         try {
           await redis.set(cacheKey, JSON.stringify(responsePayload), "EX", CACHE_TTL_SECONDS);
         } catch (cacheError) {
-          console.warn("[AI Suggestions Cache] Failed to store cache", cacheError);
+          requestLogger.warn("AI_SUGGESTIONS_CACHE_STORE_FAILED", {
+            event: "AI_SUGGESTIONS_CACHE_STORE_FAILED",
+            error: cacheError instanceof Error ? cacheError.message : "Unknown error",
+          });
         }
 
         set.status = 200;
         return responsePayload;
       } catch (error) {
-        console.error("[AI Suggestions Error]", error);
+        didError = true;
+        requestLogger.error("AI_ERROR", {
+          event: "AI_ERROR",
+          error_type: error instanceof Error ? error.message : "Unknown error",
+        });
 
         set.status = 500;
         return {
@@ -183,8 +264,12 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: "/api/ai" })
         };
       } finally {
         const latencyMs = Date.now() - startTime;
+        trackAiErrorRate(didError, requestLogger);
         if (latencyMs > 1000) {
-          console.warn(`[AI Suggestions] Slow request: ${latencyMs}ms`);
+          requestLogger.warn("AI_SLOW_REQUEST", {
+            event: "AI_SLOW_REQUEST",
+            latency_ms: latencyMs,
+          });
         }
       }
     },
@@ -196,7 +281,12 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: "/api/ai" })
 interface SuggestionResultLog {
   data?: SuggestionsResponse;
   error?: { error: string; fallback_suggestions: Suggestion[] };
-  metadata: { model: string; latency_ms: number; aiTimeout: boolean };
+  metadata: {
+    model: string;
+    latency_ms: number;
+    aiTimeout: boolean;
+    cost_estimate_usd: number;
+  };
 }
 
 // ✅ Helper: Log to database
@@ -224,6 +314,9 @@ async function logSuggestionRequest(data: {
       },
     });
   } catch (err) {
-    console.error("[AI Log Error]", err);
+    logger.error("AI_LOG_PERSIST_ERROR", {
+      event: "AI_LOG_PERSIST_ERROR",
+      error: err instanceof Error ? err.message : "Unknown error",
+    });
   }
 }

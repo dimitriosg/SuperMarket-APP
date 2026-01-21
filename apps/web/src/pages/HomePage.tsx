@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useBasketContext } from "../context/BasketContext";
+import { shallow } from "zustand/shallow";
+import { useStore } from "../store";
 import { useProductSearch } from "../hooks/useProductSearch"; // Χρησιμοποιούμε το δικό σου hook!
 import { SearchHeader } from "../components/SearchHeader";
 import { ProductCard } from "../components/ProductCard";
@@ -50,7 +51,7 @@ const WelcomeHero = ({ onTagClick }: HeroProps) => (
     <div className="space-y-4">
       <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">ΔΗΜΟΦΙΛΕΙΣ ΑΝΑΖΗΤΗΣΕΙΣ</p>
       <div className="flex flex-wrap justify-center gap-3">
-        {["Γάλα", "Φέτα", "Ελαιόλαδο", "Καφές", "Αυγά", "Γιαούρτι"].map(tag => (
+        {popularSearches.map(tag => (
           <button 
             key={tag}
             onClick={() => onTagClick(tag)}
@@ -67,18 +68,24 @@ const WelcomeHero = ({ onTagClick }: HeroProps) => (
 export function HomePage() {
   const { 
     basket, 
-    comparison, 
     isBasketOpen, 
     isPinned, 
-    setBasketOpen, 
     toggleBasket, 
-    enabledStores, 
+    selectedStores, 
     addToBasket, 
-    removeFromBasket, 
-    updateQuantity, 
-    togglePin,
     selectAllStores
-  } = useBasketContext();
+  } = useStore(
+    (state) => ({
+      basket: state.basket,
+      isBasketOpen: state.isBasketOpen,
+      isPinned: state.isPinned,
+      toggleBasket: state.actions.toggleBasket,
+      selectedStores: state.selectedStores,
+      addToBasket: state.actions.addToBasket,
+      selectAllStores: state.actions.selectAllStores
+    }),
+    shallow
+  );
 
   const { searchTerm, setSearchTerm, results, isSearching, performSearch, error, retrySearch } =
     useProductSearch();
@@ -138,7 +145,7 @@ export function HomePage() {
   const filteredResults = results.map(product => {
     // Φιλτράρουμε τις προσφορές βάσει των ενεργών καταστημάτων
     const activeOffers = product.offers.filter(offer => 
-       enabledStores.includes(getStoreIdByName(offer.store))
+       selectedStores.includes(getStoreIdByName(offer.store))
     );
     
     // Αν δεν μείνει καμία προσφορά, ίσως θέλουμε να το κρύψουμε ή να το δείξουμε ως "unavailable"
@@ -282,16 +289,7 @@ export function HomePage() {
         */}
       </main>
 
-      <BasketSidebar 
-        isOpen={isBasketOpen}
-        isPinned={isPinned}
-        basket={basket}
-        comparison={comparison}
-        onClose={() => setBasketOpen(false)}
-        onTogglePin={togglePin}
-        onUpdateQty={updateQuantity}
-        onRemove={removeFromBasket}
-      />
+      <BasketSidebar />
 
       {/* Floating Basket Button (Εμφανίζεται αν δεν είναι pinned ή αν είναι κλειστό) */}
       {(!isPinned || !isBasketOpen) && (

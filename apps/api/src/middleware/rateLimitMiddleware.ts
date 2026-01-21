@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import type Redis from "ioredis";
+import { createRequestLogger, getRequestId } from "../utils/logger";
 
 const DEFAULT_LIMIT = 10;
 const DEFAULT_WINDOW_SECONDS = 60 * 60;
@@ -44,6 +45,8 @@ export const rateLimitMiddleware = ({
 }: RateLimitOptions) =>
   new Elysia({ name: "rateLimitMiddleware" }).onBeforeHandle(async (ctx) => {
     const userId = getUserId(ctx);
+    const requestId = getRequestId(ctx.headers);
+    const requestLogger = createRequestLogger({ requestId, userId });
     const key = `${keyPrefix}:${userId}`;
 
     try {
@@ -65,6 +68,10 @@ export const rateLimitMiddleware = ({
       ctx.set.headers["X-RateLimit-Reset"] = String(resetSeconds);
 
       if (current > limit) {
+        requestLogger.warn("RATE_LIMIT_HIT", {
+          event: "RATE_LIMIT_HIT",
+          remaining,
+        });
         ctx.set.status = 429;
         return {
           error: "RATE_LIMITED",
@@ -72,6 +79,9 @@ export const rateLimitMiddleware = ({
         };
       }
     } catch (error) {
-      console.warn("[RateLimit] Redis unavailable", error);
+      requestLogger.warn("RATE_LIMIT_REDIS_ERROR", {
+        event: "RATE_LIMIT_REDIS_ERROR",
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
     }
   });

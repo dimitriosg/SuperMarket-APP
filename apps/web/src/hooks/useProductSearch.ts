@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
-import { ProductResult } from "../types";
+import { useEffect, useState } from "react";
+import { useStore } from "../store";
 
 export function useProductSearch() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [results, setResults] = useState<ProductResult[]>([]);
+  const results = useStore((state) => state.products);
+  const setProducts = useStore((state) => state.actions.setProducts);
+  const setFilters = useStore((state) => state.actions.setFilters);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [requestId, setRequestId] = useState(0);
@@ -16,6 +18,10 @@ export function useProductSearch() {
     }, 500);
     return () => clearTimeout(timer);
   }, [searchTerm]);
+
+  useEffect(() => {
+    setFilters({ query: debouncedSearch });
+  }, [debouncedSearch, setFilters]);
 
   // API Call
   useEffect(() => {

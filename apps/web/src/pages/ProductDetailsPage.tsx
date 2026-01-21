@@ -1,14 +1,21 @@
 import { useEffect, useState, useMemo } from "react"; // <--- Προσθήκη useMemo
 import { useParams, useNavigate } from "react-router-dom";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { useBasketContext } from "../context/BasketContext";
+import { shallow } from "zustand/shallow";
+import { useStore } from "../store";
 import { STORES_DATA, getStoreIdByName, DEFAULT_IMG } from "../services/api";
 import { ProductResult } from "../types";
 
 export function ProductDetailsPage() {
   const { id } = useParams(); 
   const navigate = useNavigate();
-  const { addToBasket, basket } = useBasketContext();
+  const { addToBasket, basket } = useStore(
+    (state) => ({
+      addToBasket: state.actions.addToBasket,
+      basket: state.basket
+    }),
+    shallow
+  );
   
   const [product, setProduct] = useState<ProductResult | null>(null);
   const [loading, setLoading] = useState(true);
