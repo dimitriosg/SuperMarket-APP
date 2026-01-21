@@ -8,6 +8,7 @@ import { basketController } from "./routes/basket.route";
 import { adminRoutes } from "./routes/admin.route";
 import { aiSuggestionsRoutes } from "./routes/ai-suggestions.route"; 
 import { productRoutes } from "./routes/products.route";
+import { authRoutes } from "./routes/auth.route";
 
 
 const app = new Elysia()
@@ -19,6 +20,7 @@ const app = new Elysia()
   .use(searchRoutes)
   .use(basketController)  
   .use(adminRoutes)
+  .use(authRoutes)
   
   // ✅ AI Suggestions routes (μόνο AI route plugin, πριν το .onError)
   .use(aiSuggestionsRoutes)
