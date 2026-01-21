@@ -18,13 +18,13 @@ export function BasketComparison({ comparison, basketSize }: Props) {
       key={store.storeName}
       className={`p-4 rounded-2xl flex justify-between items-center transition-all ${
         isBest
-          ? "bg-indigo-600 text-white shadow-indigo-200 shadow-lg scale-[1.02]"
-          : "bg-slate-50 border border-slate-100"
+          ? "bg-indigo-600 text-white shadow-indigo-200 shadow-lg scale-[1.02] dark:bg-indigo-500 dark:shadow-indigo-500/30"
+          : "bg-slate-50 border border-slate-100 dark:bg-slate-900 dark:border-slate-800"
       }`}
     >
       <div className="flex items-center gap-3">
         {/* Λογότυπο */}
-        <div className="w-10 h-10 bg-white rounded-lg p-1 flex items-center justify-center overflow-hidden">
+        <div className="w-10 h-10 bg-white rounded-lg p-1 flex items-center justify-center overflow-hidden dark:bg-slate-950">
           <img 
             src={store.logo} 
             alt={store.storeName} 
@@ -36,12 +36,12 @@ export function BasketComparison({ comparison, basketSize }: Props) {
         </div>
         
         <div>
-          <div className={`font-black text-sm ${isBest ? "text-white" : "text-slate-800"}`}>
+          <div className={`font-black text-sm ${isBest ? "text-white" : "text-slate-800 dark:text-slate-100"}`}>
             {store.storeName}
           </div>
           {/* Αν υπάρχουν ελλείψεις, δείξε τες εδώ */}
           {store.missingItems > 0 && (
-            <div className={`text-[10px] font-bold ${isBest ? "text-indigo-200" : "text-red-500"}`}>
+            <div className={`text-[10px] font-bold ${isBest ? "text-indigo-200" : "text-red-500 dark:text-red-300"}`}>
               Λείπουν {store.missingItems} προϊόντα
             </div>
           )}
@@ -49,11 +49,11 @@ export function BasketComparison({ comparison, basketSize }: Props) {
       </div>
 
       <div className="flex flex-col items-end">
-        <span className={`text-lg font-black ${isBest ? "text-white" : "text-slate-800"}`}>
+        <span className={`text-lg font-black ${isBest ? "text-white" : "text-slate-800 dark:text-slate-100"}`}>
           {store.totalCost.toFixed(2)}€
         </span>
         {store.foundItems === basketSize && (
-          <span className={`text-[9px] font-bold uppercase tracking-wider ${isBest ? "text-green-300" : "text-green-600"}`}>
+          <span className={`text-[9px] font-bold uppercase tracking-wider ${isBest ? "text-green-300" : "text-green-600 dark:text-emerald-300"}`}>
             Πληρες
           </span>
         )}
@@ -94,7 +94,7 @@ export function BasketComparison({ comparison, basketSize }: Props) {
       {/* Empty State */}
       {comparison.full.length === 0 && comparison.partial.length === 0 && (
         <div className="text-center py-4">
-          <p className="text-xs text-slate-400">Δεν βρέθηκαν τιμές για αυτά τα προϊόντα.</p>
+          <p className="text-xs text-slate-400 dark:text-slate-500">Δεν βρέθηκαν τιμές για αυτά τα προϊόντα.</p>
         </div>
       )}
     </div>

@@ -25,28 +25,28 @@ export function ProductSearch({ basket, onAdd }: Props) {
         }}
         className="relative"
       >
-        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">🔍</span>
+        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">🔍</span>
         <input
           value={searchTerm}
           onChange={(event) => setSearchTerm(event.target.value)}
           placeholder="Αναζήτηση προϊόντων..."
-          className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm font-medium text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+          className="w-full rounded-2xl border border-slate-200 bg-white py-3 pl-11 pr-4 text-sm font-medium text-slate-700 shadow-sm focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:focus:border-indigo-300 dark:focus:ring-indigo-500/40"
         />
       </form>
 
       {debouncedSearch.length > 0 && debouncedSearch.length < 2 && (
-        <p className="text-xs text-slate-400">Πληκτρολόγησε τουλάχιστον 2 χαρακτήρες.</p>
+        <p className="text-xs text-slate-400 dark:text-slate-500">Πληκτρολόγησε τουλάχιστον 2 χαρακτήρες.</p>
       )}
 
       <div className="space-y-3">
         {isSearching && (
-          <div className="rounded-xl border border-dashed border-indigo-200 bg-indigo-50/70 p-4 text-center text-sm font-semibold text-indigo-600">
+          <div className="rounded-xl border border-dashed border-indigo-200 bg-indigo-50/70 p-4 text-center text-sm font-semibold text-indigo-600 dark:border-indigo-500/40 dark:bg-indigo-500/10 dark:text-indigo-200">
             Αναζήτηση προϊόντων...
           </div>
         )}
 
         {!isSearching && debouncedSearch.length >= 2 && results.length === 0 && (
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-center text-xs font-semibold text-slate-500">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-center text-xs font-semibold text-slate-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400">
             Δεν βρέθηκαν προϊόντα για “{debouncedSearch}”.
           </div>
         )}
@@ -56,9 +56,9 @@ export function ProductSearch({ basket, onAdd }: Props) {
           return (
             <div
               key={product.id}
-              className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm"
+              className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-sm dark:border-slate-800 dark:bg-slate-950"
             >
-              <div className="h-12 w-12 rounded-xl bg-slate-50 p-2">
+              <div className="h-12 w-12 rounded-xl bg-slate-50 p-2 dark:bg-slate-900">
                 <img
                   src={product.image || DEFAULT_IMG}
                   alt={product.name}
@@ -66,17 +66,17 @@ export function ProductSearch({ basket, onAdd }: Props) {
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-bold text-slate-700 line-clamp-2">{product.name}</p>
-                <p className="text-[11px] text-slate-400">Από {product.bestPrice.toFixed(2)}€</p>
+                <p className="text-xs font-bold text-slate-700 line-clamp-2 dark:text-slate-100">{product.name}</p>
+                <p className="text-[11px] text-slate-400 dark:text-slate-500">Από {product.bestPrice.toFixed(2)}€</p>
               </div>
               {quantityInBasket > 0 ? (
-                <span className="rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-bold uppercase text-emerald-600">
+                <span className="rounded-full bg-emerald-100 px-3 py-1 text-[10px] font-bold uppercase text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-300">
                   Στο καλάθι ({quantityInBasket})
                 </span>
               ) : (
                 <button
                   onClick={() => onAdd(product)}
-                  className="rounded-full bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-indigo-500"
+                  className="rounded-full bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400"
                 >
                   Προσθήκη
                 </button>
