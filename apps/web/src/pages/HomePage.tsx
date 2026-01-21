@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { useBasketContext } from "../context/BasketContext";
+import { shallow } from "zustand/shallow";
+import { useStore } from "../store";
 import { useProductSearch } from "../hooks/useProductSearch"; // Χρησιμοποιούμε το δικό σου hook!
 import { SearchHeader } from "../components/SearchHeader";
 import { ProductCard } from "../components/ProductCard";
@@ -72,20 +73,27 @@ const WelcomeHero = ({ onTagClick }: HeroProps) => (
 export function HomePage() {
   const { 
     basket, 
-    comparison, 
     isBasketOpen, 
     isPinned, 
-    setBasketOpen, 
     toggleBasket, 
-    enabledStores, 
+    selectedStores, 
     addToBasket, 
-    removeFromBasket, 
-    updateQuantity, 
-    togglePin,
     selectAllStores
-  } = useBasketContext();
+  } = useStore(
+    (state) => ({
+      basket: state.basket,
+      isBasketOpen: state.isBasketOpen,
+      isPinned: state.isPinned,
+      toggleBasket: state.actions.toggleBasket,
+      selectedStores: state.selectedStores,
+      addToBasket: state.actions.addToBasket,
+      selectAllStores: state.actions.selectAllStores
+    }),
+    shallow
+  );
 
-  const { searchTerm, setSearchTerm, results, isSearching, performSearch } = useProductSearch();
+  const { searchTerm, setSearchTerm, results, isSearching, performSearch, error, retrySearch } =
+    useProductSearch();
 
   // --- NEW: State για τα Φίλτρα (Collapsible) ---
   const [isFiltersOpen, setIsFiltersOpen] = useState(true);
@@ -142,7 +150,7 @@ export function HomePage() {
   const filteredResults = results.map(product => {
     // Φιλτράρουμε τις προσφορές βάσει των ενεργών καταστημάτων
     const activeOffers = product.offers.filter(offer => 
-       enabledStores.includes(getStoreIdByName(offer.store))
+       selectedStores.includes(getStoreIdByName(offer.store))
     );
     
     // Αν δεν μείνει καμία προσφορά, ίσως θέλουμε να το κρύψουμε ή να το δείξουμε ως "unavailable"
@@ -196,7 +204,19 @@ export function HomePage() {
         }`}>
           
           {/* A. Welcome State */}
-          {!isSearching && results.length === 0 && (
+          {error && !isSearching && (
+            <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
+              <p>{error}</p>
+              <button
+                onClick={retrySearch}
+                className="mt-2 text-sm font-bold text-red-600 underline underline-offset-2"
+              >
+                Δοκίμασε ξανά
+              </button>
+            </div>
+          )}
+
+          {!isSearching && results.length === 0 && !searchTerm && !error && (
             <WelcomeHero onTagClick={(tag) => {
               setSearchTerm(tag);
               performSearch(tag);
@@ -204,7 +224,7 @@ export function HomePage() {
           )}
 
           {/* B. Results Grid */}
-          {(isSearching || results.length > 0) && (
+          {(isSearching || results.length > 0 || searchTerm) && (
             <>
               <div className="flex justify-between items-end mb-6">
                 <h2 className="text-xl font-bold text-slate-800">
@@ -257,7 +277,7 @@ export function HomePage() {
               )}
 
               {/* EMPTY STATE */}
-              {results.length === 0 && !isSearching && searchTerm && (
+              {results.length === 0 && !isSearching && searchTerm && !error && (
                 <div className="text-center py-20">
                   <div className="text-6xl mb-4">🤷‍♂️</div>
                   <h3 className="text-xl font-bold text-slate-700">Δεν βρέθηκαν προϊόντα</h3>
@@ -275,16 +295,7 @@ export function HomePage() {
         */}
       </main>
 
-      <BasketSidebar 
-        isOpen={isBasketOpen}
-        isPinned={isPinned}
-        basket={basket}
-        comparison={comparison}
-        onClose={() => setBasketOpen(false)}
-        onTogglePin={togglePin}
-        onUpdateQty={updateQuantity}
-        onRemove={removeFromBasket}
-      />
+      <BasketSidebar />
 
       {/* Floating Basket Button (Εμφανίζεται αν δεν είναι pinned ή αν είναι κλειστό) */}
       {(!isPinned || !isBasketOpen) && (
