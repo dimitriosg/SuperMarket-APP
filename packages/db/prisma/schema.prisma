@@ -85,6 +85,7 @@ model Product {
   quantityUnit   UnitType?
   
   normalizedName String @default("")
+  embedding      Float[]?
   
   isActive   Boolean  @default(true)
   createdAt  DateTime @default(now())

@@ -1,5 +1,7 @@
 // apps/api/src/services/ai-suggestions.service.ts
 
+import { embeddingSuggestionsService } from "./embeddingSuggestionsService";
+
 export interface SuggestionsRequest {
   items: string[];
   budget?: number;
@@ -12,6 +14,7 @@ export interface Suggestion {
   category: string;
   price: number;
   rationale: string;
+  image?: string;
 }
 
 export interface SuggestionsResponse {
@@ -26,80 +29,33 @@ export interface SuggestionsResponse {
  * Rule-based fallback suggestions
  * Triggered when AI fails or times out
  */
-function generateFallbackSuggestions(items: string[]): Suggestion[] {
-  const itemsLower = items.map((i) => i.toLowerCase());
-
-  const ruleMap: Record<string, Suggestion[]> = {
-    γάλα: [
-      {
-        id: "butter_001",
-        name: "Βούτυρο",
-        category: "Γαλακτοκομικά",
-        price: 3.5,
-        rationale: "Συνδυάζεται τέλεια με γάλα",
-      },
-      {
-        id: "cereal_001",
-        name: "Δημητριακά",
-        category: "Πρωϊνό",
-        price: 2.99,
-        rationale: "Κλασικός συνδυασμός",
-      },
-    ],
-    ψωμί: [
-      {
-        id: "cheese_001",
-        name: "Φέτα ΠΟΠ",
-        category: "Γαλακτοκομικά",
-        price: 4.2,
-        rationale: "Ταιριάζει με ψωμί",
-      },
-    ],
-    κοτόπουλο: [
-      {
-        id: "lemon_001",
-        name: "Λεμόνια",
-        category: "Φρούτα",
-        price: 1.8,
-        rationale: "Συνδυάζεται με κοτόπουλο",
-      },
-    ],
-  };
-
-  const suggestions: Suggestion[] = [];
-
-  for (const item of itemsLower) {
-    for (const [keyword, items] of Object.entries(ruleMap)) {
-      if (item.includes(keyword)) {
-        suggestions.push(...items);
-      }
-    }
+async function generateFallbackSuggestions(items: string[]): Promise<Suggestion[]> {
+  const embeddingSuggestions = await embeddingSuggestionsService.getSuggestions(items, 5);
+  if (embeddingSuggestions.length > 0) {
+    return embeddingSuggestions;
   }
 
-  // Deduplicate & limit to 5
-  const unique = Array.from(new Map(suggestions.map((s) => [s.id, s])).values()).slice(0, 5);
-
-  // Generic fallback
-  if (unique.length === 0) {
-    return [
-      {
-        id: "generic_1",
-        name: "Ελαιόλαδο ΠΟΠ",
-        category: "Έλαια",
-        price: 8.5,
-        rationale: "Ελληνικό κλασικό",
-      },
-      {
-        id: "generic_2",
-        name: "Φέτα ΠΟΠ",
-        category: "Γαλακτοκομικά",
-        price: 4.2,
-        rationale: "Δημοφιλές",
-      },
-    ];
+  const randomSuggestions = await embeddingSuggestionsService.getRandomSuggestions(5);
+  if (randomSuggestions.length > 0) {
+    return randomSuggestions;
   }
 
-  return unique;
+  return [
+    {
+      id: "generic_1",
+      name: "Ελαιόλαδο ΠΟΠ",
+      category: "Έλαια",
+      price: 8.5,
+      rationale: "Ελληνικό κλασικό",
+    },
+    {
+      id: "generic_2",
+      name: "Φέτα ΠΟΠ",
+      category: "Γαλακτοκομικά",
+      price: 4.2,
+      rationale: "Δημοφιλές",
+    },
+  ];
 }
 
 /**
@@ -209,7 +165,7 @@ export async function generateSuggestions(
     };
   } catch (error: unknown) {
     const latency = Date.now() - startTime;
-    const fallback = generateFallbackSuggestions(request.items);
+    const fallback = await generateFallbackSuggestions(request.items);
 
     const isTimeout = error instanceof Error && error.name === "AbortError";
     const isParseError = error instanceof Error && error.message === "AI_PARSE_ERROR";
@@ -220,7 +176,7 @@ export async function generateSuggestions(
         fallback_suggestions: fallback,
       },
       metadata: {
-        model: "fallback-rule",
+        model: "fallback-embedding",
         latency_ms: latency,
         aiTimeout: isTimeout,
       },
