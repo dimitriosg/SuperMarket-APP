@@ -18,15 +18,13 @@ const popularSearches = ["Γάλα", "Φέτα", "Ελαιόλαδο", "Καφέ
 
 const PopularSearches = ({ onTagClick }: HeroProps) => (
   <div className="space-y-4">
-    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">ΔΗΜΟΦΙΛΕΙΣ ΑΝΑΖΗΤΗΣΕΙΣ</p>
+    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">ΔΗΜΟΦΙΛΕΙΣ ΑΝΑΖΗΤΗΣΕΙΣ</p>
     <div className="flex flex-wrap justify-center gap-3">
       {popularSearches.map(tag => (
         <Button 
           key={tag}
           onClick={() => onTagClick(tag)}
-          variant="secondary"
-          size="sm"
-          className="rounded-full font-bold text-slate-600 hover:border-indigo-400 hover:text-indigo-600 hover:shadow-md active:scale-95"
+          className="px-4 py-2 bg-white border border-slate-200 rounded-full text-slate-600 font-bold text-sm hover:border-indigo-400 hover:text-indigo-600 hover:shadow-md transition-all active:scale-95 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:border-indigo-500/60 dark:hover:text-indigo-300"
         >
           {tag}
         </Button>
@@ -37,30 +35,28 @@ const PopularSearches = ({ onTagClick }: HeroProps) => (
 
 const WelcomeHero = ({ onTagClick }: HeroProps) => (
   <div className="flex flex-col items-center justify-center py-10 md:py-20 text-center animate-fade-in">
-    <div className="bg-indigo-50 p-6 rounded-full mb-6 shadow-sm border border-indigo-100">
+    <div className="bg-indigo-50 p-6 rounded-full mb-6 shadow-sm border border-indigo-100 dark:bg-indigo-500/10 dark:border-indigo-500/30">
       <span className="text-6xl">🛒</span>
     </div>
-    <h2 className="text-3xl md:text-5xl font-black text-slate-800 mb-4 tracking-tight">
-      Καλώς ήρθες στο <span className="text-indigo-600">MarketWise</span>
+    <h2 className="text-3xl md:text-5xl font-black text-slate-800 mb-4 tracking-tight dark:text-slate-100">
+      Καλώς ήρθες στο <span className="text-indigo-600 dark:text-indigo-300">MarketWise</span>
     </h2>
-    <p className="text-slate-500 text-lg max-w-lg mb-8 leading-relaxed font-medium">
+    <p className="text-slate-500 text-lg max-w-lg mb-8 leading-relaxed font-medium dark:text-slate-400">
       Ο έξυπνος βοηθός σου για το σούπερ μάρκετ. <br className="hidden md:block" />
       Επίλεξε την περιοχή σου από αριστερά και ξεκίνα!
     </p>
-    <p className="text-slate-400 text-sm md:text-base max-w-lg mb-8">
+    <p className="text-slate-400 text-sm md:text-base max-w-lg mb-8 dark:text-slate-500">
       Βήμα 1: επίλεξε περιοχή/κατάστημα για να δεις τις καλύτερες επιλογές.
     </p>
     
     <div className="space-y-4">
-      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">ΔΗΜΟΦΙΛΕΙΣ ΑΝΑΖΗΤΗΣΕΙΣ</p>
+      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">ΔΗΜΟΦΙΛΕΙΣ ΑΝΑΖΗΤΗΣΕΙΣ</p>
       <div className="flex flex-wrap justify-center gap-3">
         {["Γάλα", "Φέτα", "Ελαιόλαδο", "Καφές", "Αυγά", "Γιαούρτι"].map(tag => (
           <Button 
             key={tag}
             onClick={() => onTagClick(tag)}
-            variant="secondary"
-            size="sm"
-            className="rounded-full font-bold text-slate-600 hover:border-indigo-400 hover:text-indigo-600 hover:shadow-md active:scale-95"
+            className="px-4 py-2 bg-white border border-slate-200 rounded-full text-slate-600 font-bold text-sm hover:border-indigo-400 hover:text-indigo-600 hover:shadow-md transition-all active:scale-95 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:border-indigo-500/60 dark:hover:text-indigo-300"
           >
             {tag}
           </Button>
@@ -170,7 +166,7 @@ export function HomePage() {
 
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] font-sans pb-20 flex flex-col">
+    <div className="min-h-screen bg-slate-50 font-sans pb-20 flex flex-col dark:bg-slate-950">
       
       {/* 1. HEADER */}
       <SearchHeader 
@@ -227,11 +223,11 @@ export function HomePage() {
           {(isSearching || results.length > 0 || searchTerm) && (
             <>
               <div className="flex justify-between items-end mb-6">
-                <h2 className="text-xl font-bold text-slate-800">
+                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
                   {results.length > 0 ? `Βρέθηκαν ${results.length} προϊόντα` : 'Αποτελέσματα'}
                 </h2>
                 {filteredResults.length < results.length && (
-                   <span className="text-sm text-orange-500 font-medium">
+                   <span className="text-sm text-orange-500 font-medium dark:text-orange-300">
                      ⚠️ Μερικά προϊόντα κρύφτηκαν λόγω φίλτρων
                    </span>
                 )}
@@ -255,15 +251,14 @@ export function HomePage() {
                 results.length > 0 && !isSearching && (
                   <div className="text-center py-20">
                     <div className="text-6xl mb-4">🤷‍♂️</div>
-                    <h3 className="text-xl font-bold text-slate-700">Δεν βρέθηκαν προϊόντα με αυτά τα φίλτρα</h3>
-                    <p className="text-slate-400 mt-2">
+                    <h3 className="text-xl font-bold text-slate-700 dark:text-slate-100">Δεν βρέθηκαν προϊόντα με αυτά τα φίλτρα</h3>
+                    <p className="text-slate-400 mt-2 dark:text-slate-500">
                       Τα φίλτρα μπορεί να κρύβουν διαθέσιμα προϊόντα. Δοκίμασε να τα καθαρίσεις ή άλλαξε αναζήτηση.
                     </p>
                     <div className="flex flex-col items-center gap-4 mt-6">
                       <Button
                         onClick={selectAllStores}
-                        size="lg"
-                        className="rounded-full font-bold shadow-md hover:bg-indigo-500"
+                        className="px-6 py-3 bg-indigo-600 text-white rounded-full font-bold shadow-md hover:bg-indigo-500 transition-all dark:bg-indigo-500 dark:hover:bg-indigo-400"
                       >
                         Καθάρισε φίλτρα
                       </Button>
@@ -280,8 +275,8 @@ export function HomePage() {
               {results.length === 0 && !isSearching && searchTerm && !error && (
                 <div className="text-center py-20">
                   <div className="text-6xl mb-4">🤷‍♂️</div>
-                  <h3 className="text-xl font-bold text-slate-700">Δεν βρέθηκαν προϊόντα</h3>
-                  <p className="text-slate-400">Δοκίμασε να ψάξεις με διαφορετικούς όρους (π.χ. "τυρί" αντί για "τυριά").</p>
+                  <h3 className="text-xl font-bold text-slate-700 dark:text-slate-100">Δεν βρέθηκαν προϊόντα</h3>
+                  <p className="text-slate-400 dark:text-slate-500">Δοκίμασε να ψάξεις με διαφορετικούς όρους (π.χ. "τυρί" αντί για "τυριά").</p>
                 </div>
               )}
             </>
@@ -301,8 +296,7 @@ export function HomePage() {
       {(!isPinned || !isBasketOpen) && (
         <Button
           onClick={toggleBasket}
-          size="lg"
-          className="fixed bottom-6 right-6 z-40 rounded-full shadow-2xl hover:scale-110 transition-transform"
+          className="fixed bottom-6 right-6 z-40 bg-indigo-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-all flex items-center gap-2 dark:bg-indigo-500"
         >
           <span className="font-bold">🛒 {basket.length}</span>
         </Button>

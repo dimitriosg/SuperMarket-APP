@@ -4,11 +4,19 @@
 
 :root {
   color-scheme: light;
+  --app-bg: #f8fafc;
+  --app-text: #0f172a;
+}
+
+.dark {
+  color-scheme: dark;
+  --app-bg: #0f172a;
+  --app-text: #e2e8f0;
 }
 
 body {
   margin: 0;
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  background-color: #f8fafc;
-  color: #0f172a;
+  background-color: var(--app-bg);
+  color: var(--app-text);
 }

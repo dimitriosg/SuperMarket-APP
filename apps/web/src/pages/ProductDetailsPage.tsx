@@ -102,7 +102,7 @@ export function ProductDetailsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="animate-spin text-4xl">🛒</div>
       </div>
     );
@@ -110,9 +110,9 @@ export function ProductDetailsPage() {
 
   if (!product) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
-        <h2 className="text-xl font-bold text-slate-500">Το προϊόν δεν βρέθηκε</h2>
-        <button onClick={() => navigate('/')} className="text-indigo-600 font-bold hover:underline">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4 dark:bg-slate-950">
+        <h2 className="text-xl font-bold text-slate-500 dark:text-slate-400">Το προϊόν δεν βρέθηκε</h2>
+        <button onClick={() => navigate('/')} className="text-indigo-600 font-bold hover:underline dark:text-indigo-300">
             Επιστροφή στην αναζήτηση
         </button>
       </div>
@@ -120,22 +120,22 @@ export function ProductDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-20 font-sans">
+    <div className="min-h-screen bg-slate-50 pb-20 font-sans dark:bg-slate-950">
       
       {/* HEADER */}
-      <div className="bg-white border-b sticky top-0 z-20 px-4 py-3 shadow-sm flex items-center gap-4">
-        <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center bg-slate-100 rounded-full hover:bg-slate-200 transition-colors text-slate-600">
+      <div className="bg-white border-b border-slate-200 sticky top-0 z-20 px-4 py-3 shadow-sm flex items-center gap-4 dark:border-slate-800 dark:bg-slate-950">
+        <button onClick={() => navigate(-1)} className="w-10 h-10 flex items-center justify-center bg-slate-100 rounded-full hover:bg-slate-200 transition-colors text-slate-600 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800">
           ←
         </button>
-        <h1 className="font-black text-lg text-slate-800 truncate">Λεπτομέρειες Προϊόντος</h1>
+        <h1 className="font-black text-lg text-slate-800 truncate dark:text-slate-100">Λεπτομέρειες Προϊόντος</h1>
       </div>
 
       <div className="max-w-6xl mx-auto p-4 md:p-8 grid lg:grid-cols-12 gap-8">
         
         {/* --- LEFT COLUMN: PRODUCT INFO --- */}
         <div className="lg:col-span-5 space-y-6">
-            <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100 flex flex-col items-center text-center relative overflow-hidden">
-                <div className="w-full aspect-square bg-slate-50 rounded-2xl mb-6 flex items-center justify-center p-4">
+            <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100 flex flex-col items-center text-center relative overflow-hidden dark:bg-slate-950 dark:border-slate-800">
+                <div className="w-full aspect-square bg-slate-50 rounded-2xl mb-6 flex items-center justify-center p-4 dark:bg-slate-900">
                     <img 
                         src={product.image || DEFAULT_IMG} 
                         alt={product.name} 
@@ -143,21 +143,21 @@ export function ProductDetailsPage() {
                     />
                 </div>
                 
-                <h2 className="text-2xl font-black text-slate-800 mb-2 leading-tight">
+                <h2 className="text-2xl font-black text-slate-800 mb-2 leading-tight dark:text-slate-100">
                     {product.name}
                 </h2>
                 
-                <div className="text-4xl font-black text-indigo-600 mb-1">
+                <div className="text-4xl font-black text-indigo-600 mb-1 dark:text-indigo-300">
                     {bestPrice.toFixed(2)}€
                 </div>
-                <div className="text-sm text-slate-400 font-bold mb-8">
+                <div className="text-sm text-slate-400 font-bold mb-8 dark:text-slate-500">
                     καλύτερη τιμή
                 </div>
 
                 {/* ADD TO BASKET BUTTON */}
                 <button 
                     onClick={() => addToBasket(product)}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-xl shadow-lg shadow-indigo-200 active:scale-95 transition-all flex items-center justify-center gap-3"
+                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-xl shadow-lg shadow-indigo-200 active:scale-95 transition-all flex items-center justify-center gap-3 dark:bg-indigo-500 dark:hover:bg-indigo-400"
                 >
                     {quantityInBasket > 0 ? (
                         <>
@@ -174,8 +174,8 @@ export function ProductDetailsPage() {
             </div>
 
             {/* CHART CARD */}
-            <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100">
-                <h3 className="font-black text-slate-800 mb-6 flex items-center gap-2">
+            <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-100 dark:bg-slate-950 dark:border-slate-800">
+                <h3 className="font-black text-slate-800 mb-6 flex items-center gap-2 dark:text-slate-100">
                     📈 Ιστορικό Τιμής (6 μήνες)
                 </h3>
                 <div className="h-[200px] w-full">
@@ -203,9 +203,9 @@ export function ProductDetailsPage() {
 
         {/* --- RIGHT COLUMN: OFFERS LIST --- */}
         <div className="lg:col-span-7">
-            <h3 className="font-black text-xl text-slate-800 mb-6">🏷️ Τιμές ανά Κατάστημα</h3>
-            <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden">
-                <div className="divide-y divide-slate-50">
+            <h3 className="font-black text-xl text-slate-800 mb-6 dark:text-slate-100">🏷️ Τιμές ανά Κατάστημα</h3>
+            <div className="bg-white rounded-[2rem] shadow-sm border border-slate-100 overflow-hidden dark:bg-slate-950 dark:border-slate-800">
+                <div className="divide-y divide-slate-50 dark:divide-slate-800">
                     {sortedOffers.map((offer, idx) => {
                         const storeId = getStoreIdByName(offer.store);
                         const storeInfo = STORES_DATA.find(s => s.id === storeId);
@@ -215,27 +215,27 @@ export function ProductDetailsPage() {
                         const isBestPrice = idx === 0;
 
                         return (
-                            <div key={idx} className={`p-5 flex items-center gap-4 hover:bg-slate-50 transition-colors ${isBestPrice ? 'bg-green-50/50' : ''}`}>
+                            <div key={idx} className={`p-5 flex items-center gap-4 hover:bg-slate-50 transition-colors ${isBestPrice ? 'bg-green-50/50 dark:bg-emerald-500/10' : 'dark:hover:bg-slate-900'}`}>
                                 
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black ${isBestPrice ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-400'}`}>
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black ${isBestPrice ? 'bg-green-500 text-white' : 'bg-slate-100 text-slate-400 dark:bg-slate-900 dark:text-slate-400'}`}>
                                     #{idx + 1}
                                 </div>
 
-                                <div className="w-12 h-12 bg-white border border-slate-100 rounded-lg p-1 flex items-center justify-center">
+                                <div className="w-12 h-12 bg-white border border-slate-100 rounded-lg p-1 flex items-center justify-center dark:bg-slate-950 dark:border-slate-800">
                                     <img src={logo} alt={cleanName} className="w-full h-full object-contain" />
                                 </div>
 
                                 <div className="flex-1">
-                                    <div className="font-bold text-slate-800">{cleanName}</div>
-                                    <div className="text-xs text-slate-400">{offer.date}</div>
+                                    <div className="font-bold text-slate-800 dark:text-slate-100">{cleanName}</div>
+                                    <div className="text-xs text-slate-400 dark:text-slate-500">{offer.date}</div>
                                 </div>
 
                                 <div className="text-right">
-                                    <div className={`text-xl font-black ${isBestPrice ? 'text-green-600' : 'text-slate-800'}`}>
+                                    <div className={`text-xl font-black ${isBestPrice ? 'text-green-600 dark:text-emerald-300' : 'text-slate-800 dark:text-slate-100'}`}>
                                         {Number(offer.price).toFixed(2)}€
                                     </div>
                                     {isBestPrice && (
-                                        <div className="text-[10px] text-green-600 font-bold bg-green-100 px-2 py-0.5 rounded-full inline-block">
+                                        <div className="text-[10px] text-green-600 font-bold bg-green-100 px-2 py-0.5 rounded-full inline-block dark:bg-emerald-500/20 dark:text-emerald-200">
                                             ΦΘΗΝΟΤΕΡΟ
                                         </div>
                                     )}
