@@ -80,7 +80,8 @@ export function HomePage() {
     selectAllStores
   } = useBasketContext();
 
-  const { searchTerm, setSearchTerm, results, isSearching, performSearch } = useProductSearch();
+  const { searchTerm, setSearchTerm, results, isSearching, performSearch, error, retrySearch } =
+    useProductSearch();
 
   // --- NEW: State για τα Φίλτρα (Collapsible) ---
   const [isFiltersOpen, setIsFiltersOpen] = useState(true);
@@ -191,7 +192,19 @@ export function HomePage() {
         }`}>
           
           {/* A. Welcome State */}
-          {!isSearching && results.length === 0 && (
+          {error && !isSearching && (
+            <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
+              <p>{error}</p>
+              <button
+                onClick={retrySearch}
+                className="mt-2 text-sm font-bold text-red-600 underline underline-offset-2"
+              >
+                Δοκίμασε ξανά
+              </button>
+            </div>
+          )}
+
+          {!isSearching && results.length === 0 && !searchTerm && !error && (
             <WelcomeHero onTagClick={(tag) => {
               setSearchTerm(tag);
               performSearch(tag);
@@ -199,7 +212,7 @@ export function HomePage() {
           )}
 
           {/* B. Results Grid */}
-          {(isSearching || results.length > 0) && (
+          {(isSearching || results.length > 0 || searchTerm) && (
             <>
               <div className="flex justify-between items-end mb-6">
                 <h2 className="text-xl font-bold text-slate-800">
@@ -251,7 +264,7 @@ export function HomePage() {
               )}
 
               {/* EMPTY STATE */}
-              {results.length === 0 && !isSearching && searchTerm && (
+              {results.length === 0 && !isSearching && searchTerm && !error && (
                 <div className="text-center py-20">
                   <div className="text-6xl mb-4">🤷‍♂️</div>
                   <h3 className="text-xl font-bold text-slate-700">Δεν βρέθηκαν προϊόντα</h3>
