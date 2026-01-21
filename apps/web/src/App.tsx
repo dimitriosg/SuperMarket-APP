@@ -4,18 +4,24 @@ import { Index } from "./pages/Index";
 import { BasketAnalysisPage } from "./pages/BasketAnalysisPage";
 import { ProductDetailsPage } from "./pages/ProductDetailsPage";
 import { ShoppingList } from "./pages/ShoppingList";
+import { BasketProvider } from "./context/BasketContext";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/analysis" element={<BasketAnalysisPage />} />
-        <Route path="/product/:id" element={<ProductDetailsPage />} />
-        <Route path="/shopping-list" element={<ShoppingList />} />
-      </Routes>
-    </BrowserRouter>
+    <BasketProvider>
+      <BrowserRouter>
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/analysis" element={<BasketAnalysisPage />} />
+            <Route path="/product/:id" element={<ProductDetailsPage />} />
+            <Route path="/shopping-list" element={<ShoppingList />} />
+          </Routes>
+        </ErrorBoundary>
+      </BrowserRouter>
+    </BasketProvider>
   );
 }
 
