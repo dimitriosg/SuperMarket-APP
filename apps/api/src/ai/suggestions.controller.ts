@@ -73,12 +73,12 @@ export const createAISuggestionsRoutes = (app: Elysia) =>
 // Helper function for logging
 async function logSuggestionRequest(data: any) {
   try {
-    // Note: If 'aISuggestionsLog' still shows an error, try reloading VS Code
+    // Note: If 'aIASuggestionsLog' still shows an error, try reloading VS Code
     // window (Ctrl+Shift+P -> Reload Window) after 'bun prisma generate'.
     // @ts-ignore
-    if (prisma.aISuggestionsLog) {
+    if (prisma.aIASuggestionsLog) {
        // @ts-ignore
-      await prisma.aISuggestionsLog.create({
+      await prisma.aIASuggestionsLog.create({
         data: {
           userId: data.userId,
           requestPayload: {

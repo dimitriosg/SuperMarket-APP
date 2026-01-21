@@ -208,7 +208,7 @@ async function logSuggestionRequest(data: {
   result: SuggestionResultLog;
 }) {
   try {
-    await db.aISuggestionsLog.create({
+    await db.aIASuggestionsLog.create({
       data: {
         userId: data.userId,
         requestPayload: { items: data.items, budget: data.budget, preferences: data.preferences },
