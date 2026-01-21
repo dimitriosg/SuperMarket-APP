@@ -2,6 +2,8 @@ import { ProductResult } from "../types";
 import { DEFAULT_IMG } from "../services/api";
 import { Link } from "react-router-dom";
 import { getRelativeTime } from "../utils/date";
+import { Button } from "./ui/Button";
+import { Card } from "./ui/Card";
 
 type Props = {
   product: ProductResult;
@@ -46,7 +48,7 @@ export function ProductCard({ product, isInBasket, onAdd, selectedStoreFilter }:
   const { text: timeText, isStale } = getRelativeTime(lastUpdated);
 
   return (
-    <div className="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex flex-col hover:border-indigo-300 transition-all group h-full relative">
+    <Card className="p-5 rounded-3xl border border-slate-200 flex flex-col hover:border-indigo-300 transition-all group h-full relative">
       
       {isExclusive && (
         <div className="absolute top-4 left-4 z-10 bg-amber-400 text-white text-[9px] font-black px-2 py-1 rounded-md shadow-sm uppercase tracking-wider pointer-events-none">
@@ -113,16 +115,18 @@ export function ProductCard({ product, isInBasket, onAdd, selectedStoreFilter }:
         )}
       </div>
 
-      <button
+      <Button
         onClick={() => onAdd(product)}
-        className={`mt-auto w-full py-3 rounded-xl font-black transition-all text-[11px] uppercase tracking-wider ${
-          isInBasket 
-            ? "bg-green-50 text-green-700 cursor-default" 
+        size="lg"
+        disabled={isInBasket}
+        className={`mt-auto w-full rounded-xl text-[11px] font-black uppercase tracking-wider ${
+          isInBasket
+            ? "bg-green-50 text-green-700 hover:bg-green-50"
             : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md hover:shadow-lg"
         }`}
       >
         {isInBasket ? "✓ Στο καλαθι" : "Προσθηκη"}
-      </button>
-    </div>
+      </Button>
+    </Card>
   );
 }

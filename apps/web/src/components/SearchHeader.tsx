@@ -1,6 +1,7 @@
 // apps/web/src/components/SearchHeader.tsx
-import { useState } from "react";
 import { ShoppingCart } from "lucide-react"; // Αν έχεις lucide, αλλιώς βάλε emoji 🛒
+import { Button } from "./ui/Button";
+import { Input } from "./ui/Input";
 
 type Props = {
   searchTerm: string;
@@ -28,14 +29,16 @@ export function SearchHeader({
         </h1>
 
         <div className="flex-1 max-w-2xl relative">
-          <input
+          <Input
             id="product-search-input"
             type="text"
+            label="Αναζήτηση προϊόντων"
+            hideLabel
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && onSearchSubmit()} // Για να δουλεύει το Enter
+            onKeyDown={(e) => e.key === "Enter" && onSearchSubmit()} // Για να δουλεύει το Enter
             placeholder="Ψάξε προϊόντα (π.χ. φέτα, γάλα)..."
-            className="w-full p-3 pl-5 bg-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium transition-all"
+            className="bg-slate-100 py-3 pl-5 font-medium focus:ring-indigo-500"
           />
           
           {loading && (
@@ -46,17 +49,20 @@ export function SearchHeader({
         </div>
 
         {/* ΚΟΥΜΠΙ ΚΑΛΑΘΙΟΥ ΣΤΟ HEADER */}
-        <button 
+        <Button 
           onClick={onCartClick}
-          className="relative p-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-colors"
+          variant="ghost"
+          size="icon"
+          className="relative bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
+          icon={<ShoppingCart size={24} />}
+          aria-label="Άνοιγμα καλαθιού"
         >
-          <ShoppingCart size={24} />
           {cartCount > 0 && (
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white">
               {cartCount}
             </span>
           )}
-        </button>
+        </Button>
 
       </div>
     </header>
