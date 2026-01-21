@@ -196,7 +196,12 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: "/api/ai" })
 interface SuggestionResultLog {
   data?: SuggestionsResponse;
   error?: { error: string; fallback_suggestions: Suggestion[] };
-  metadata: { model: string; latency_ms: number; aiTimeout: boolean };
+  metadata: {
+    model: string;
+    latency_ms: number;
+    aiTimeout: boolean;
+    cost_estimate_usd: number;
+  };
 }
 
 // ✅ Helper: Log to database
