@@ -1,70 +1,88 @@
+import { z } from "zod";
+
 export interface SuggestionsRequest {
   items: string[];
   budget?: number;
   preferences?: string[];
 }
 
-export interface ValidationError {
+export class ValidationError extends Error {
   field: string;
-  message: string;
+
+  constructor(field: string, message: string) {
+    super(message);
+    this.field = field;
+  }
 }
 
-export function validateSuggestionsRequest(
-  data: unknown
-): { isValid: true } | { isValid: false; errors: ValidationError[] } {
-  const errors: ValidationError[] = [];
+const GREEK_ONLY_REGEX = /^[\p{Script=Greek}\s]+$/u;
+const PROFANITY_LIST = ["fuck", "shit", "bitch", "asshole", "cunt", "μαλάκα", "μαλακα", "σκατά", "σκατα"];
 
-  if (!data || typeof data !== "object") {
-    return { isValid: false, errors: [{ field: "body", message: "Invalid request body" }] };
-  }
+const itemSchema = z
+  .string()
+  .trim()
+  .min(1, { message: "Item cannot be empty" })
+  .max(100, { message: "Item text max 100 characters" })
+  .refine((value) => GREEK_ONLY_REGEX.test(value), {
+    message: "Item must contain Greek characters only",
+  });
 
-  const { items, budget, preferences } = data as Record<string, unknown>;
-
-  // Validate items
-  if (!Array.isArray(items)) {
-    errors.push({ field: "items", message: "Items must be an array" });
-  } else {
-    if (items.length === 0) {
-      errors.push({ field: "items", message: "Items array cannot be empty" });
+const itemsSchema = z.array(itemSchema).superRefine((items, ctx) => {
+  const seen = new Set<string>();
+  items.forEach((item, index) => {
+    const normalized = item.trim().toLowerCase();
+    if (seen.has(normalized)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Duplicate item",
+        path: [index],
+      });
+    } else {
+      seen.add(normalized);
     }
-    if (items.length > 50) {
-      errors.push({ field: "items", message: "Maximum 50 items allowed" });
-    }
-    items.forEach((item, idx) => {
-      if (typeof item !== "string") {
-        errors.push({ field: `items[${idx}]`, message: "Item must be a string" });
-      } else if (item.length > 100) {
-        errors.push({ field: `items[${idx}]`, message: "Item text max 100 characters" });
+  });
+});
+
+const preferencesSchema = z
+  .array(z.string().trim().min(1, { message: "Preference cannot be empty" }))
+  .max(5, { message: "Maximum 5 preferences allowed" })
+  .superRefine((preferences, ctx) => {
+    preferences.forEach((preference, index) => {
+      const normalized = preference.toLowerCase();
+      const hasProfanity = PROFANITY_LIST.some((term) => normalized.includes(term));
+      if (hasProfanity) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Preference contains profanity",
+          path: [index],
+        });
       }
     });
-  }
+  });
 
-  // Validate budget (optional)
-  if (budget !== undefined) {
-    if (typeof budget !== "number" || budget < 0 || budget > 1000) {
-      errors.push({ field: "budget", message: "Budget must be 0-1000" });
+const suggestionsRequestSchema = z.object({
+  items: itemsSchema,
+  budget: z
+    .number()
+    .min(0, { message: "Budget must be 0-1000" })
+    .max(1000, {
+      message: "Budget must be 0-1000",
+    })
+    .optional(),
+  preferences: preferencesSchema.optional(),
+});
+
+const formatIssuePath = (path: (string | number)[]) =>
+  path.length > 0 ? path.join(".") : "body";
+
+export function validateSuggestionsRequest(data: unknown): SuggestionsRequest {
+  try {
+    return suggestionsRequestSchema.parse(data);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const issue = error.issues[0];
+      throw new ValidationError(formatIssuePath(issue.path), issue.message);
     }
+    throw error;
   }
-
-  // Validate preferences (optional)
-  if (preferences !== undefined) {
-    if (!Array.isArray(preferences)) {
-      errors.push({ field: "preferences", message: "Preferences must be an array" });
-    } else {
-      if (preferences.length > 5) {
-        errors.push({ field: "preferences", message: "Maximum 5 preferences allowed" });
-      }
-      preferences.forEach((pref, idx) => {
-        if (typeof pref !== "string") {
-          errors.push({ field: `preferences[${idx}]`, message: "Preference must be a string" });
-        }
-      });
-    }
-  }
-
-  if (errors.length > 0) {
-    return { isValid: false, errors };
-  }
-
-  return { isValid: true };
 }

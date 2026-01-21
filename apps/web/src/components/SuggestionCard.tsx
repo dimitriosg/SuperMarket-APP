@@ -1,6 +1,8 @@
 import React from "react";
 import { Plus } from "lucide-react";
 import type { Suggestion } from "../hooks/useAISuggestions";
+import { Button } from "./ui/Button";
+import { Card } from "./ui/Card";
 
 interface SuggestionCardProps {
   suggestion: Suggestion;
@@ -30,14 +32,13 @@ export const SuggestionCard: React.FC<SuggestionCardProps> = ({
       <p className="text-sm text-gray-600 mb-3 italic dark:text-slate-400">
         "{suggestion.rationale}"
       </p>
-      
-      <button
+
+      <Button
         onClick={() => onAdd(suggestion)}
         className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-1.5 px-3 rounded text-sm font-medium transition-colors dark:bg-blue-500 dark:hover:bg-blue-400"
       >
-        <Plus size={16} />
         Προσθήκη
-      </button>
-    </div>
+      </Button>
+    </Card>
   );
 };

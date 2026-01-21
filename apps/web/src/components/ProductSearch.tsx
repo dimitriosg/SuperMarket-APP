@@ -2,6 +2,8 @@ import { useMemo } from "react";
 import { BasketItem, ProductResult } from "../types";
 import { useProductSearch } from "../hooks/useProductSearch";
 import { DEFAULT_IMG } from "../services/api";
+import { Button } from "./ui/Button";
+import { Input } from "./ui/Input";
 
 type Props = {
   basket: BasketItem[];
@@ -74,12 +76,12 @@ export function ProductSearch({ basket, onAdd }: Props) {
                   Στο καλάθι ({quantityInBasket})
                 </span>
               ) : (
-                <button
+                <Button
                   onClick={() => onAdd(product)}
                   className="rounded-full bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400"
                 >
                   Προσθήκη
-                </button>
+                </Button>
               )}
             </div>
           );

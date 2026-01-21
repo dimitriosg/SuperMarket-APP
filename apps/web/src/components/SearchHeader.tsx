@@ -1,6 +1,9 @@
 // apps/web/src/components/SearchHeader.tsx
 import { ShoppingCart, Moon, Sun } from "lucide-react"; // Αν έχεις lucide, αλλιώς βάλε emoji 🛒
 import { useTheme } from "../hooks/useTheme";
+import { ShoppingCart } from "lucide-react"; // Αν έχεις lucide, αλλιώς βάλε emoji 🛒
+import { Button } from "./ui/Button";
+import { Input } from "./ui/Input";
 
 type Props = {
   searchTerm: string;
@@ -30,12 +33,14 @@ export function SearchHeader({
         </h1>
 
         <div className="flex-1 max-w-2xl relative">
-          <input
+          <Input
             id="product-search-input"
             type="text"
+            label="Αναζήτηση προϊόντων"
+            hideLabel
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && onSearchSubmit()} // Για να δουλεύει το Enter
+            onKeyDown={(e) => e.key === "Enter" && onSearchSubmit()} // Για να δουλεύει το Enter
             placeholder="Ψάξε προϊόντα (π.χ. φέτα, γάλα)..."
             className="w-full p-3 pl-5 bg-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium transition-all text-slate-900 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-indigo-300"
           />
@@ -57,17 +62,16 @@ export function SearchHeader({
         </button>
 
         {/* ΚΟΥΜΠΙ ΚΑΛΑΘΙΟΥ ΣΤΟ HEADER */}
-        <button 
+        <Button 
           onClick={onCartClick}
           className="relative p-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-colors dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20"
         >
-          <ShoppingCart size={24} />
           {cartCount > 0 && (
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white dark:border-slate-950">
               {cartCount}
             </span>
           )}
-        </button>
+        </Button>
 
       </div>
     </header>

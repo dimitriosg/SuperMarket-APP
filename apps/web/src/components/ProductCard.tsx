@@ -2,6 +2,8 @@ import { ProductResult } from "../types";
 import { DEFAULT_IMG } from "../services/api";
 import { Link } from "react-router-dom";
 import { getRelativeTime } from "../utils/date";
+import { Button } from "./ui/Button";
+import { Card } from "./ui/Card";
 
 type Props = {
   product: ProductResult;
@@ -113,7 +115,7 @@ export function ProductCard({ product, isInBasket, onAdd, selectedStoreFilter }:
         )}
       </div>
 
-      <button
+      <Button
         onClick={() => onAdd(product)}
         className={`mt-auto w-full py-3 rounded-xl font-black transition-all text-[11px] uppercase tracking-wider ${
           isInBasket 
@@ -122,7 +124,7 @@ export function ProductCard({ product, isInBasket, onAdd, selectedStoreFilter }:
         }`}
       >
         {isInBasket ? "✓ Στο καλαθι" : "Προσθηκη"}
-      </button>
-    </div>
+      </Button>
+    </Card>
   );
 }

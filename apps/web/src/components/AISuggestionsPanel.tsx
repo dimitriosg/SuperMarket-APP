@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Sparkles, RefreshCw, AlertCircle } from "lucide-react";
 import { SuggestionCard } from "./SuggestionCard";
+import { Button } from "./ui/Button";
 import { useAISuggestions } from "../hooks/useAISuggestions";
 import type { Suggestion } from "../hooks/useAISuggestions";
 
@@ -59,7 +60,7 @@ export const AISuggestionsPanel: React.FC<AISuggestionsPanelProps> = ({
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium dark:bg-blue-500 dark:hover:bg-blue-400"
           >
             🎯 Δώσε μου ιδέες
-          </button>
+          </Button>
         </div>
       )}
 
@@ -88,7 +89,7 @@ export const AISuggestionsPanel: React.FC<AISuggestionsPanelProps> = ({
             className="mt-2 text-sm text-red-600 hover:text-red-700 font-medium underline dark:text-red-300 dark:hover:text-red-200"
           >
             Δοκίμασε ξανά
-          </button>
+          </Button>
         </div>
       )}
 
@@ -116,12 +117,12 @@ export const AISuggestionsPanel: React.FC<AISuggestionsPanelProps> = ({
 
       {/* CTA Button (when suggestions empty but user wants to try) */}
       {!loading && suggestions.length === 0 && items.length > 0 && !error && (
-        <button
+        <Button
           onClick={handleFetch}
           className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all font-medium text-lg dark:from-blue-500 dark:to-indigo-500 dark:hover:from-blue-400 dark:hover:to-indigo-400"
         >
           ✨ Δώσε μου ιδέες
-        </button>
+        </Button>
       )}
     </div>
   );

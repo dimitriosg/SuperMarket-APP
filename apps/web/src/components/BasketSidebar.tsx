@@ -1,28 +1,38 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { BasketItem, BasketComparisonResult } from "../types"; // <--- ΑΛΛΑΓΗ ΤΥΠΟΥ
+import { shallow } from "zustand/shallow";
 import { DEFAULT_IMG } from "../services/api";
 import { BasketComparison } from "./BasketComparison";
 import { getRelativeTime } from "../utils/date";
-import { useBasketContext } from "../context/BasketContext";
+import { useStore } from "../store";
 
-// Ενημερωμένα Props με τον σωστό τύπο
-type Props = {
-  isOpen: boolean;
-  isPinned: boolean;
-  basket: BasketItem[];
-  comparison: { full: BasketComparisonResult[]; partial: BasketComparisonResult[] }; // <--- ΑΛΛΑΓΗ
-  onClose: () => void;
-  onTogglePin: () => void;
-  onUpdateQty: (id: string, delta: number) => void;
-  onRemove: (id: string) => void;
-};
-
-export function BasketSidebar({
-  isOpen, isPinned, basket, comparison, onClose, onTogglePin, onUpdateQty, onRemove
-}: Props) {
-
-  const { addToBasket, clearBasket } = useBasketContext();
+export function BasketSidebar() {
+  const {
+    isOpen,
+    isPinned,
+    basket,
+    comparison,
+    addToBasket,
+    clearBasket,
+    togglePin,
+    updateQuantity,
+    removeFromBasket,
+    setBasketOpen
+  } = useStore(
+    (state) => ({
+      isOpen: state.isBasketOpen,
+      isPinned: state.isPinned,
+      basket: state.basket,
+      comparison: state.comparison,
+      addToBasket: state.actions.addToBasket,
+      clearBasket: state.actions.clearBasket,
+      togglePin: state.actions.togglePin,
+      updateQuantity: state.actions.updateQuantity,
+      removeFromBasket: state.actions.removeFromBasket,
+      setBasketOpen: state.actions.setBasketOpen
+    }),
+    shallow
+  );
   
   const [showStaleDetails, setShowStaleDetails] = useState(false);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
@@ -83,7 +93,7 @@ export function BasketSidebar({
   };
 
   const handleContinueShopping = () => {
-    onClose();
+    setBasketOpen(false);
     window.setTimeout(() => {
       document.getElementById("product-search-input")?.focus();
     }, 0);
@@ -96,7 +106,7 @@ export function BasketSidebar({
       {!isPinned && (
         <div 
           className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity" 
-          onClick={onClose} 
+          onClick={() => setBasketOpen(false)} 
         />
       )}
       

@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { shallow } from "zustand/shallow";
 import { STORES_DATA, LOCATIONS } from "../services/api";
-import { useBasketContext } from "../context/BasketContext";
+import { useStore } from "../store";
 
 type Props = {
   isOpen: boolean;
@@ -11,9 +12,23 @@ type Props = {
 
 export function StoreFilters({ isOpen, onToggle, showOnboarding, onDismissOnboarding }: Props) {
   const { 
-    enabledStores, toggleStoreFilter, selectedLocation, changeLocation, 
-    selectAllStores, deselectAllStores 
-  } = useBasketContext();
+    selectedStores, 
+    toggleStoreFilter, 
+    selectedLocation, 
+    changeLocation, 
+    selectAllStores, 
+    deselectAllStores 
+  } = useStore(
+    (state) => ({
+      selectedStores: state.selectedStores,
+      toggleStoreFilter: state.actions.toggleStoreFilter,
+      selectedLocation: state.selectedLocation,
+      changeLocation: state.actions.changeLocation,
+      selectAllStores: state.actions.selectAllStores,
+      deselectAllStores: state.actions.deselectAllStores
+    }),
+    shallow
+  );
   
   const [isStoresListExpanded, setIsStoresListExpanded] = useState(true);
 
@@ -134,7 +149,7 @@ export function StoreFilters({ isOpen, onToggle, showOnboarding, onDismissOnboar
                 {STORES_DATA.map(store => {
                     const isAvailableInRegion = store.regions.includes("all") || store.regions.includes(selectedLocation);
                     if (!isAvailableInRegion && selectedLocation !== 'all') return null;
-                    const isChecked = enabledStores.includes(store.id);
+                    const isChecked = selectedStores.includes(store.id);
                     return (
                         <label key={store.id} className={`flex items-center gap-3 p-2 rounded-xl cursor-pointer transition-all ${isChecked ? 'bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-800' : 'opacity-60 hover:opacity-100'}`}>
                             <div className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${isChecked ? 'bg-indigo-600 border-indigo-600 dark:bg-indigo-500 dark:border-indigo-500' : 'border-slate-300 bg-white dark:border-slate-700 dark:bg-slate-950'}`}>

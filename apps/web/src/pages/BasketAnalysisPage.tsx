@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { useBasketContext } from "../context/BasketContext";
+import { shallow } from "zustand/shallow";
 import { BasketBuilder } from "../components/BasketBuilder";
+import { useStore } from "../store";
 import { DEFAULT_IMG, getStoreIdByName } from "../services/api";
 
 export function BasketAnalysisPage() {
@@ -10,10 +11,21 @@ export function BasketAnalysisPage() {
     comparison,
     updateQuantity,
     removeFromBasket,
-    enabledStores,
+    selectedStores,
     addToBasket,
     clearBasket
-  } = useBasketContext();
+  } = useStore(
+    (state) => ({
+      basket: state.basket,
+      comparison: state.comparison,
+      updateQuantity: state.actions.updateQuantity,
+      removeFromBasket: state.actions.removeFromBasket,
+      selectedStores: state.selectedStores,
+      addToBasket: state.actions.addToBasket,
+      clearBasket: state.actions.clearBasket
+    }),
+    shallow
+  );
 
   const bestSingleStore = comparison.full[0];
 
@@ -23,7 +35,7 @@ export function BasketAnalysisPage() {
       // Ασφαλές φιλτράρισμα προσφορών
       const validOffers = (item.offers || []).filter(offer => {
         const storeId = getStoreIdByName(offer.store);
-        return enabledStores.includes(storeId);
+        return selectedStores.includes(storeId);
       });
 
       // Εύρεση καλύτερης τιμής
@@ -33,7 +45,7 @@ export function BasketAnalysisPage() {
       
       return { ...item, activeOffer: bestOffer };
     });
-  }, [basket, enabledStores]);
+  }, [basket, selectedStores]);
 
   const mixMatchTotal = useMemo(() => {
     return mixMatchStrategy.reduce((acc, item) => {

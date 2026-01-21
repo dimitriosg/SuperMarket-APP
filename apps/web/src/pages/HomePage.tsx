@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
-import { useBasketContext } from "../context/BasketContext";
+import { shallow } from "zustand/shallow";
+import { useStore } from "../store";
 import { useProductSearch } from "../hooks/useProductSearch"; // Χρησιμοποιούμε το δικό σου hook!
 import { SearchHeader } from "../components/SearchHeader";
 import { ProductCard } from "../components/ProductCard";
 import { BasketSidebar } from "../components/BasketSidebar";
 import { StoreFilters } from "../components/StoreFilters";
 import { getStoreIdByName } from "../services/api";
+import { Button } from "../components/ui/Button";
 
 // --- WELCOME HERO (Το κρατάμε ίδιο) ---
 type HeroProps = {
@@ -19,13 +21,13 @@ const PopularSearches = ({ onTagClick }: HeroProps) => (
     <p className="text-xs font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">ΔΗΜΟΦΙΛΕΙΣ ΑΝΑΖΗΤΗΣΕΙΣ</p>
     <div className="flex flex-wrap justify-center gap-3">
       {popularSearches.map(tag => (
-        <button 
+        <Button 
           key={tag}
           onClick={() => onTagClick(tag)}
           className="px-4 py-2 bg-white border border-slate-200 rounded-full text-slate-600 font-bold text-sm hover:border-indigo-400 hover:text-indigo-600 hover:shadow-md transition-all active:scale-95 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:border-indigo-500/60 dark:hover:text-indigo-300"
         >
           {tag}
-        </button>
+        </Button>
       ))}
     </div>
   </div>
@@ -51,13 +53,13 @@ const WelcomeHero = ({ onTagClick }: HeroProps) => (
       <p className="text-xs font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">ΔΗΜΟΦΙΛΕΙΣ ΑΝΑΖΗΤΗΣΕΙΣ</p>
       <div className="flex flex-wrap justify-center gap-3">
         {["Γάλα", "Φέτα", "Ελαιόλαδο", "Καφές", "Αυγά", "Γιαούρτι"].map(tag => (
-          <button 
+          <Button 
             key={tag}
             onClick={() => onTagClick(tag)}
             className="px-4 py-2 bg-white border border-slate-200 rounded-full text-slate-600 font-bold text-sm hover:border-indigo-400 hover:text-indigo-600 hover:shadow-md transition-all active:scale-95 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:border-indigo-500/60 dark:hover:text-indigo-300"
           >
             {tag}
-          </button>
+          </Button>
         ))}
       </div>
     </div>
@@ -67,20 +69,27 @@ const WelcomeHero = ({ onTagClick }: HeroProps) => (
 export function HomePage() {
   const { 
     basket, 
-    comparison, 
     isBasketOpen, 
     isPinned, 
-    setBasketOpen, 
     toggleBasket, 
-    enabledStores, 
+    selectedStores, 
     addToBasket, 
-    removeFromBasket, 
-    updateQuantity, 
-    togglePin,
     selectAllStores
-  } = useBasketContext();
+  } = useStore(
+    (state) => ({
+      basket: state.basket,
+      isBasketOpen: state.isBasketOpen,
+      isPinned: state.isPinned,
+      toggleBasket: state.actions.toggleBasket,
+      selectedStores: state.selectedStores,
+      addToBasket: state.actions.addToBasket,
+      selectAllStores: state.actions.selectAllStores
+    }),
+    shallow
+  );
 
-  const { searchTerm, setSearchTerm, results, isSearching, performSearch } = useProductSearch();
+  const { searchTerm, setSearchTerm, results, isSearching, performSearch, error, retrySearch } =
+    useProductSearch();
 
   // --- NEW: State για τα Φίλτρα (Collapsible) ---
   const [isFiltersOpen, setIsFiltersOpen] = useState(true);
@@ -137,7 +146,7 @@ export function HomePage() {
   const filteredResults = results.map(product => {
     // Φιλτράρουμε τις προσφορές βάσει των ενεργών καταστημάτων
     const activeOffers = product.offers.filter(offer => 
-       enabledStores.includes(getStoreIdByName(offer.store))
+       selectedStores.includes(getStoreIdByName(offer.store))
     );
     
     // Αν δεν μείνει καμία προσφορά, ίσως θέλουμε να το κρύψουμε ή να το δείξουμε ως "unavailable"
@@ -191,7 +200,19 @@ export function HomePage() {
         }`}>
           
           {/* A. Welcome State */}
-          {!isSearching && results.length === 0 && (
+          {error && !isSearching && (
+            <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
+              <p>{error}</p>
+              <button
+                onClick={retrySearch}
+                className="mt-2 text-sm font-bold text-red-600 underline underline-offset-2"
+              >
+                Δοκίμασε ξανά
+              </button>
+            </div>
+          )}
+
+          {!isSearching && results.length === 0 && !searchTerm && !error && (
             <WelcomeHero onTagClick={(tag) => {
               setSearchTerm(tag);
               performSearch(tag);
@@ -199,7 +220,7 @@ export function HomePage() {
           )}
 
           {/* B. Results Grid */}
-          {(isSearching || results.length > 0) && (
+          {(isSearching || results.length > 0 || searchTerm) && (
             <>
               <div className="flex justify-between items-end mb-6">
                 <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
@@ -235,12 +256,12 @@ export function HomePage() {
                       Τα φίλτρα μπορεί να κρύβουν διαθέσιμα προϊόντα. Δοκίμασε να τα καθαρίσεις ή άλλαξε αναζήτηση.
                     </p>
                     <div className="flex flex-col items-center gap-4 mt-6">
-                      <button
+                      <Button
                         onClick={selectAllStores}
                         className="px-6 py-3 bg-indigo-600 text-white rounded-full font-bold shadow-md hover:bg-indigo-500 transition-all dark:bg-indigo-500 dark:hover:bg-indigo-400"
                       >
                         Καθάρισε φίλτρα
-                      </button>
+                      </Button>
                       <PopularSearches onTagClick={(tag) => {
                         setSearchTerm(tag);
                         performSearch(tag);
@@ -251,7 +272,7 @@ export function HomePage() {
               )}
 
               {/* EMPTY STATE */}
-              {results.length === 0 && !isSearching && searchTerm && (
+              {results.length === 0 && !isSearching && searchTerm && !error && (
                 <div className="text-center py-20">
                   <div className="text-6xl mb-4">🤷‍♂️</div>
                   <h3 className="text-xl font-bold text-slate-700 dark:text-slate-100">Δεν βρέθηκαν προϊόντα</h3>
@@ -269,25 +290,16 @@ export function HomePage() {
         */}
       </main>
 
-      <BasketSidebar 
-        isOpen={isBasketOpen}
-        isPinned={isPinned}
-        basket={basket}
-        comparison={comparison}
-        onClose={() => setBasketOpen(false)}
-        onTogglePin={togglePin}
-        onUpdateQty={updateQuantity}
-        onRemove={removeFromBasket}
-      />
+      <BasketSidebar />
 
       {/* Floating Basket Button (Εμφανίζεται αν δεν είναι pinned ή αν είναι κλειστό) */}
       {(!isPinned || !isBasketOpen) && (
-        <button 
+        <Button
           onClick={toggleBasket}
           className="fixed bottom-6 right-6 z-40 bg-indigo-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-all flex items-center gap-2 dark:bg-indigo-500"
         >
           <span className="font-bold">🛒 {basket.length}</span>
-        </button>
+        </Button>
       )}
 
     </div>

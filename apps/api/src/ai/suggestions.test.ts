@@ -1,5 +1,5 @@
 import { describe, it, expect } from "bun:test";
-import { validateSuggestionsRequest } from "@/utils/validation";
+import { ValidationError, validateSuggestionsRequest } from "@/utils/validation";
 import { generateFallbackSuggestions } from "@/ai/suggestions.service";
 
 describe("AI Suggestions - Validation", () => {
@@ -9,36 +9,46 @@ describe("AI Suggestions - Validation", () => {
       budget: 50,
       preferences: ["χωρίς γλουτένη"],
     });
-    expect(result.isValid).toBe(true);
+    expect(result.items).toEqual(["γάλα", "ψωμί"]);
   });
 
-  it("should reject empty items", () => {
-    const result = validateSuggestionsRequest({ items: [] });
-    expect(result.isValid).toBe(false);
-    expect(result.errors.some((e) => e.field === "items")).toBe(true);
+  it("should reject non-Greek items", () => {
+    expect(() => validateSuggestionsRequest({ items: ["milk"] })).toThrow(ValidationError);
   });
 
-  it("should reject items > 50", () => {
-    const result = validateSuggestionsRequest({
-      items: Array(51).fill("item"),
-    });
-    expect(result.isValid).toBe(false);
+  it("should reject duplicate items", () => {
+    expect(() =>
+      validateSuggestionsRequest({
+        items: ["γάλα", "γάλα"],
+      })
+    ).toThrow(ValidationError);
   });
 
   it("should reject budget > 1000", () => {
-    const result = validateSuggestionsRequest({
-      items: ["item"],
-      budget: 1001,
-    });
-    expect(result.isValid).toBe(false);
+    expect(() =>
+      validateSuggestionsRequest({
+        items: ["γάλα"],
+        budget: 1001,
+      })
+    ).toThrow(ValidationError);
   });
 
   it("should reject preferences > 5", () => {
-    const result = validateSuggestionsRequest({
-      items: ["item"],
-      preferences: Array(6).fill("pref"),
-    });
-    expect(result.isValid).toBe(false);
+    expect(() =>
+      validateSuggestionsRequest({
+        items: ["γάλα"],
+        preferences: Array(6).fill("χωρίς γλουτένη"),
+      })
+    ).toThrow(ValidationError);
+  });
+
+  it("should reject profanity in preferences", () => {
+    expect(() =>
+      validateSuggestionsRequest({
+        items: ["γάλα"],
+        preferences: ["μαλάκα"],
+      })
+    ).toThrow(ValidationError);
   });
 });
 
