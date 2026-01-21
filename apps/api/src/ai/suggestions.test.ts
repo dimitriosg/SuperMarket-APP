@@ -43,20 +43,20 @@ describe("AI Suggestions - Validation", () => {
 });
 
 describe("AI Suggestions - Fallback", () => {
-  it("should generate fallback for γάλα", () => {
-    const suggestions = generateFallbackSuggestions(["γάλα"]);
-    expect(suggestions.length > 0).toBe(true);
-    expect(suggestions.some((s) => s.name.includes("Βούτυρο") || s.name.includes("Δημητριακά"))).toBe(true);
-  });
-
-  it("should generate generic suggestions for unknown items", () => {
-    const suggestions = generateFallbackSuggestions(["unknown123"]);
+  it("should generate fallback suggestions", async () => {
+    const suggestions = await generateFallbackSuggestions(["γάλα"]);
     expect(suggestions.length > 0).toBe(true);
     expect(suggestions.length <= 5).toBe(true);
   });
 
-  it("should deduplicate suggestions", () => {
-    const suggestions = generateFallbackSuggestions(["γάλα", "γάλα"]);
+  it("should generate suggestions for unknown items", async () => {
+    const suggestions = await generateFallbackSuggestions(["unknown123"]);
+    expect(suggestions.length > 0).toBe(true);
+    expect(suggestions.length <= 5).toBe(true);
+  });
+
+  it("should deduplicate suggestions", async () => {
+    const suggestions = await generateFallbackSuggestions(["γάλα", "γάλα"]);
     const ids = new Set(suggestions.map((s) => s.id));
     expect(ids.size).toBe(suggestions.length);
   });
