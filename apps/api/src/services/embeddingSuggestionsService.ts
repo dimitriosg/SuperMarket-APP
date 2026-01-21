@@ -135,7 +135,7 @@ const fetchLatestPrices = async (productIds: string[]) => {
     where: {
       productId: { in: productIds },
     },
-    orderBy: { collectedAt: "desc" },
+    orderBy: [{ productId: "asc" }, { collectedAt: "desc" }],
     distinct: ["productId"],
     select: {
       productId: true,
