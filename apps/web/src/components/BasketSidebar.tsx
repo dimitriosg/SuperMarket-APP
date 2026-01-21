@@ -1,28 +1,38 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { BasketItem, BasketComparisonResult } from "../types"; // <--- ΑΛΛΑΓΗ ΤΥΠΟΥ
+import { shallow } from "zustand/shallow";
 import { DEFAULT_IMG } from "../services/api";
 import { BasketComparison } from "./BasketComparison";
 import { getRelativeTime } from "../utils/date";
-import { useBasketContext } from "../context/BasketContext";
+import { useStore } from "../store";
 
-// Ενημερωμένα Props με τον σωστό τύπο
-type Props = {
-  isOpen: boolean;
-  isPinned: boolean;
-  basket: BasketItem[];
-  comparison: { full: BasketComparisonResult[]; partial: BasketComparisonResult[] }; // <--- ΑΛΛΑΓΗ
-  onClose: () => void;
-  onTogglePin: () => void;
-  onUpdateQty: (id: string, delta: number) => void;
-  onRemove: (id: string) => void;
-};
-
-export function BasketSidebar({
-  isOpen, isPinned, basket, comparison, onClose, onTogglePin, onUpdateQty, onRemove
-}: Props) {
-
-  const { addToBasket, clearBasket } = useBasketContext();
+export function BasketSidebar() {
+  const {
+    isOpen,
+    isPinned,
+    basket,
+    comparison,
+    addToBasket,
+    clearBasket,
+    togglePin,
+    updateQuantity,
+    removeFromBasket,
+    setBasketOpen
+  } = useStore(
+    (state) => ({
+      isOpen: state.isBasketOpen,
+      isPinned: state.isPinned,
+      basket: state.basket,
+      comparison: state.comparison,
+      addToBasket: state.actions.addToBasket,
+      clearBasket: state.actions.clearBasket,
+      togglePin: state.actions.togglePin,
+      updateQuantity: state.actions.updateQuantity,
+      removeFromBasket: state.actions.removeFromBasket,
+      setBasketOpen: state.actions.setBasketOpen
+    }),
+    shallow
+  );
   
   const [showStaleDetails, setShowStaleDetails] = useState(false);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
@@ -83,7 +93,7 @@ export function BasketSidebar({
   };
 
   const handleContinueShopping = () => {
-    onClose();
+    setBasketOpen(false);
     window.setTimeout(() => {
       document.getElementById("product-search-input")?.focus();
     }, 0);
@@ -96,7 +106,7 @@ export function BasketSidebar({
       {!isPinned && (
         <div 
           className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity" 
-          onClick={onClose} 
+          onClick={() => setBasketOpen(false)} 
         />
       )}
       
@@ -109,7 +119,7 @@ export function BasketSidebar({
         <div className="p-6 border-b flex justify-between items-center bg-white sticky top-0 z-10">
           <div className="flex items-center gap-3">
             <h2 className="text-2xl font-black italic tracking-tighter">ΚΑΛΑΘΙ</h2>
-            <button onClick={onTogglePin} className={`hidden lg:block p-2 rounded-lg transition-colors ${isPinned ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400 hover:bg-slate-200"}`}>
+            <button onClick={togglePin} className={`hidden lg:block p-2 rounded-lg transition-colors ${isPinned ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400 hover:bg-slate-200"}`}>
               📌
             </button>
           </div>
@@ -124,7 +134,7 @@ export function BasketSidebar({
                   🗑️
                 </button>
              )}
-             <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-2xl font-light">✕</button>
+             <button onClick={() => setBasketOpen(false)} className="text-slate-400 hover:text-slate-600 text-2xl font-light">✕</button>
           </div>
         </div>
 
@@ -218,7 +228,7 @@ export function BasketSidebar({
                        <Link
                          key={item.id}
                          to={`/product/${item.id}`}
-                         onClick={() => { if (!isPinned) onClose(); }}
+                         onClick={() => { if (!isPinned) setBasketOpen(false); }}
                          className="flex items-center gap-3 rounded-xl border border-slate-100 bg-white p-2 hover:border-indigo-200 hover:bg-indigo-50 transition-colors"
                        >
                          <div className="h-10 w-10 rounded-lg bg-slate-50 p-1 flex items-center justify-center">
@@ -255,14 +265,14 @@ export function BasketSidebar({
                     </h4>
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
-                        <button onClick={() => onUpdateQty(item.id, -1)} className="w-6 h-6 flex items-center justify-center font-black text-indigo-600 hover:bg-white rounded-md transition-colors">-</button>
+                        <button onClick={() => updateQuantity(item.id, -1)} className="w-6 h-6 flex items-center justify-center font-black text-indigo-600 hover:bg-white rounded-md transition-colors">-</button>
                         <span className="text-xs font-black w-6 text-center">{item.quantity}</span>
-                        <button onClick={() => onUpdateQty(item.id, 1)} className="w-6 h-6 flex items-center justify-center font-black text-indigo-600 hover:bg-white rounded-md transition-colors">+</button>
+                        <button onClick={() => updateQuantity(item.id, 1)} className="w-6 h-6 flex items-center justify-center font-black text-indigo-600 hover:bg-white rounded-md transition-colors">+</button>
                       </div>
                       <span className="font-black text-sm text-slate-900">
                         {(item.bestPrice * item.quantity).toFixed(2)}€
                       </span>
-                      <button onClick={() => onRemove(item.id)} className="text-red-300 hover:text-red-500 transition-colors">🗑️</button>
+                      <button onClick={() => removeFromBasket(item.id)} className="text-red-300 hover:text-red-500 transition-colors">🗑️</button>
                     </div>
                   </div>
                 </div>
@@ -279,7 +289,7 @@ export function BasketSidebar({
                 <Link 
                     to="/analysis"
                     className="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg hover:shadow-indigo-200"
-                    onClick={() => { if (!isPinned) onClose(); }}
+                    onClick={() => { if (!isPinned) setBasketOpen(false); }}
                 >
                     📊 Λεπτομερής Ανάλυση
                 </Link>

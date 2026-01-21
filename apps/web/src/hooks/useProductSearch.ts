@@ -1,10 +1,12 @@
-import { useState, useEffect } from "react";
-import { ProductResult } from "../types";
+import { useEffect, useState } from "react";
+import { useStore } from "../store";
 
 export function useProductSearch() {
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [results, setResults] = useState<ProductResult[]>([]);
+  const results = useStore((state) => state.products);
+  const setProducts = useStore((state) => state.actions.setProducts);
+  const setFilters = useStore((state) => state.actions.setFilters);
   const [loading, setLoading] = useState(false);
 
   // Debounce 500ms
@@ -15,10 +17,14 @@ export function useProductSearch() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  useEffect(() => {
+    setFilters({ query: debouncedSearch });
+  }, [debouncedSearch, setFilters]);
+
   // API Call
   useEffect(() => {
     if (!debouncedSearch || debouncedSearch.length < 2) {
-      setResults([]);
+      setProducts([]);
       return;
     }
 
@@ -32,14 +38,14 @@ export function useProductSearch() {
       })
       .then((data: any[]) => {
         console.log("✅ Hook: Βρήκα", data.length, "προϊόντα"); // <--- Πρέπει να το δεις στο F12
-        setResults(data);
+        setProducts(data);
       })
       .catch((err) => {
         console.error("❌ Hook Error:", err);
-        setResults([]);
+        setProducts([]);
       })
       .finally(() => setLoading(false));
-  }, [debouncedSearch]);
+  }, [debouncedSearch, setProducts]);
 
   const performSearch = (term: string) => {
     setSearchTerm(term);
