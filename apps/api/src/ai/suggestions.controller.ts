@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
 import { generateSuggestions } from "./suggestions.service";
-import { validateSuggestionsRequest } from "../utils/validation";
+import { ValidationError, validateSuggestionsRequest } from "../utils/validation";
 import { prisma } from "../db";
 
 export const createAISuggestionsRoutes = (app: Elysia) =>
@@ -9,13 +9,19 @@ export const createAISuggestionsRoutes = (app: Elysia) =>
       "/suggestions",
       async ({ body, set }) => {
         // 1. Validation
-        const validation = validateSuggestionsRequest(body);
-        if (!validation.isValid) {
-          set.status = 400;
-          return { error: "INVALID_INPUT", details: validation.errors };
-        }
+        let items: string[];
+        let budget: number | undefined;
+        let preferences: string[] | undefined;
 
-        const { items, budget, preferences } = body;
+        try {
+          ({ items, budget, preferences } = validateSuggestionsRequest(body));
+        } catch (error) {
+          if (error instanceof ValidationError) {
+            set.status = 400;
+            return { error: "INVALID_INPUT", details: [{ field: error.field, message: error.message }] };
+          }
+          throw error;
+        }
         
         // 2. Mock user ID (Fixes 'Property userId does not exist' error)
         // Since we don't have auth middleware yet, we use a placeholder.
