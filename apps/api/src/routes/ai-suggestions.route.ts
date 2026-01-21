@@ -5,8 +5,8 @@ import {
   type Suggestion,
   type SuggestionsResponse,
 } from "../services/ai-suggestions.service";
-import { validateSuggestionsRequest } from "../utils/validation";
 import { db } from "../db";
+import { authMiddleware } from "../middleware/auth.middleware";
 
 const suggestionsRequestSchema = t.Object({
   items: t.Array(t.String({ maxLength: 100 }), { minItems: 1, maxItems: 50 }),
@@ -45,14 +45,20 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: "/api/ai" })
       };
     }
   })
+  .use(authMiddleware)
   .post(
     "/suggestions",
-    async ({ body, set }) => {
+    async ({ body, set, userId }) => {
       const startTime = Date.now();
 
       const { items, budget, preferences } = body;
 
       try {
+        if (!userId) {
+          set.status = 401;
+          return { error: "UNAUTHORIZED", message: "Unauthorized" };
+        }
+
         // ✅ Get API key from env
         const apiKey = process.env.OPENAI_API_KEY || process.env.PERPLEXITY_API_KEY;
 
@@ -65,6 +71,7 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: "/api/ai" })
 
         // ✅ Log to database (non-blocking)
         logSuggestionRequest({
+          userId,
           items,
           budget,
           preferences,
@@ -113,6 +120,7 @@ interface SuggestionResultLog {
 
 // ✅ Helper: Log to database
 async function logSuggestionRequest(data: {
+  userId: string;
   items: string[];
   budget?: number;
   preferences?: string[];
@@ -121,7 +129,7 @@ async function logSuggestionRequest(data: {
   try {
     await db.aISuggestionsLog.create({
       data: {
-        userId: null, // TODO: Add auth
+        userId: data.userId,
         requestPayload: { items: data.items, budget: data.budget, preferences: data.preferences },
         requestItemsCount: data.items.length,
         requestBudget: data.budget,
