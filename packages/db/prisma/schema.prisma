@@ -85,6 +85,7 @@ model Product {
   quantityUnit   UnitType?
   
   normalizedName String @default("")
+  embedding      Float[]?
   
   isActive   Boolean  @default(true)
   createdAt  DateTime @default(now())
@@ -136,7 +137,7 @@ model PriceSnapshot {
 }
 
 // for AI suggestions
-model AISuggestionsLog {
+model AIASuggestionsLog {
   id        String   @id @default(cuid())
   userId    String   @db.Uuid
   
@@ -160,4 +161,31 @@ model AISuggestionsLog {
   
   @@index([userId, createdAt(sort: Desc)])
   @@index([userId, aiTimeout])
+  @@index([createdAt])
+  @@map("AISuggestionsLog")
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([email])
+  @@index([createdAt])
+}
+
+model ProductEmbedding {
+  id        String   @id @default(cuid())
+  productId String   @unique
+  embedding Unsupported("vector")
+  model     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([createdAt])
 }

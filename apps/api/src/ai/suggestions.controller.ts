@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
 import { generateSuggestions } from "./suggestions.service";
-import { validateSuggestionsRequest } from "../utils/validation";
+import { ValidationError, validateSuggestionsRequest } from "../utils/validation";
 import { prisma } from "../db";
 
 export const createAISuggestionsRoutes = (app: Elysia) =>
@@ -9,13 +9,19 @@ export const createAISuggestionsRoutes = (app: Elysia) =>
       "/suggestions",
       async ({ body, set }) => {
         // 1. Validation
-        const validation = validateSuggestionsRequest(body);
-        if (!validation.isValid) {
-          set.status = 400;
-          return { error: "INVALID_INPUT", details: validation.errors };
-        }
+        let items: string[];
+        let budget: number | undefined;
+        let preferences: string[] | undefined;
 
-        const { items, budget, preferences } = body;
+        try {
+          ({ items, budget, preferences } = validateSuggestionsRequest(body));
+        } catch (error) {
+          if (error instanceof ValidationError) {
+            set.status = 400;
+            return { error: "INVALID_INPUT", details: [{ field: error.field, message: error.message }] };
+          }
+          throw error;
+        }
         
         // 2. Mock user ID (Fixes 'Property userId does not exist' error)
         // Since we don't have auth middleware yet, we use a placeholder.
@@ -73,12 +79,12 @@ export const createAISuggestionsRoutes = (app: Elysia) =>
 // Helper function for logging
 async function logSuggestionRequest(data: any) {
   try {
-    // Note: If 'aISuggestionsLog' still shows an error, try reloading VS Code
+    // Note: If 'aIASuggestionsLog' still shows an error, try reloading VS Code
     // window (Ctrl+Shift+P -> Reload Window) after 'bun prisma generate'.
     // @ts-ignore
-    if (prisma.aISuggestionsLog) {
+    if (prisma.aIASuggestionsLog) {
        // @ts-ignore
-      await prisma.aISuggestionsLog.create({
+      await prisma.aIASuggestionsLog.create({
         data: {
           userId: data.userId,
           requestPayload: {

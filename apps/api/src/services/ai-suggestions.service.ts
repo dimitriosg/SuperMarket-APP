@@ -1,5 +1,19 @@
 // apps/api/src/services/ai-suggestions.service.ts
 
+import OpenAI, {
+  APIConnectionError,
+  APIError,
+  AuthenticationError,
+  BadRequestError,
+  ConflictError,
+  InternalServerError,
+  NotFoundError,
+  PermissionDeniedError,
+  RateLimitError,
+  UnprocessableEntityError,
+} from "@openai/sdk";
+import { embeddingSuggestionsService } from "./embeddingSuggestionsService";
+
 export interface SuggestionsRequest {
   items: string[];
   budget?: number;
@@ -12,6 +26,7 @@ export interface Suggestion {
   category: string;
   price: number;
   rationale: string;
+  image?: string;
 }
 
 export interface SuggestionsResponse {
@@ -19,6 +34,7 @@ export interface SuggestionsResponse {
   metadata: {
     model: string;
     latency_ms: number;
+    cost_estimate_usd: number;
   };
 }
 
@@ -26,80 +42,33 @@ export interface SuggestionsResponse {
  * Rule-based fallback suggestions
  * Triggered when AI fails or times out
  */
-function generateFallbackSuggestions(items: string[]): Suggestion[] {
-  const itemsLower = items.map((i) => i.toLowerCase());
-
-  const ruleMap: Record<string, Suggestion[]> = {
-    γάλα: [
-      {
-        id: "butter_001",
-        name: "Βούτυρο",
-        category: "Γαλακτοκομικά",
-        price: 3.5,
-        rationale: "Συνδυάζεται τέλεια με γάλα",
-      },
-      {
-        id: "cereal_001",
-        name: "Δημητριακά",
-        category: "Πρωϊνό",
-        price: 2.99,
-        rationale: "Κλασικός συνδυασμός",
-      },
-    ],
-    ψωμί: [
-      {
-        id: "cheese_001",
-        name: "Φέτα ΠΟΠ",
-        category: "Γαλακτοκομικά",
-        price: 4.2,
-        rationale: "Ταιριάζει με ψωμί",
-      },
-    ],
-    κοτόπουλο: [
-      {
-        id: "lemon_001",
-        name: "Λεμόνια",
-        category: "Φρούτα",
-        price: 1.8,
-        rationale: "Συνδυάζεται με κοτόπουλο",
-      },
-    ],
-  };
-
-  const suggestions: Suggestion[] = [];
-
-  for (const item of itemsLower) {
-    for (const [keyword, items] of Object.entries(ruleMap)) {
-      if (item.includes(keyword)) {
-        suggestions.push(...items);
-      }
-    }
+async function generateFallbackSuggestions(items: string[]): Promise<Suggestion[]> {
+  const embeddingSuggestions = await embeddingSuggestionsService.getSuggestions(items, 5);
+  if (embeddingSuggestions.length > 0) {
+    return embeddingSuggestions;
   }
 
-  // Deduplicate & limit to 5
-  const unique = Array.from(new Map(suggestions.map((s) => [s.id, s])).values()).slice(0, 5);
-
-  // Generic fallback
-  if (unique.length === 0) {
-    return [
-      {
-        id: "generic_1",
-        name: "Ελαιόλαδο ΠΟΠ",
-        category: "Έλαια",
-        price: 8.5,
-        rationale: "Ελληνικό κλασικό",
-      },
-      {
-        id: "generic_2",
-        name: "Φέτα ΠΟΠ",
-        category: "Γαλακτοκομικά",
-        price: 4.2,
-        rationale: "Δημοφιλές",
-      },
-    ];
+  const randomSuggestions = await embeddingSuggestionsService.getRandomSuggestions(5);
+  if (randomSuggestions.length > 0) {
+    return randomSuggestions;
   }
 
-  return unique;
+  return [
+    {
+      id: "generic_1",
+      name: "Ελαιόλαδο ΠΟΠ",
+      category: "Έλαια",
+      price: 8.5,
+      rationale: "Ελληνικό κλασικό",
+    },
+    {
+      id: "generic_2",
+      name: "Φέτα ΠΟΠ",
+      category: "Γαλακτοκομικά",
+      price: 4.2,
+      rationale: "Δημοφιλές",
+    },
+  ];
 }
 
 /**
@@ -110,6 +79,11 @@ async function callOpenAI(
   apiKey: string,
   signal: AbortSignal
 ): Promise<SuggestionsResponse> {
+  const client = new OpenAI({
+    apiKey,
+    maxRetries: 2,
+  });
+  const startTime = Date.now();
   const messages = [
     {
       role: "system" as const,
@@ -132,31 +106,27 @@ Budget: €${request.budget || "χωρίς όριο"}
     },
   ];
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${apiKey}`,
-    },
-    body: JSON.stringify({
-      model: "gpt-4-turbo-preview",
+  const response = await client.chat.completions.create(
+    {
+      model: "gpt-4o",
       messages,
       temperature: 0.7,
       max_tokens: 500,
-    }),
-    signal,
-  });
-
-  if (!response.ok) {
-    throw new Error(`OpenAI Error: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  const content = data.choices[0].message.content;
+      response_format: { type: "json_object" },
+    },
+    { signal }
+  );
+  const latency = Date.now() - startTime;
+  const content = response.choices[0]?.message?.content ?? "";
   let parsed: SuggestionsResponse;
 
   try {
-    parsed = JSON.parse(content);
+    const normalizedContent = content
+      .replace(/^```json\s*/i, "")
+      .replace(/^```\s*/i, "")
+      .replace(/```\s*$/i, "")
+      .trim();
+    parsed = JSON.parse(normalizedContent);
   } catch (parseError) {
     throw new Error("AI_PARSE_ERROR", { cause: parseError });
   }
@@ -165,11 +135,18 @@ Budget: €${request.budget || "χωρίς όριο"}
     throw new Error("AI_PARSE_ERROR");
   }
 
+  const usage = response.usage;
+  const promptTokens = usage?.prompt_tokens ?? 0;
+  const completionTokens = usage?.completion_tokens ?? 0;
+  const costEstimate =
+    promptTokens * (5 / 1_000_000) + completionTokens * (15 / 1_000_000);
+
   return {
     suggestions: parsed.suggestions,
     metadata: {
-      model: "gpt-4-turbo",
-      latency_ms: 0,
+      model: "gpt-4o",
+      latency_ms: latency,
+      cost_estimate_usd: costEstimate,
     },
   };
 }
@@ -183,7 +160,12 @@ export async function generateSuggestions(
 ): Promise<{
   data?: SuggestionsResponse;
   error?: { error: string; fallback_suggestions: Suggestion[] };
-  metadata: { model: string; latency_ms: number; aiTimeout: boolean };
+  metadata: {
+    model: string;
+    latency_ms: number;
+    aiTimeout: boolean;
+    cost_estimate_usd: number;
+  };
 }> {
   const startTime = Date.now();
 
@@ -202,27 +184,58 @@ export async function generateSuggestions(
     return {
       data: response,
       metadata: {
-        model: "gpt-4-turbo",
+        model: "gpt-4o",
         latency_ms: Date.now() - startTime,
         aiTimeout: false,
+        cost_estimate_usd: response.metadata.cost_estimate_usd,
       },
     };
   } catch (error: unknown) {
     const latency = Date.now() - startTime;
-    const fallback = generateFallbackSuggestions(request.items);
+    const fallback = await generateFallbackSuggestions(request.items);
 
     const isTimeout = error instanceof Error && error.name === "AbortError";
     const isParseError = error instanceof Error && error.message === "AI_PARSE_ERROR";
+    const isRateLimited = error instanceof RateLimitError;
+    const isBadRequest = error instanceof BadRequestError;
+    const isAuthError =
+      error instanceof AuthenticationError || error instanceof PermissionDeniedError;
+    const isNotFound = error instanceof NotFoundError;
+    const isConflict = error instanceof ConflictError;
+    const isUnprocessable = error instanceof UnprocessableEntityError;
+    const isInternalError = error instanceof InternalServerError;
+    const isConnectionError = error instanceof APIConnectionError;
+    const isApiError = error instanceof APIError;
+    const openAiErrorType = [
+      isRateLimited && "RateLimitError",
+      isBadRequest && "BadRequestError",
+      isAuthError && "AuthenticationError",
+      isNotFound && "NotFoundError",
+      isConflict && "ConflictError",
+      isUnprocessable && "UnprocessableEntityError",
+      isInternalError && "InternalServerError",
+      isConnectionError && "APIConnectionError",
+      isApiError && "APIError",
+    ]
+      .filter(Boolean)
+      .join("|");
 
     return {
       error: {
-        error: isTimeout ? "AI_TIMEOUT" : isParseError ? "AI_PARSE_ERROR" : "AI_ERROR",
+        error: isTimeout
+          ? "AI_TIMEOUT"
+          : isParseError
+            ? "AI_PARSE_ERROR"
+            : openAiErrorType
+              ? `OPENAI_${openAiErrorType}`
+              : "AI_ERROR",
         fallback_suggestions: fallback,
       },
       metadata: {
-        model: "fallback-rule",
+        model: "fallback-embedding",
         latency_ms: latency,
         aiTimeout: isTimeout,
+        cost_estimate_usd: 0,
       },
     };
   }

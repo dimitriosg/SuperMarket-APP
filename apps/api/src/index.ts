@@ -8,6 +8,8 @@ import { basketController } from "./routes/basket.route";
 import { adminRoutes } from "./routes/admin.route";
 import { aiSuggestionsRoutes } from "./routes/ai-suggestions.route"; 
 import { productRoutes } from "./routes/products.route";
+import { authRoutes } from "./routes/auth.route";
+import { createRequestLogger, getRequestId, logger, resolveUserId } from "./utils/logger";
 
 
 const app = new Elysia()
@@ -19,12 +21,13 @@ const app = new Elysia()
   .use(searchRoutes)
   .use(basketController)  
   .use(adminRoutes)
+  .use(authRoutes)
   
   // ✅ AI Suggestions routes (μόνο AI route plugin, πριν το .onError)
   .use(aiSuggestionsRoutes)
 
   // ✅ Error handler
-  .onError(({ error, code, set }) => {
+  .onError(({ error, code, set, request }) => {
   const requestErrorCodes = new Set([
     "VALIDATION",
     "PARSE",
@@ -38,10 +41,22 @@ const app = new Elysia()
     const status = isNotFound ? 404 : isRequestError ? 400 : 500;
     set.status = status;
 
+    const requestId = getRequestId(request?.headers);
+    const userId = resolveUserId(request?.headers);
+    const requestLogger = createRequestLogger({ requestId, userId });
+
     if (status >= 500) {
-      console.error(code, error);
+      requestLogger.error("REQUEST_ERROR", {
+        event: "REQUEST_ERROR",
+        error_type: code,
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
     } else {
-      console.warn(code, error);
+      requestLogger.warn("REQUEST_ERROR", {
+        event: "REQUEST_ERROR",
+        error_type: code,
+        message: error instanceof Error ? error.message : "Unknown error",
+      });
     }
 
     const message =
@@ -76,7 +91,9 @@ const app = new Elysia()
 const job = new CronJob(
   '0 1 2 * * *', 
   async function() {
-    console.log('⏰ Cron Job Triggered: Daily Price Sync');
+    logger.info("CRON_DAILY_PRICE_SYNC_TRIGGERED", {
+      event: "CRON_DAILY_PRICE_SYNC_TRIGGERED",
+    });
     await ekatanalotisService.syncAll();
   },
   null,
@@ -84,7 +101,12 @@ const job = new CronJob(
   'Europe/Athens'
 );
 
-console.log(
-  `🦊 Elysia is running at http://${app.server?.hostname}:${app.server?.port}`
-);
-console.log("⏰ Daily Sync Job scheduled for 2:01 AM Athens time.");
+logger.info("API_SERVER_STARTED", {
+  event: "API_SERVER_STARTED",
+  host: app.server?.hostname,
+  port: app.server?.port,
+});
+logger.info("CRON_DAILY_SYNC_SCHEDULED", {
+  event: "CRON_DAILY_SYNC_SCHEDULED",
+  timezone: "Europe/Athens",
+});

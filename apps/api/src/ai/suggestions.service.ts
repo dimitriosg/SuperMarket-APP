@@ -1,4 +1,5 @@
 import type { SuggestionsRequest } from "../utils/validation";
+import { embeddingSuggestionsService } from "../services/embeddingSuggestionsService";
 
 export interface Suggestion {
   id: string;
@@ -26,103 +27,40 @@ export interface ErrorResponse {
  * Rule-based fallback suggestions
  * Triggered if AI fails/times out
  */
-function generateFallbackSuggestions(items: string[]): Suggestion[] {
-  const itemsLower = items.map((i) => i.toLowerCase());
-
-  // Heuristic rules: if item exists, suggest complementary products
-  const suggestions: Suggestion[] = [];
-
-  const ruleMap: Record<string, Suggestion[]> = {
-    γάλα: [
-      {
-        id: "butter_001",
-        name: "Βούτυρο",
-        category: "Γαλακτοκομικά",
-        price: 3.5,
-        rationale: "Συνδυάζεται τέλεια με το γάλα σου",
-      },
-      {
-        id: "cereal_001",
-        name: "Δημητριακά με ίνες",
-        category: "Πρωϊνό",
-        price: 2.99,
-        rationale: "Δημοφιλή με γάλα",
-      },
-    ],
-    ψωμί: [
-      {
-        id: "cheese_001",
-        name: "Φέτα ΠΟΠ",
-        category: "Γαλακτοκομικά",
-        price: 4.2,
-        rationale: "Κλασική συνδυασμός με ψωμί",
-      },
-      {
-        id: "jam_001",
-        name: "Μαρμελάδα φράουλα",
-        category: "Διατροφή",
-        price: 2.5,
-        rationale: "Δημοφιλής επιλογή",
-      },
-    ],
-    κοτόπουλο: [
-      {
-        id: "lemon_001",
-        name: "Λεμόνια (ελληνικά)",
-        category: "Φρούτα & Λαχανικά",
-        price: 1.8,
-        rationale: "Συνδυάζεται με κοτόπουλο",
-      },
-      {
-        id: "olive_oil_001",
-        name: "Ελαιόλαδο Extra Virgin",
-        category: "Έλαια & Ξίδια",
-        price: 7.5,
-        rationale: "Ιδανικό για μαγείρεμα",
-      },
-    ],
-  };
-
-  // Find suggestions based on items
-  for (const item of itemsLower) {
-    for (const [keyword, fallbackItems] of Object.entries(ruleMap)) {
-      if (item.includes(keyword)) {
-        suggestions.push(...fallbackItems);
-      }
-    }
+export async function generateFallbackSuggestions(items: string[]): Promise<Suggestion[]> {
+  const embeddingSuggestions = await embeddingSuggestionsService.getSuggestions(items, 5);
+  if (embeddingSuggestions.length > 0) {
+    return embeddingSuggestions;
   }
 
-  // Remove duplicates & limit to 5
-  const unique = Array.from(new Map(suggestions.map((s) => [s.id, s])).values()).slice(0, 5);
-
-  // If no matches, return generic top sellers
-  if (unique.length === 0) {
-    return [
-      {
-        id: "generic_1",
-        name: "Ελαιόλαδο ΠΟΠ Κορωνέικη",
-        category: "Έλαια",
-        price: 8.5,
-        rationale: "Δημοφιλές προϊόν",
-      },
-      {
-        id: "generic_2",
-        name: "Φέτα ΠΟΠ",
-        category: "Γαλακτοκομικά",
-        price: 4.2,
-        rationale: "Ελληνικό κλασικό",
-      },
-      {
-        id: "generic_3",
-        name: "Μέλι Ελληνικό",
-        category: "Διατροφή",
-        price: 5.9,
-        rationale: "Φυσικό & υγιεινό",
-      },
-    ];
+  const randomSuggestions = await embeddingSuggestionsService.getRandomSuggestions(5);
+  if (randomSuggestions.length > 0) {
+    return randomSuggestions;
   }
 
-  return unique;
+  return [
+    {
+      id: "generic_1",
+      name: "Ελαιόλαδο ΠΟΠ Κορωνέικη",
+      category: "Έλαια",
+      price: 8.5,
+      rationale: "Δημοφιλές προϊόν",
+    },
+    {
+      id: "generic_2",
+      name: "Φέτα ΠΟΠ",
+      category: "Γαλακτοκομικά",
+      price: 4.2,
+      rationale: "Ελληνικό κλασικό",
+    },
+    {
+      id: "generic_3",
+      name: "Μέλι Ελληνικό",
+      category: "Διατροφή",
+      price: 5.9,
+      rationale: "Φυσικό & υγιεινό",
+    },
+  ];
 }
 
 /**
@@ -171,14 +109,14 @@ export async function generateSuggestions(
 
     if (error instanceof Error && error.name === "AbortError") {
       // Timeout occurred
-      const fallback = generateFallbackSuggestions(request.items);
+      const fallback = await generateFallbackSuggestions(request.items);
       return {
         error: {
           error: "AI_TIMEOUT",
           fallback_suggestions: fallback,
         },
         metadata: {
-          model: "fallback-rule",
+          model: "fallback-embedding",
           latency_ms: latency,
           aiTimeout: true,
         },
@@ -186,14 +124,14 @@ export async function generateSuggestions(
     }
 
     // Other AI errors
-    const fallback = generateFallbackSuggestions(request.items);
+    const fallback = await generateFallbackSuggestions(request.items);
     return {
       error: {
         error: "AI_ERROR",
         fallback_suggestions: fallback,
       },
       metadata: {
-        model: "fallback-rule",
+        model: "fallback-embedding",
         latency_ms: latency,
         aiTimeout: false,
       },
