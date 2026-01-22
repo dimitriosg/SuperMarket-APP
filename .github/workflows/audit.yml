@@ -1,0 +1,14 @@
+name: Weekly Code Audit
+on:
+  schedule:
+    - cron: '0 9 * * 1' # Monday 9 AM
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run audit with Copilot
+        run: |
+          # Trigger Copilot audit (requires GitHub CLI)
+          gh copilot suggest "Run code audit on requirements 1-10"
