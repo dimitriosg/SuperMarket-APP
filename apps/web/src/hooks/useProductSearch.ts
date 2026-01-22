@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useStore } from "../store";
+import { useFetch } from "./useFetch";
 
 export function useProductSearch() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -9,7 +10,7 @@ export function useProductSearch() {
   const setFilters = useStore((state) => state.actions.setFilters);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [requestId, setRequestId] = useState(0);
+  const [searchUrl, setSearchUrl] = useState<string | null>(null);
 
   // Debounce 500ms
   useEffect(() => {
@@ -26,37 +27,59 @@ export function useProductSearch() {
   // API Call
   useEffect(() => {
     if (!debouncedSearch || debouncedSearch.length < 2) {
-      setResults([]);
+      setProducts([]);
       setError(null);
+      setSearchUrl(null);
       return;
     }
 
-    console.log("🚀 Hook: Ψάχνω για:", debouncedSearch); // <--- Πρέπει να το δεις στο F12
-    setLoading(true);
     setError(null);
+    setSearchUrl(
+      `${import.meta.env.VITE_API_URL}/products/search?q=${encodeURIComponent(
+        debouncedSearch
+      )}`
+    );
+  }, [debouncedSearch]);
 
-    fetch(`${import.meta.env.VITE_API_URL}/products/search?q=${debouncedSearch}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("API Error");
-        return res.json();
-      })
-      .then((data: any[]) => {
-        console.log("✅ Hook: Βρήκα", data.length, "προϊόντα"); // <--- Πρέπει να το δεις στο F12
-        setResults(data);
-        setError(null);
-      })
-      .catch((err) => {
-        console.error("❌ Hook Error:", err);
-        setResults([]);
-        setError("Η αναζήτηση απέτυχε. Δοκίμασε ξανά.");
-      })
-      .finally(() => setLoading(false));
-  }, [debouncedSearch, requestId]);
+  const { data, loading: isSearching, error: fetchError, retry } = useFetch<any[]>(
+    searchUrl,
+    {
+      immediate: Boolean(searchUrl),
+      responseHandler: async (response) => {
+        if (!response.ok) {
+          throw new Error("Η αναζήτηση απέτυχε. Δοκίμασε ξανά.");
+        }
+        return (await response.json()) as any[];
+      },
+    }
+  );
+
+  const resultsMemo = useMemo(() => data ?? [], [data]);
+
+  useEffect(() => {
+    if (fetchError) {
+      setProducts([]);
+      setError(fetchError);
+      setLoading(false);
+      return;
+    }
+
+    if (searchUrl) {
+      setProducts(resultsMemo);
+      setError(null);
+    }
+
+    setLoading(isSearching);
+  }, [fetchError, isSearching, resultsMemo, searchUrl, setProducts]);
 
   const performSearch = (term: string) => {
     setSearchTerm(term);
     setDebouncedSearch(term);
-    setRequestId((prev) => prev + 1);
+    setSearchUrl(
+      term.length >= 2
+        ? `${import.meta.env.VITE_API_URL}/products/search?q=${encodeURIComponent(term)}`
+        : null
+    );
   };
 
   return {
@@ -66,7 +89,7 @@ export function useProductSearch() {
     setSearchTerm,
     debouncedSearch,
     performSearch,
-    retrySearch: () => setRequestId((prev) => prev + 1),
+    retrySearch: retry,
     error
   };
 }

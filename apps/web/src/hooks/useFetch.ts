@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-type UseFetchOptions = {
+type UseFetchOptions<T> = {
   init?: RequestInit;
   immediate?: boolean;
   signal?: AbortSignal;
+  responseHandler?: (response: Response) => Promise<T>;
 };
 
 type UseFetchResult<T> = {
@@ -51,9 +52,9 @@ const mapNetworkError = (error: unknown) => {
 
 export const useFetch = <T,>(
   url: string | null,
-  options: UseFetchOptions = {}
+  options: UseFetchOptions<T> = {}
 ): UseFetchResult<T> => {
-  const { init, immediate = true, signal: externalSignal } = options;
+  const { init, immediate = true, signal: externalSignal, responseHandler } = options;
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -99,15 +100,20 @@ export const useFetch = <T,>(
             signal: controller.signal,
           });
 
-          if (!response.ok) {
-            throw new Error(
-              `Σφάλμα διακομιστή: ${response.status} ${
-                response.statusText || "Άγνωστο"
-              }`
-            );
-          }
+          const handler =
+            responseHandler ??
+            (async (incoming: Response) => {
+              if (!incoming.ok) {
+                throw new Error(
+                  `Σφάλμα διακομιστή: ${incoming.status} ${
+                    incoming.statusText || "Άγνωστο"
+                  }`
+                );
+              }
+              return (await incoming.json()) as T;
+            });
 
-          const result = (await response.json()) as T;
+          const result = await handler(response);
           cacheRef.current = result;
           setData(result);
           setError(null);

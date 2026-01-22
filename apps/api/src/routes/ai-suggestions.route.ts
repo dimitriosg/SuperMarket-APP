@@ -10,6 +10,7 @@ import { authMiddleware } from "../middleware/auth.middleware";
 import { rateLimitMiddleware } from "../middleware/rateLimitMiddleware";
 import { redis } from "../redis";
 import { createRequestLogger, getRequestId, logger } from "../utils/logger";
+import { validateSuggestionsRequest, ValidationError } from "../utils/validation";
 
 const suggestionsRequestSchema = t.Object({
   items: t.Array(t.String({ maxLength: 100 }), { minItems: 1, maxItems: 50 }),
@@ -145,14 +146,32 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: "/api/ai" })
     "/suggestions",
     async ({ body, set, headers, userId }) => {
       const startTime = Date.now();
-
-      const { items, budget, preferences } = body;
+      let items: string[] = [];
+      let budget: number | undefined;
+      let preferences: string[] | undefined;
       const resolvedUserId = userId ?? getUserId({ headers });
       const requestId = getRequestId(headers);
       const requestLogger = createRequestLogger({ requestId, userId: resolvedUserId });
       let didError = false;
 
       try {
+        try {
+          const parsed = validateSuggestionsRequest(body);
+          items = parsed.items;
+          budget = parsed.budget;
+          preferences = parsed.preferences;
+        } catch (error) {
+          if (error instanceof ValidationError) {
+            set.status = 400;
+            return {
+              error: "INVALID_INPUT",
+              message: "Request validation failed",
+              details: [{ field: error.field, message: error.message }],
+            };
+          }
+          throw error;
+        }
+
         if (!resolvedUserId) {
           set.status = 401;
           return { error: "UNAUTHORIZED", message: "Unauthorized" };
@@ -269,8 +288,13 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: "/api/ai" })
           requestLogger.warn("AI_SLOW_REQUEST", {
             event: "AI_SLOW_REQUEST",
             latency_ms: latencyMs,
+            request_duration: latencyMs,
           });
         }
+        requestLogger.info("AI_REQUEST_COMPLETED", {
+          event: "AI_REQUEST_COMPLETED",
+          request_duration: latencyMs,
+        });
       }
     },
     {
