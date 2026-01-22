@@ -28,6 +28,10 @@ const transports: winston.transport[] = [];
 
 if (isProduction) {
   transports.push(
+    new winston.transports.File({
+      dirname: logDirectory,
+      filename: "app.log",
+    }),
     new DailyRotateFile({
       dirname: logDirectory,
       filename: "api-%DATE%.log",
