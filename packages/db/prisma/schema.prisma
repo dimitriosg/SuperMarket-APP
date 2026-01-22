@@ -162,6 +162,7 @@ model AIASuggestionsLog {
   @@index([userId, createdAt(sort: Desc)])
   @@index([userId, aiTimeout])
   @@index([createdAt])
+  @@map("AISuggestionsLog")
 }
 
 model User {
