@@ -236,9 +236,11 @@ export const createAiSuggestionsRoutes = () =>
               code: result.error.error,
               message: errorMessage,
               requestId,
+              details: {
+                fallback_suggestions: result.error.fallback_suggestions,
+                metadata: result.metadata,
+              },
             },
-            fallback_suggestions: result.error.fallback_suggestions,
-            metadata: result.metadata,
           };
         }
 
