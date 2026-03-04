@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { logger } from "../../utils/logger";
 
 const prisma = new PrismaClient();
 const __filename = fileURLToPath(import.meta.url);
@@ -17,7 +18,10 @@ function normalizeText(text: string): string {
 
 async function syncEKatanalotis() {
   const filePath = path.join(__dirname, "13012026.json");
-  if (!fs.existsSync(filePath)) return console.error("❌ JSON missing!");
+  if (!fs.existsSync(filePath)) {
+    logger.error("SYNC_EKAT_OLD_JSON_MISSING", { file: "ingestion/ekatanalotis/sync-ekatanalotis-OLD" });
+    return;
+  }
 
   const rawData = fs.readFileSync(filePath, "utf-8");
   const json = JSON.parse(rawData);
@@ -26,7 +30,7 @@ async function syncEKatanalotis() {
   // Base URL για τις εικόνες
   const BASE_IMAGE_URL = "https://warply.s3.amazonaws.com/applications/ed840ad545884deeb6c6b699176797ed/products/";
 
-  console.log("🚀 Updating Products with Normalization...");
+  logger.info("SYNC_EKAT_OLD_STARTED", { file: "ingestion/ekatanalotis/sync-ekatanalotis-OLD" });
   
   let count = 0;
   for (const item of products) {
@@ -55,7 +59,7 @@ async function syncEKatanalotis() {
       // Ignored
     }
   }
-  console.log(`\n✅ Updated ${count} products.`);
+  logger.info("SYNC_EKAT_OLD_COMPLETE", { file: "ingestion/ekatanalotis/sync-ekatanalotis-OLD", updatedCount: count });
 }
 
 syncEKatanalotis();

@@ -1,12 +1,13 @@
 import { IngestedProductRow } from "@repo/shared";
 import * as cheerio from "cheerio";
 import { HEADERS, CATEGORY_URLS } from "./config";
+import { logger } from "../../utils/logger";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const scrapeUrl = async (url: string): Promise<IngestedProductRow[]> => {
     try {
-        console.log(`[Sklavenitis] Scraping: ${url}`);
+        logger.info("SKLAVENITIS_SCRAPING", { file: "ingestion/sklavenitis/index", url });
         const res = await fetch(url, { headers: HEADERS });
         if (!res.ok) return [];
 
@@ -46,14 +47,14 @@ export const sklavenitisIngestionPlugin = async (_storeId: string): Promise<Inge
     // 1. Προαιρετικά: Τρέχουμε το Discovery στην αρχή για να δούμε αν υπάρχουν νέα πράγματα
     // const discoveredMap = await discoverAllCategories();
 
-    console.log(`[Sklavenitis] Ξεκινάει η σάρωση...`);
+    logger.info("SKLAVENITIS_INGESTION_START", { file: "ingestion/sklavenitis/index" });
 
     for (const url of CATEGORY_URLS) {
         const products = await scrapeUrl(url);
         
         // Υβριδικός έλεγχος:
         if (products.length === 0) {
-            console.warn(`⚠️ Η κατηγορία ${url} φαίνεται άδεια ή άλλαξε. Ίσως χρειάζεται Discovery.`);
+            logger.warn("SKLAVENITIS_EMPTY_CATEGORY", { file: "ingestion/sklavenitis/index", url });
             // Εδώ μελλοντικά μπορούμε να προσθέσουμε αυτόματη διόρθωση
         }
 
@@ -66,7 +67,7 @@ export const sklavenitisIngestionPlugin = async (_storeId: string): Promise<Inge
 
 // Health Check
 const discoverAllCategories = async (): Promise<Record<string, string>> => {
-    console.log("[Sklavenitis] Running Discovery to find all category links...");
+    logger.info("SKLAVENITIS_DISCOVERY_START", { file: "ingestion/sklavenitis/index" });
     try {
         const res = await fetch("https://www.sklavenitis.gr/katigories/", { headers: HEADERS });
         const html = await res.text();
@@ -88,7 +89,7 @@ const discoverAllCategories = async (): Promise<Record<string, string>> => {
 
         return discovered;
     } catch (err) {
-        console.error("[Sklavenitis] Discovery failed", err);
+        logger.error("SKLAVENITIS_DISCOVERY_FAILED", { file: "ingestion/sklavenitis/index", message: err instanceof Error ? err.message : String(err) });
         return {};
     }
 };

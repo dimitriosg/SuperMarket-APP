@@ -1,5 +1,6 @@
 import { chromium } from 'playwright';
 import { PrismaClient } from "@prisma/client";
+import { logger } from '../utils/logger';
 
 const prisma = new PrismaClient();
 
@@ -9,11 +10,11 @@ const prisma = new PrismaClient();
 async function saveProducts(products: any[]) {
     const store = await prisma.store.findFirst({ where: { name: { contains: "ab" } } });
     if (!store) {
-        console.error("❌ Το κατάστημα AB δεν βρέθηκε στη βάση. Τρέξε το seed πρώτα.");
+        logger.error("AB_AUTO_STORE_NOT_FOUND", { file: "ingestion/ab-auto" });
         return;
     }
 
-    console.log(`💾 Αποθήκευση ${products.length} προϊόντων στη βάση...`);
+    logger.info("AB_AUTO_SAVING", { file: "ingestion/ab-auto", count: products.length });
 
     for (const item of products) {
         try {
@@ -43,7 +44,7 @@ async function saveProducts(products: any[]) {
                 }
             });
         } catch (err) {
-            console.error(`⚠️ Σφάλμα στο προϊόν ${item.name}:`, err);
+            logger.error("AB_AUTO_PRODUCT_ERROR", { file: "ingestion/ab-auto", product: item.name, message: err instanceof Error ? err.message : String(err) });
         }
     }
 }
@@ -52,7 +53,7 @@ async function saveProducts(products: any[]) {
  * Κύρια συνάρτηση Scraping
  */
 async function scrapeABCategory(categoryUrl: string) {
-    console.log(`🚀 Εκκίνηση browser για: ${categoryUrl}`);
+    logger.info("AB_AUTO_BROWSER_START", { file: "ingestion/ab-auto", categoryUrl });
     
     const browser = await chromium.launch({ 
         headless: false, // Βάλτο false για να βλέπεις αν όντως ανοίγει!
@@ -73,7 +74,7 @@ async function scrapeABCategory(categoryUrl: string) {
                     const json = JSON.parse(text);
                     const products = json.data?.categoryProductSearch?.products || [];
                     if (products.length > 0) {
-                        console.log(`📦 ΜΠΙΝΓΚΟ! Λήφθηκαν ${products.length} προϊόντα.`);
+                        logger.info("AB_AUTO_PRODUCTS_FOUND", { file: "ingestion/ab-auto", count: products.length });
                         await saveProducts(products);
                     }
                 }
@@ -82,15 +83,15 @@ async function scrapeABCategory(categoryUrl: string) {
     });
 
     try {
-        console.log("🌐 Φόρτωση σελίδας...");
+        logger.info("AB_AUTO_PAGE_LOADING", { file: "ingestion/ab-auto" });
         await page.goto(categoryUrl, { waitUntil: 'domcontentloaded' });
         
         // Περιμένουμε να εμφανιστεί το banner των cookies και το κλείνουμε αν μπορούμε
         // ή απλά περιμένουμε λίγο να φορτώσει το API
-        console.log("⏳ Αναμονή για δεδομένα (10 δευτερόλεπτα)...");
+        logger.info("AB_AUTO_WAITING", { file: "ingestion/ab-auto" });
         await page.waitForTimeout(10000);
 
-        console.log("🖱️ Scrolling...");
+        logger.info("AB_AUTO_SCROLLING", { file: "ingestion/ab-auto" });
         for (let i = 0; i < 3; i++) {
             await page.mouse.wheel(0, 1500);
             await page.waitForTimeout(3000);
@@ -98,10 +99,10 @@ async function scrapeABCategory(categoryUrl: string) {
         }
 
     } catch (err: any) {
-        console.error("❌ Σφάλμα:", err.message);
+        logger.error("AB_AUTO_SCRAPE_ERROR", { file: "ingestion/ab-auto", message: err.message });
     } finally {
         await browser.close();
-        console.log("\n🏁 Browser closed.");
+        logger.info("AB_AUTO_BROWSER_CLOSED", { file: "ingestion/ab-auto" });
     }
 }
 
@@ -116,6 +117,6 @@ const categories = [
     for (const url of categories) {
         await scrapeABCategory(url);
     }
-    console.log("🏁 Όλες οι κατηγορίες ολοκληρώθηκαν!");
+    logger.info("AB_AUTO_ALL_CATEGORIES_DONE", { file: "ingestion/ab-auto" });
     process.exit(0);
 })();

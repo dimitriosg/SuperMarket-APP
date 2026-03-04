@@ -1,5 +1,6 @@
 // apps/api/src/seed.ts
 import { PrismaClient } from "@prisma/client";
+import { logger } from "./utils/logger";
 
 const prisma = new PrismaClient();
 
@@ -20,7 +21,7 @@ const DATA = [
 ];
 
 async function main() {
-  console.log("🌱 Seeding Chains & Stores...");
+  logger.info("SEED_STARTED", { file: "seed" });
 
   for (const item of DATA) {
     // 1. Δημιουργία ή Εύρεση της Αλυσίδας (Chain)
@@ -50,13 +51,13 @@ async function main() {
       }
     });
 
-    console.log(`✅ Created Chain & Store: ${item.name}`);
+    logger.info("SEED_CREATED", { file: "seed", name: item.name });
   }
 }
 
 main()
   .catch((e) => {
-    console.error(e);
+    logger.error("SEED_FAILED", { file: "seed", message: e instanceof Error ? e.message : String(e) });
     process.exit(1);
   })
   .finally(async () => {

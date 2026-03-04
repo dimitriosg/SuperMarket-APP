@@ -2,6 +2,7 @@ import type { ProductSearchItemDto, ProductSearchResponseDto } from '@supermarke
 import type { Prisma } from '@prisma/client';
 import { Elysia, t } from 'elysia';
 import { db } from '../db';
+import { logger } from '../utils/logger';
 
 type ProductWithPrices = Prisma.ProductGetPayload<{
   include: {
@@ -20,7 +21,7 @@ export const createProductRoutes = () =>
       if (!q || q.length < 2) return [];
       const searchTerm = q.trim();
 
-      console.log(`🔎 Searching for: "${searchTerm}"`);
+      logger.info("PRODUCT_SEARCH", { route: "GET /products/search", searchTerm });
 
       const products = await db.product.findMany({
         where: {
@@ -39,7 +40,7 @@ export const createProductRoutes = () =>
         take: 50
       });
 
-      console.log(`✅ Found ${products.length} products`);
+      logger.info("PRODUCT_SEARCH_RESULTS", { route: "GET /products/search", count: products.length });
 
       return products.map((product: ProductWithPrices): ProductSearchItemDto => {
         const prices = product.prices;

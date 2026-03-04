@@ -3,13 +3,14 @@ import { IngestedProductRow } from "@repo/shared";
 import { woltIngestionPlugin } from "./wolt-fallback/wolt";
 import { sklavenitisIngestionPlugin } from "./sklavenitis/index";
 import { abIngestionPlugin } from "./ab/index";
+import { logger } from "../utils/logger";
 
 export const upsertIngestedRows = async (
   chainName: string,
   storeExternalId: string,
   rows: IngestedProductRow[]
 ) => {
-  console.log(`📦 Upserting ${rows.length} items for ${chainName}...`);
+  logger.info("INGESTION_UPSERT_START", { file: "ingestion/service", chainName, rowCount: rows.length });
 
   let chain = await prisma.chain.findFirst({
     where: { OR: [{ slug: chainName.toLowerCase() }, { label: chainName }] },
@@ -74,7 +75,7 @@ export const upsertIngestedRows = async (
       },
     });
   }
-  console.log(`✅ Finished upserting ${rows.length} products for ${chainName}.`);
+  logger.info("INGESTION_UPSERT_DONE", { file: "ingestion/service", chainName, rowCount: rows.length });
 };
 
 // "Τροχονόμος" συναρτηση

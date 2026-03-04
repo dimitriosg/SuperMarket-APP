@@ -1,8 +1,9 @@
 // apps/api/src/ingestion/ab/discovery.ts
 import { AB_HEADERS } from "./config";
+import { logger } from "../../utils/logger";
 
 export const discoverAbCategories = async () => {
-  console.log("[AB Discovery] Fetching category tree...");
+  logger.info("AB_DISCOVERY_START", { file: "ingestion/ab/discovery" });
 
   const body = {
     operationName: "GetCategories",
@@ -33,7 +34,7 @@ export const discoverAbCategories = async () => {
     const categories = json.data?.categories || [];
 
     if (categories.length === 0) {
-        console.warn("[AB Discovery] No categories found. Check if the Hash or Cookies expired.");
+        logger.warn("AB_DISCOVERY_NO_CATEGORIES", { file: "ingestion/ab/discovery" });
         return [];
     }
 
@@ -44,12 +45,10 @@ export const discoverAbCategories = async () => {
       subCategories: cat.childCategories?.map((c: any) => c.name).join(", ").substring(0, 50) + "..."
     }));
 
-    console.log(`[AB Discovery] Found ${flatCategories.length} main categories:`);
-    console.table(flatCategories);
-    
+    logger.info("AB_DISCOVERY_DONE", { file: "ingestion/ab/discovery", count: flatCategories.length });
     return flatCategories;
   } catch (err) {
-    console.error("[AB Discovery] Failed:", err);
+    logger.error("AB_DISCOVERY_FAILED", { file: "ingestion/ab/discovery", message: err instanceof Error ? err.message : String(err) });
     return [];
   }
 };

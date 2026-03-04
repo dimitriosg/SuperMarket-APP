@@ -1,9 +1,10 @@
 import { PrismaClient } from "@prisma/client";
+import { logger } from "../utils/logger";
 
 const prisma = new PrismaClient();
 
 async function fetchFromAB(categoryCode: string) {
-  console.log(`📡 Κλήση API για την κατηγορία: ${categoryCode}...`);
+  logger.info("AB_API_FETCHING", { file: "ingestion/ab-api", categoryCode });
 
   const query = `
     query GetCategoryProductSearch($categoryCode: String, $currentPage: Int, $pageSize: Int, $sort: String) {
@@ -58,15 +59,15 @@ async function fetchFromAB(categoryCode: string) {
     const products = json.data?.categoryProductSearch?.products || [];
 
     if (products.length === 0) {
-      console.log("⚠️ Το API δεν επέστρεψε προϊόντα. Ίσως χρειάζεται φρεσκάρισμα το categoryCode.");
+      logger.warn("AB_API_NO_PRODUCTS", { file: "ingestion/ab-api", categoryCode });
       return;
     }
 
-    console.log(`✅ Λήφθηκαν ${products.length} προϊόντα από το API.`);
+    logger.info("AB_API_PRODUCTS_RECEIVED", { file: "ingestion/ab-api", count: products.length });
     await saveToDb(products);
 
   } catch (error: any) {
-    console.error("❌ Αποτυχία API:", error.message);
+    logger.error("AB_API_FETCH_FAILED", { file: "ingestion/ab-api", message: error.message });
   }
 }
 
@@ -98,7 +99,7 @@ async function saveToDb(products: any[]) {
       }
     });
   }
-  console.log("✨ Η βάση ενημερώθηκε!");
+  logger.info("AB_API_DB_UPDATED", { file: "ingestion/ab-api" });
 }
 
 // Κωδικοί κατηγοριών ΑΒ:

@@ -1,4 +1,5 @@
 import { prisma } from "../db";
+import { logger } from "../utils/logger";
 
 const MERCHANT_MAP: Record<number, string> = {
   0: "ab",
@@ -62,7 +63,7 @@ function parseRemoteProducts(value: unknown): RemoteProduct[] {
   if (!Array.isArray(value)) return [];
   return value.filter((item, index) => {
     if (!isRemoteProduct(item)) {
-      console.warn(`⚠️ Invalid product payload at index ${index}.`);
+      logger.warn("INVALID_PRODUCT_PAYLOAD", { service: "ekatanalotisService", index });
       return false;
     }
     return true;
@@ -72,7 +73,7 @@ function parseRemoteProducts(value: unknown): RemoteProduct[] {
 export const ekatanalotisService = {
   
   async syncAll() {
-    console.log("🚀 Starting Auto-Sync...");
+    logger.info("SYNC_STARTED", { service: "ekatanalotisService" });
     const startTime = Date.now();
     
     try {
@@ -92,7 +93,7 @@ export const ekatanalotisService = {
 
       if (products.length === 0) throw new Error("No products found.");
 
-      console.log(`📦 Found ${products.length} products. Starting DB operations...`);
+      logger.info("SYNC_PRODUCTS_FOUND", { service: "ekatanalotisService", count: products.length });
 
       let stats = { productsUpserted: 0, pricesAdded: 0, errors: 0 };
       const today = new Date();
@@ -136,20 +137,24 @@ export const ekatanalotisService = {
                 { price: number; date: Date; productId: string; storeId: string }[]
               >((acc, priceItem) => {
                 if (!isRemotePrice(priceItem)) {
-                  console.warn(
-                    `⚠️ Invalid price payload for ean=${item.barcode} merchant=${String(
+                  logger.warn("INVALID_PRICE_PAYLOAD", {
+                    service: "ekatanalotisService",
+                    ean: item.barcode,
+                    merchant: String(
                       (priceItem as RemotePrice | undefined)?.merchant_uuid
-                    )}`
-                  );
+                    ),
+                  });
                   stats.errors++;
                   return acc;
                 }
 
                 const storeId = MERCHANT_MAP[priceItem.merchant_uuid];
                 if (!storeId) {
-                  console.warn(
-                    `⚠️ Unknown merchant for ean=${item.barcode} merchant=${priceItem.merchant_uuid}`
-                  );
+                  logger.warn("UNKNOWN_MERCHANT", {
+                    service: "ekatanalotisService",
+                    ean: item.barcode,
+                    merchant: priceItem.merchant_uuid,
+                  });
                   stats.errors++;
                   return acc;
                 }
@@ -157,9 +162,11 @@ export const ekatanalotisService = {
                 const priceVal =
                   typeof priceItem.price === "string" ? parseFloat(priceItem.price) : priceItem.price;
                 if (Number.isNaN(priceVal)) {
-                  console.warn(
-                    `⚠️ Invalid price value for ean=${item.barcode} merchant=${priceItem.merchant_uuid}`
-                  );
+                  logger.warn("INVALID_PRICE_VALUE", {
+                    service: "ekatanalotisService",
+                    ean: item.barcode,
+                    merchant: priceItem.merchant_uuid,
+                  });
                   stats.errors++;
                   return acc;
                 }
@@ -181,17 +188,23 @@ export const ekatanalotisService = {
           });
         } catch (err) {
           stats.errors++;
-          console.error(`❌ Failed item ean=${item.barcode}:`, err);
+          logger.error("SYNC_ITEM_FAILED", {
+            service: "ekatanalotisService",
+            ean: item.barcode,
+            message: err instanceof Error ? err.message : String(err),
+          });
         }
       }
 
-      console.log("\n"); // New line μετά το progress bar
       const duration = ((Date.now() - startTime) / 1000).toFixed(1);
-      console.log(`✅ Sync Complete in ${duration}s!`, stats);
+      logger.info("SYNC_COMPLETE", { service: "ekatanalotisService", duration, stats });
       return { success: true, stats, duration };
 
     } catch (error) {
-      console.error("\n❌ Sync Failed:", error);
+      logger.error("SYNC_FAILED", {
+        service: "ekatanalotisService",
+        message: error instanceof Error ? error.message : String(error),
+      });
       return { success: false, error: String(error) };
     }
   }

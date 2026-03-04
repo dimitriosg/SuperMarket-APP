@@ -1,6 +1,7 @@
 // apps/api/src/ingestion/ekatanalotis/sync-prices.ts
 import { PrismaClient } from "@prisma/client";
 import { PricingService } from "../../services/pricing.service";
+import { logger } from "../../utils/logger";
 
 const prisma = new PrismaClient();
 
@@ -25,7 +26,7 @@ type ProductJSON = {
 };
 
 async function syncPrices() {
-  console.log("🚀 Starting Auto-Price Sync...");
+  logger.info("PRICE_SYNC_STARTED", { file: "ingestion/ekatanalotis/sync-prices" });
 
   // 1. Δυναμικό URL με Timestamp
   const timestamp = Date.now(); 
@@ -33,7 +34,7 @@ async function syncPrices() {
   const url = `https://warply.s3.amazonaws.com/applications/ed840ad545884deeb6c6b699176797ed/basket-retailers/prices.json?cid=${timestamp}`;
 
   try {
-    console.log(`⬇️ Fetching data from: ${url}`);
+    logger.info("PRICE_SYNC_FETCHING", { file: "ingestion/ekatanalotis/sync-prices", url });
     
     const response = await fetch(url, {
       method: "GET",
@@ -54,13 +55,13 @@ async function syncPrices() {
     const merchants: MerchantJSON[] = result.merchants || [];
     const products: ProductJSON[] = result.products || [];
 
-    console.log(`📦 Found ${merchants.length} merchants and ${products.length} products.`);
+    logger.info("PRICE_SYNC_DATA_FOUND", { file: "ingestion/ekatanalotis/sync-prices", merchantCount: merchants.length, productCount: products.length });
 
     // --- STEP 1: SYNC MERCHANTS (CHAINS & STORES) ---
     // Φτιάχνουμε έναν χάρτη (Map) για να βρίσκουμε γρήγορα το ID του Store από το merchant_uuid
     const storeMap = new Map<number, string>(); // uuid (int) -> databaseId (string)
 
-    console.log("🏪 Syncing Merchants...");
+    logger.info("PRICE_SYNC_MERCHANTS", { file: "ingestion/ekatanalotis/sync-prices" });
     for (const m of merchants) {
       // 1a. Upsert Chain
       const chain = await prisma.chain.upsert({
@@ -90,7 +91,7 @@ async function syncPrices() {
     }
 
     // --- STEP 2: SYNC PRICES ---
-    console.log("💰 Syncing Prices & Checking Anomalies...");
+    logger.info("PRICE_SYNC_PRICES", { file: "ingestion/ekatanalotis/sync-prices" });
     let priceCount = 0;
     let anomalyCount = 0;
 
@@ -144,10 +145,10 @@ async function syncPrices() {
       if (priceCount % 500 === 0) process.stdout.write(".");
     }
 
-    console.log(`\n✅ Done! Inserted ${priceCount} prices. Detected ${anomalyCount} anomalies.`);
+    logger.info("PRICE_SYNC_COMPLETE", { file: "ingestion/ekatanalotis/sync-prices", priceCount, anomalyCount });
 
   } catch (error) {
-    console.error("❌ Error syncing prices:", error);
+    logger.error("PRICE_SYNC_FAILED", { file: "ingestion/ekatanalotis/sync-prices", message: error instanceof Error ? error.message : String(error) });
   } finally {
     await prisma.$disconnect();
   }

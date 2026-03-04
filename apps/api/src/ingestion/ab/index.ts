@@ -1,6 +1,7 @@
 // apps/api/src/ingestion/ab/index.ts
 import { IngestedProductRow } from "@repo/shared";
 import { AB_HEADERS, AB_CATEGORIES } from "./config";
+import { logger } from "../../utils/logger";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -67,19 +68,19 @@ try {
       };
     });
   } catch (err) {
-    console.error(`[AB] Failed for ${categoryId}:`, err);
+    logger.error("AB_CATEGORY_FETCH_FAILED", { file: "ingestion/ab/index", categoryId, message: err instanceof Error ? err.message : String(err) });
     return [];
   }
 };
 
 export const abIngestionPlugin = async (_storeId: string): Promise<IngestedProductRow[]> => {
   let allProducts: IngestedProductRow[] = [];
-  console.log(`[AB] Ξεκινάει η σάρωση για ${AB_CATEGORIES.length} κατηγορίες...`);
+  logger.info("AB_INGESTION_START", { file: "ingestion/ab/index", categoryCount: AB_CATEGORIES.length });
 
   for (const cat of AB_CATEGORIES) {
-    console.log(`[AB] Scanning: ${cat.name} (${cat.id})`);
+    logger.info("AB_SCANNING_CATEGORY", { file: "ingestion/ab/index", name: cat.name, id: cat.id });
     const products = await fetchAbCategory(cat.id);
-    console.log(`   > Βρέθηκαν ${products.length} προϊόντα.`);
+    logger.info("AB_CATEGORY_RESULTS", { file: "ingestion/ab/index", name: cat.name, productCount: products.length });
     allProducts = [...allProducts, ...products];
     await wait(1000);
   }

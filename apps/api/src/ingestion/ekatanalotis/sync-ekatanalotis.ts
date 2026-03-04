@@ -4,6 +4,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { PricingService } from "../../services/pricing.service"; 
+import { logger } from "../../utils/logger";
 
 const prisma = new PrismaClient();
 const __filename = fileURLToPath(import.meta.url);
@@ -18,7 +19,10 @@ function normalizeText(text: string): string {
 
 async function syncEKatanalotis() {
   const filePath = path.join(__dirname, "13012026.json");
-  if (!fs.existsSync(filePath)) return console.error("❌ JSON missing!");
+  if (!fs.existsSync(filePath)) {
+    logger.error("SYNC_EKAT_JSON_MISSING", { file: "ingestion/ekatanalotis/sync-ekatanalotis" });
+    return;
+  }
 
   const rawData = fs.readFileSync(filePath, "utf-8");
   const json = JSON.parse(rawData);
@@ -26,7 +30,7 @@ async function syncEKatanalotis() {
   
   const BASE_IMAGE_URL = "https://warply.s3.amazonaws.com/applications/ed840ad545884deeb6c6b699176797ed/products/";
 
-  console.log(`🚀 Starting Sync for ${products.length} products...`);
+  logger.info("SYNC_EKAT_STARTED", { file: "ingestion/ekatanalotis/sync-ekatanalotis", productCount: products.length });
   
   let count = 0;
 
@@ -74,13 +78,13 @@ async function syncEKatanalotis() {
       count++;
       if (count % 200 === 0) process.stdout.write(".");
     } catch (e) {
-      console.error(`Error on ${item.barcode}:`, e);
+      logger.error("SYNC_EKAT_ITEM_ERROR", { file: "ingestion/ekatanalotis/sync-ekatanalotis", barcode: item.barcode, message: e instanceof Error ? e.message : String(e) });
     }
   }
   
-  console.log(`\n✅ Finished! Processed ${count} products.`);
+  logger.info("SYNC_EKAT_COMPLETE", { file: "ingestion/ekatanalotis/sync-ekatanalotis", processedCount: count });
 }
 
 syncEKatanalotis()
-  .catch(e => console.error(e))
+  .catch(e => logger.error("SYNC_EKAT_FATAL", { file: "ingestion/ekatanalotis/sync-ekatanalotis", message: e instanceof Error ? e.message : String(e) }))
   .finally(async () => await prisma.$disconnect());
