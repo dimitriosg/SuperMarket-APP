@@ -54,7 +54,7 @@ export const AISuggestionsPanel: React.FC<AISuggestionsPanelProps> = ({
       {!loading && suggestions.length === 0 && !error && (
         <div className="text-center py-8">
           <p className="text-gray-600 mb-4 dark:text-slate-400">Πρόσθεσε items για καλύτερες προτάσεις</p>
-          <button
+          <Button
             onClick={handleFetch}
             disabled={items.length === 0}
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium dark:bg-blue-500 dark:hover:bg-blue-400"
@@ -84,7 +84,7 @@ export const AISuggestionsPanel: React.FC<AISuggestionsPanelProps> = ({
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 dark:bg-red-500/10 dark:border-red-500/40">
           <p className="text-red-700 text-sm font-medium dark:text-red-300">⚠️ {error}</p>
-          <button
+          <Button
             onClick={handleFetch}
             className="mt-2 text-sm text-red-600 hover:text-red-700 font-medium underline dark:text-red-300 dark:hover:text-red-200"
           >
