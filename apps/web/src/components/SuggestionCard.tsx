@@ -39,6 +39,6 @@ export const SuggestionCard: React.FC<SuggestionCardProps> = ({
       >
         Προσθήκη
       </Button>
-    </Card>
+    </div>
   );
 };
