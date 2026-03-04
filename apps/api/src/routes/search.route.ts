@@ -1,33 +1,50 @@
-// apps/api/src/routes/search.route.ts
-import { Elysia, t } from "elysia";
-import { productService } from "../services/productService";
+import { Elysia, t } from 'elysia';
+import { productService } from '../services/productService';
+import { sendApiError } from '../utils/api-error';
+import { createRouteLogger } from '../utils/logger';
 
-export const searchRoutes = new Elysia({ prefix: "/products" })
-  
-  // Endpoint 1: Search (Υπάρχον)
-  .get("/search", async ({ query, set }) => {
-    const q = query.q;
-    // Αν δεν έχει query, μην επιστρέφεις τίποτα (ή επέστρεψε empty array)
-    if (!query.q) return []; 
-    
-    try {
-      return await productService.searchProducts(q);
-    } catch (error) {
-      console.error(error);
-      set.status = 500;
-      return { error: "Internal Error" };
+export const searchRoutes = new Elysia({ prefix: '/products' })
+  .get(
+    '/search',
+    async ({ query, set, headers }) => {
+      if (!query.q) return [];
+
+      const routeLogger = createRouteLogger({ headers, route: 'GET /products/search' });
+
+      try {
+        return await productService.searchProducts(query.q);
+      } catch (error) {
+        routeLogger.error('PRODUCT_SEARCH_FAILED', {
+          event: 'PRODUCT_SEARCH_FAILED',
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
+
+        return sendApiError(set, {
+          status: 500,
+          code: 'INTERNAL_ERROR',
+          message: 'Internal Error',
+        });
+      }
+    },
+    {
+      query: t.Object({ q: t.String() }),
     }
-  }, {
-    query: t.Object({ q: t.String() })
-  })
+  )
+  .get('/suggestions', async ({ set, headers }) => {
+    const routeLogger = createRouteLogger({ headers, route: 'GET /products/suggestions' });
 
-  // Endpoint 2: Suggestions (ΝΕΟ - Για το Sidebar)
-  .get("/suggestions", async ({ set }) => {
     try {
       return await productService.getSuggestions();
     } catch (error) {
-      console.error(error);
-      set.status = 500;
-      return { error: "Failed to get suggestions" };
+      routeLogger.error('PRODUCT_SUGGESTIONS_FAILED', {
+        event: 'PRODUCT_SUGGESTIONS_FAILED',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+
+      return sendApiError(set, {
+        status: 500,
+        code: 'INTERNAL_ERROR',
+        message: 'Failed to get suggestions',
+      });
     }
   });

@@ -1,20 +1,21 @@
-import { randomUUID } from "node:crypto";
-import fs from "node:fs";
-import winston from "winston";
-import DailyRotateFile from "winston-daily-rotate-file";
+import { randomUUID } from 'node:crypto';
+import fs from 'node:fs';
+import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 
-const env = process.env.NODE_ENV ?? "development";
-const isProduction = env === "production";
+const env = process.env.NODE_ENV ?? 'development';
+const isProduction = env === 'production';
 
-const logDirectory = process.env.LOG_DIR ?? "logs";
+const logDirectory = process.env.LOG_DIR ?? 'logs';
 
 if (isProduction) {
   fs.mkdirSync(logDirectory, { recursive: true });
 }
 
 const ensureContext = winston.format((info) => {
-  info.request_id = info.request_id ?? "system";
-  info.userId = info.userId ?? "system";
+  info.request_id = info.request_id ?? 'system';
+  info.userId = info.userId ?? 'system';
+  info.route = info.route ?? 'system';
   return info;
 });
 
@@ -30,10 +31,10 @@ if (isProduction) {
   transports.push(
     new DailyRotateFile({
       dirname: logDirectory,
-      filename: "api-%DATE%.log",
-      datePattern: "YYYY-MM-DD",
+      filename: 'api-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
       zippedArchive: true,
-      maxFiles: "14d",
+      maxFiles: '14d',
     })
   );
 } else {
@@ -41,10 +42,10 @@ if (isProduction) {
 }
 
 export const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL ?? "info",
+  level: process.env.LOG_LEVEL ?? 'info',
   format: baseFormat,
   defaultMeta: {
-    service: "api",
+    service: 'api',
     environment: env,
   },
   transports,
@@ -53,31 +54,44 @@ export const logger = winston.createLogger({
 export const createRequestLogger = (context: {
   requestId?: string;
   userId?: string;
+  route?: string;
 }) =>
   logger.child({
-    request_id: context.requestId ?? "system",
-    userId: context.userId ?? "system",
+    request_id: context.requestId ?? 'system',
+    userId: context.userId ?? 'system',
+    route: context.route ?? 'system',
+  });
+
+export const createRouteLogger = (context: {
+  headers?: Headers | Record<string, string | undefined>;
+  route: string;
+  userId?: string;
+}) =>
+  createRequestLogger({
+    requestId: getRequestId(context.headers),
+    userId: context.userId ?? resolveUserId(context.headers),
+    route: context.route,
   });
 
 export const resolveRequestId = (headers?: Headers | Record<string, string | undefined>) => {
   if (!headers) return undefined;
   if (headers instanceof Headers) {
-    return headers.get("x-request-id") ?? undefined;
+    return headers.get('x-request-id') ?? undefined;
   }
 
-  const headerValue = headers["x-request-id"] ?? headers["x-requestid"];
-  return typeof headerValue === "string" ? headerValue : undefined;
+  const headerValue = headers['x-request-id'] ?? headers['x-requestid'];
+  return typeof headerValue === 'string' ? headerValue : undefined;
 };
 
 export const getRequestId = (headers?: Headers | Record<string, string | undefined>) =>
   resolveRequestId(headers) ?? randomUUID();
 
 export const resolveUserId = (headers?: Headers | Record<string, string | undefined>) => {
-  if (!headers) return "guest";
+  if (!headers) return 'guest';
   if (headers instanceof Headers) {
-    return headers.get("x-user-id") ?? headers.get("x-userid") ?? "guest";
+    return headers.get('x-user-id') ?? headers.get('x-userid') ?? 'guest';
   }
 
-  const headerValue = headers["x-user-id"] ?? headers["x-userid"];
-  return typeof headerValue === "string" ? headerValue : "guest";
+  const headerValue = headers['x-user-id'] ?? headers['x-userid'];
+  return typeof headerValue === 'string' ? headerValue : 'guest';
 };

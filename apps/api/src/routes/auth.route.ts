@@ -1,26 +1,35 @@
-import { Elysia, t } from "elysia";
-import { db } from "../db";
-import { signJwt, verifyJwt, type JwtPayload } from "../utils/jwt";
-import { verifyPassword } from "../utils/password";
+import { Elysia, t } from 'elysia';
+import { db } from '../db';
+import { signJwt, verifyJwt, type JwtPayload } from '../utils/jwt';
+import { verifyPassword } from '../utils/password';
+import { sendApiError } from '../utils/api-error';
+import { createRouteLogger } from '../utils/logger';
 
 const ACCESS_TOKEN_TTL_SECONDS = 60 * 60 * 24;
 const REFRESH_TOKEN_TTL_SECONDS = 60 * 60 * 24 * 7;
 
-const invalidCredentialsResponse = (set: { status: number }) => {
-  set.status = 401;
-  return { error: "INVALID_CREDENTIALS", message: "Invalid email or password" };
-};
+const invalidCredentialsResponse = (set: { status?: number }) =>
+  sendApiError(set, {
+    status: 401,
+    code: 'INVALID_CREDENTIALS',
+    message: 'Invalid email or password',
+  });
 
-export const authRoutes = new Elysia({ prefix: "/api/auth" })
+export const authRoutes = new Elysia({ prefix: '/api/auth' })
   .post(
-    "/login",
-    async ({ body, set }) => {
+    '/login',
+    async ({ body, set, headers }) => {
+      const routeLogger = createRouteLogger({ headers, route: 'POST /api/auth/login' });
       const { email, password } = body;
       const secret = process.env.JWT_SECRET;
 
       if (!secret) {
-        set.status = 500;
-        return { error: "AUTH_UNAVAILABLE", message: "Authentication unavailable" };
+        routeLogger.error('AUTH_UNAVAILABLE', { event: 'AUTH_UNAVAILABLE' });
+        return sendApiError(set, {
+          status: 500,
+          code: 'AUTH_UNAVAILABLE',
+          message: 'Authentication unavailable',
+        });
       }
 
       const user = await db.user.findUnique({
@@ -38,18 +47,18 @@ export const authRoutes = new Elysia({ prefix: "/api/auth" })
       }
 
       const accessToken = signJwt(
-        { userId: user.id, tokenType: "access", expiresIn: ACCESS_TOKEN_TTL_SECONDS },
+        { userId: user.id, tokenType: 'access', expiresIn: ACCESS_TOKEN_TTL_SECONDS },
         secret
       );
       const refreshToken = signJwt(
-        { userId: user.id, tokenType: "refresh", expiresIn: REFRESH_TOKEN_TTL_SECONDS },
+        { userId: user.id, tokenType: 'refresh', expiresIn: REFRESH_TOKEN_TTL_SECONDS },
         secret
       );
 
       return {
         accessToken,
         refreshToken,
-        tokenType: "Bearer",
+        tokenType: 'Bearer',
         expiresIn: ACCESS_TOKEN_TTL_SECONDS,
       };
     },
@@ -61,35 +70,47 @@ export const authRoutes = new Elysia({ prefix: "/api/auth" })
     }
   )
   .post(
-    "/refresh",
-    async ({ body, set }) => {
+    '/refresh',
+    async ({ body, set, headers }) => {
+      const routeLogger = createRouteLogger({ headers, route: 'POST /api/auth/refresh' });
       const { refreshToken } = body;
       const secret = process.env.JWT_SECRET;
 
       if (!secret) {
-        set.status = 500;
-        return { error: "AUTH_UNAVAILABLE", message: "Authentication unavailable" };
+        routeLogger.error('AUTH_UNAVAILABLE', { event: 'AUTH_UNAVAILABLE' });
+        return sendApiError(set, {
+          status: 500,
+          code: 'AUTH_UNAVAILABLE',
+          message: 'Authentication unavailable',
+        });
       }
 
       const result = verifyJwt<JwtPayload>(refreshToken, secret);
-      if (!result.valid || result.payload.tokenType !== "refresh") {
-        set.status = 401;
-        return { error: "INVALID_TOKEN", message: "Invalid refresh token" };
+      if (!result.valid || result.payload.tokenType !== 'refresh') {
+        return sendApiError(set, {
+          status: 401,
+          code: 'INVALID_TOKEN',
+          message: 'Invalid refresh token',
+        });
       }
 
       const accessToken = signJwt(
-        { userId: result.payload.userId, tokenType: "access", expiresIn: ACCESS_TOKEN_TTL_SECONDS },
+        { userId: result.payload.userId, tokenType: 'access', expiresIn: ACCESS_TOKEN_TTL_SECONDS },
         secret
       );
       const newRefreshToken = signJwt(
-        { userId: result.payload.userId, tokenType: "refresh", expiresIn: REFRESH_TOKEN_TTL_SECONDS },
+        {
+          userId: result.payload.userId,
+          tokenType: 'refresh',
+          expiresIn: REFRESH_TOKEN_TTL_SECONDS,
+        },
         secret
       );
 
       return {
         accessToken,
         refreshToken: newRefreshToken,
-        tokenType: "Bearer",
+        tokenType: 'Bearer',
         expiresIn: ACCESS_TOKEN_TTL_SECONDS,
       };
     },

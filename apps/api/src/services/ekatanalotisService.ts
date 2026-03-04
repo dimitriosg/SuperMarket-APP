@@ -1,22 +1,25 @@
-import { prisma } from "../db";
+import { prisma } from '../db';
+import { createRequestLogger, getRequestId } from '../utils/logger';
 
 const MERCHANT_MAP: Record<number, string> = {
-  0: "ab",
-  1: "bazaar",
-  2: "efresh",
-  3: "galaxias",
-  4: "kritikos",
-  5: "lidl",
-  6: "marketin",
-  7: "masoutis",
-  8: "mymarket",
-  9: "sklavenitis",
-  10: "synka",
-  11: "xalkiadakis"
+  0: 'ab',
+  1: 'bazaar',
+  2: 'efresh',
+  3: 'galaxias',
+  4: 'kritikos',
+  5: 'lidl',
+  6: 'marketin',
+  7: 'masoutis',
+  8: 'mymarket',
+  9: 'sklavenitis',
+  10: 'synka',
+  11: 'xalkiadakis',
 };
 
-const BASE_URL = "https://warply.s3.amazonaws.com/applications/ed840ad545884deeb6c6b699176797ed/basket-retailers/prices.json";
-const IMAGE_BASE_URL = "https://warply.s3.amazonaws.com/applications/ed840ad545884deeb6c6b699176797ed/products/";
+const BASE_URL =
+  'https://warply.s3.amazonaws.com/applications/ed840ad545884deeb6c6b699176797ed/basket-retailers/prices.json';
+const IMAGE_BASE_URL =
+  'https://warply.s3.amazonaws.com/applications/ed840ad545884deeb6c6b699176797ed/products/';
 
 type RemotePrice = {
   merchant_uuid: number;
@@ -30,136 +33,163 @@ type RemoteProduct = {
   prices?: RemotePrice[];
 };
 
+type SyncResult = {
+  success: boolean;
+  stats?: { productsUpserted: number; pricesAdded: number; errors: number };
+  duration?: string;
+  error?: string;
+};
+
 function normalizeText(text: string): string {
-  return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toUpperCase();
 }
 
 function isRemotePrice(value: unknown): value is RemotePrice {
-  if (!value || typeof value !== "object") return false;
+  if (!value || typeof value !== 'object') return false;
   const candidate = value as RemotePrice;
-  if (typeof candidate.merchant_uuid !== "number") return false;
-  if (typeof candidate.price !== "number" && typeof candidate.price !== "string") return false;
+  if (typeof candidate.merchant_uuid !== 'number') return false;
+  if (typeof candidate.price !== 'number' && typeof candidate.price !== 'string') return false;
   return true;
 }
 
 function isRemoteProduct(value: unknown): value is RemoteProduct {
-  if (!value || typeof value !== "object") return false;
+  if (!value || typeof value !== 'object') return false;
   const candidate = value as RemoteProduct;
-  if (typeof candidate.barcode !== "string") return false;
-  if (typeof candidate.name !== "string") return false;
+  if (typeof candidate.barcode !== 'string') return false;
+  if (typeof candidate.name !== 'string') return false;
   if (
-    typeof candidate.image !== "undefined" &&
+    typeof candidate.image !== 'undefined' &&
     candidate.image !== null &&
-    typeof candidate.image !== "string"
+    typeof candidate.image !== 'string'
   ) {
     return false;
   }
-  if (typeof candidate.prices !== "undefined" && !Array.isArray(candidate.prices)) return false;
+  if (typeof candidate.prices !== 'undefined' && !Array.isArray(candidate.prices)) return false;
   return true;
 }
 
-function parseRemoteProducts(value: unknown): RemoteProduct[] {
+function parseRemoteProducts(value: unknown, route: string): RemoteProduct[] {
+  const requestLogger = createRequestLogger({ requestId: getRequestId(), route });
   if (!Array.isArray(value)) return [];
   return value.filter((item, index) => {
     if (!isRemoteProduct(item)) {
-      console.warn(`⚠️ Invalid product payload at index ${index}.`);
+      requestLogger.warn('SYNC_INVALID_PRODUCT_PAYLOAD', {
+        event: 'SYNC_INVALID_PRODUCT_PAYLOAD',
+        index,
+      });
       return false;
     }
     return true;
   });
 }
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export const ekatanalotisService = {
-  
-  async syncAll() {
-    console.log("🚀 Starting Auto-Sync...");
+  async syncAll(route = 'system'): Promise<SyncResult> {
+    const requestLogger = createRequestLogger({ requestId: getRequestId(), route });
+    requestLogger.info('SYNC_STARTED', { event: 'SYNC_STARTED' });
     const startTime = Date.now();
-    
+
     try {
       const url = `${BASE_URL}?cid=${Date.now()}`;
       const response = await fetch(url, {
         headers: {
-            "accept": "application/json",
-            "Referer": "https://e-katanalotis.gov.gr/",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-        }
+          accept: 'application/json',
+          Referer: 'https://e-katanalotis.gov.gr/',
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        },
       });
 
       if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
-      
+
       const json = await response.json();
-      const products = parseRemoteProducts(json.context?.MAPP_PRODUCTS?.result?.products);
+      const products = parseRemoteProducts(json.context?.MAPP_PRODUCTS?.result?.products, route);
 
-      if (products.length === 0) throw new Error("No products found.");
+      if (products.length === 0) throw new Error('No products found.');
 
-      console.log(`📦 Found ${products.length} products. Starting DB operations...`);
+      requestLogger.info('SYNC_PRODUCTS_LOADED', {
+        event: 'SYNC_PRODUCTS_LOADED',
+        count: products.length,
+      });
 
-      let stats = { productsUpserted: 0, pricesAdded: 0, errors: 0 };
+      const stats = { productsUpserted: 0, pricesAdded: 0, errors: 0 };
       const today = new Date();
-      let counter = 0; // Μετρητής προόδου
+      let counter = 0;
 
       for (const item of products) {
         counter++;
-        // Log κάθε 100 προϊόντα για να ξέρουμε ότι ζει
         if (counter % 100 === 0) {
-            process.stdout.write(`\r⏳ Processing: ${counter}/${products.length} items...`);
+          requestLogger.info('SYNC_PROGRESS', {
+            event: 'SYNC_PROGRESS',
+            processed: counter,
+            total: products.length,
+          });
         }
 
         if (!item.barcode || item.barcode.length < 8) continue;
 
         try {
           const cleanName = normalizeText(item.name);
-          const finalImageUrl = item.image ? `${IMAGE_BASE_URL}${encodeURIComponent(item.image)}` : null;
+          const finalImageUrl = item.image
+            ? `${IMAGE_BASE_URL}${encodeURIComponent(item.image)}`
+            : null;
 
           await prisma.$transaction(async (tx) => {
-            // A. Product
             const product = await tx.product.upsert({
               where: { ean: item.barcode },
               update: {
                 name: item.name,
                 normalizedName: cleanName,
-                imageUrl: finalImageUrl || undefined 
+                imageUrl: finalImageUrl || undefined,
               },
               create: {
                 ean: item.barcode,
                 name: item.name,
                 normalizedName: cleanName,
-                imageUrl: finalImageUrl || "",
-              }
+                imageUrl: finalImageUrl || '',
+              },
             });
-            
+
             stats.productsUpserted++;
 
-            // B. Prices
             if (item.prices && Array.isArray(item.prices)) {
               const priceRows = item.prices.reduce<
                 { price: number; date: Date; productId: string; storeId: string }[]
               >((acc, priceItem) => {
                 if (!isRemotePrice(priceItem)) {
-                  console.warn(
-                    `⚠️ Invalid price payload for ean=${item.barcode} merchant=${String(
-                      (priceItem as RemotePrice | undefined)?.merchant_uuid
-                    )}`
-                  );
+                  requestLogger.warn('SYNC_INVALID_PRICE_PAYLOAD', {
+                    event: 'SYNC_INVALID_PRICE_PAYLOAD',
+                    ean: item.barcode,
+                  });
                   stats.errors++;
                   return acc;
                 }
 
                 const storeId = MERCHANT_MAP[priceItem.merchant_uuid];
                 if (!storeId) {
-                  console.warn(
-                    `⚠️ Unknown merchant for ean=${item.barcode} merchant=${priceItem.merchant_uuid}`
-                  );
+                  requestLogger.warn('SYNC_UNKNOWN_MERCHANT', {
+                    event: 'SYNC_UNKNOWN_MERCHANT',
+                    ean: item.barcode,
+                    merchant: priceItem.merchant_uuid,
+                  });
                   stats.errors++;
                   return acc;
                 }
 
                 const priceVal =
-                  typeof priceItem.price === "string" ? parseFloat(priceItem.price) : priceItem.price;
+                  typeof priceItem.price === 'string'
+                    ? parseFloat(priceItem.price)
+                    : priceItem.price;
                 if (Number.isNaN(priceVal)) {
-                  console.warn(
-                    `⚠️ Invalid price value for ean=${item.barcode} merchant=${priceItem.merchant_uuid}`
-                  );
+                  requestLogger.warn('SYNC_INVALID_PRICE_VALUE', {
+                    event: 'SYNC_INVALID_PRICE_VALUE',
+                    ean: item.barcode,
+                    merchant: priceItem.merchant_uuid,
+                  });
                   stats.errors++;
                   return acc;
                 }
@@ -168,7 +198,7 @@ export const ekatanalotisService = {
                   price: priceVal,
                   date: today,
                   productId: product.id,
-                  storeId
+                  storeId,
                 });
                 return acc;
               }, []);
@@ -181,18 +211,73 @@ export const ekatanalotisService = {
           });
         } catch (err) {
           stats.errors++;
-          console.error(`❌ Failed item ean=${item.barcode}:`, err);
+          requestLogger.error('SYNC_PRODUCT_FAILED', {
+            event: 'SYNC_PRODUCT_FAILED',
+            ean: item.barcode,
+            error: err instanceof Error ? err.message : String(err),
+          });
         }
       }
 
-      console.log("\n"); // New line μετά το progress bar
       const duration = ((Date.now() - startTime) / 1000).toFixed(1);
-      console.log(`✅ Sync Complete in ${duration}s!`, stats);
+      requestLogger.info('SYNC_COMPLETED', {
+        event: 'SYNC_COMPLETED',
+        duration,
+        stats,
+      });
       return { success: true, stats, duration };
-
     } catch (error) {
-      console.error("\n❌ Sync Failed:", error);
+      requestLogger.error('SYNC_FAILED', {
+        event: 'SYNC_FAILED',
+        error: error instanceof Error ? error.message : String(error),
+      });
       return { success: false, error: String(error) };
     }
-  }
+  },
+
+  async syncAllWithRetry(params: {
+    maxAttempts: number;
+    initialDelayMs: number;
+    maxDelayMs: number;
+    route: string;
+  }): Promise<SyncResult & { attempts: number }> {
+    const requestLogger = createRequestLogger({ requestId: getRequestId(), route: params.route });
+
+    let attempt = 0;
+    let delayMs = params.initialDelayMs;
+    let lastResult: SyncResult = { success: false, error: 'Unknown error' };
+
+    while (attempt < params.maxAttempts) {
+      attempt++;
+      requestLogger.info('SYNC_RETRY_ATTEMPT', {
+        event: 'SYNC_RETRY_ATTEMPT',
+        attempt,
+        max_attempts: params.maxAttempts,
+      });
+
+      lastResult = await this.syncAll(params.route);
+      if (lastResult.success) {
+        return { ...lastResult, attempts: attempt };
+      }
+
+      if (attempt < params.maxAttempts) {
+        requestLogger.warn('SYNC_RETRY_BACKOFF', {
+          event: 'SYNC_RETRY_BACKOFF',
+          attempt,
+          delay_ms: delayMs,
+          reason: lastResult.error,
+        });
+        await sleep(delayMs);
+        delayMs = Math.min(delayMs * 2, params.maxDelayMs);
+      }
+    }
+
+    requestLogger.error('SYNC_RETRY_EXHAUSTED', {
+      event: 'SYNC_RETRY_EXHAUSTED',
+      attempts: attempt,
+      error: lastResult.error,
+    });
+
+    return { ...lastResult, attempts: attempt };
+  },
 };

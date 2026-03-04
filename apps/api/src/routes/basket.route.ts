@@ -1,30 +1,40 @@
-// apps/api/src/routes/basket.route.ts
 import { Elysia, t } from 'elysia';
 import { BasketService } from '../services/basket.service';
+import { sendApiError } from '../utils/api-error';
+import { createRouteLogger } from '../utils/logger';
 
-export const basketController = new Elysia({ prefix: '/basket' })
-  .post('/analyze', async ({ body, set }) => {
+export const basketController = new Elysia({ prefix: '/basket' }).post(
+  '/analyze',
+  async ({ body, set, headers }) => {
+    const routeLogger = createRouteLogger({ headers, route: 'POST /basket/analyze' });
+
     try {
-      // body.items = [{ ean: "...", quantity: 1 }, ...]
       const result = await BasketService.calculateBasket(body.items);
       return {
         success: true,
-        data: result
+        data: result,
       };
     } catch (error) {
-      set.status = 500;
-      return {
-        success: false,
-        error: {
-          message: 'Failed to calculate basket.'
-        }
-      };
+      routeLogger.error('BASKET_ANALYSIS_FAILED', {
+        event: 'BASKET_ANALYSIS_FAILED',
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+
+      return sendApiError(set, {
+        status: 500,
+        code: 'BASKET_ANALYSIS_FAILED',
+        message: 'Failed to calculate basket.',
+      });
     }
-  }, {
+  },
+  {
     body: t.Object({
-      items: t.Array(t.Object({
-        ean: t.String(),
-        quantity: t.Number({ default: 1 })
-      }))
-    })
-  });
+      items: t.Array(
+        t.Object({
+          ean: t.String(),
+          quantity: t.Number({ default: 1 }),
+        })
+      ),
+    }),
+  }
+);
