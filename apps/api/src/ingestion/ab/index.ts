@@ -68,19 +68,19 @@ try {
       };
     });
   } catch (err) {
-    logger.error("AB_CATEGORY_FETCH_FAILED", { file: "ingestion/ab/index", categoryId, message: err instanceof Error ? err.message : String(err) });
+    logger.error("AB_CATEGORY_FETCH_FAILED", { event: "AB_CATEGORY_FETCH_FAILED", module: "ingestion/ab/index", categoryId, message: err instanceof Error ? err.message : String(err) });
     return [];
   }
 };
 
 export const abIngestionPlugin = async (_storeId: string): Promise<IngestedProductRow[]> => {
   let allProducts: IngestedProductRow[] = [];
-  logger.info("AB_INGESTION_START", { file: "ingestion/ab/index", categoryCount: AB_CATEGORIES.length });
+  logger.info("AB_INGESTION_START", { event: "AB_INGESTION_START", module: "ingestion/ab/index", categoryCount: AB_CATEGORIES.length });
 
   for (const cat of AB_CATEGORIES) {
-    logger.info("AB_SCANNING_CATEGORY", { file: "ingestion/ab/index", name: cat.name, id: cat.id });
+    logger.info("AB_SCANNING_CATEGORY", { event: "AB_SCANNING_CATEGORY", module: "ingestion/ab/index", name: cat.name, id: cat.id });
     const products = await fetchAbCategory(cat.id);
-    logger.info("AB_CATEGORY_RESULTS", { file: "ingestion/ab/index", name: cat.name, productCount: products.length });
+    logger.info("AB_CATEGORY_RESULTS", { event: "AB_CATEGORY_RESULTS", module: "ingestion/ab/index", name: cat.name, productCount: products.length });
     allProducts = [...allProducts, ...products];
     await wait(1000);
   }

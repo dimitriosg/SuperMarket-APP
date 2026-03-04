@@ -3,7 +3,7 @@ import { AB_HEADERS } from "./config";
 import { logger } from "../../utils/logger";
 
 export const discoverAbCategories = async () => {
-  logger.info("AB_DISCOVERY_START", { file: "ingestion/ab/discovery" });
+  logger.info("AB_DISCOVERY_START", { event: "AB_DISCOVERY_START", module: "ingestion/ab/discovery" });
 
   const body = {
     operationName: "GetCategories",
@@ -34,7 +34,7 @@ export const discoverAbCategories = async () => {
     const categories = json.data?.categories || [];
 
     if (categories.length === 0) {
-        logger.warn("AB_DISCOVERY_NO_CATEGORIES", { file: "ingestion/ab/discovery" });
+        logger.warn("AB_DISCOVERY_NO_CATEGORIES", { event: "AB_DISCOVERY_NO_CATEGORIES", module: "ingestion/ab/discovery" });
         return [];
     }
 
@@ -45,10 +45,10 @@ export const discoverAbCategories = async () => {
       subCategories: cat.childCategories?.map((c: any) => c.name).join(", ").substring(0, 50) + "..."
     }));
 
-    logger.info("AB_DISCOVERY_DONE", { file: "ingestion/ab/discovery", count: flatCategories.length });
+    logger.info("AB_DISCOVERY_DONE", { event: "AB_DISCOVERY_DONE", module: "ingestion/ab/discovery", count: flatCategories.length });
     return flatCategories;
   } catch (err) {
-    logger.error("AB_DISCOVERY_FAILED", { file: "ingestion/ab/discovery", message: err instanceof Error ? err.message : String(err) });
+    logger.error("AB_DISCOVERY_FAILED", { event: "AB_DISCOVERY_FAILED", module: "ingestion/ab/discovery", message: err instanceof Error ? err.message : String(err) });
     return [];
   }
 };

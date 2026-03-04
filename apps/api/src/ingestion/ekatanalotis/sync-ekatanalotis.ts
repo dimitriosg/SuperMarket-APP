@@ -20,7 +20,7 @@ function normalizeText(text: string): string {
 async function syncEKatanalotis() {
   const filePath = path.join(__dirname, "13012026.json");
   if (!fs.existsSync(filePath)) {
-    logger.error("SYNC_EKAT_JSON_MISSING", { file: "ingestion/ekatanalotis/sync-ekatanalotis" });
+    logger.error("SYNC_EKAT_JSON_MISSING", { event: "SYNC_EKAT_JSON_MISSING", module: "ingestion/ekatanalotis/sync-ekatanalotis" });
     return;
   }
 
@@ -30,7 +30,7 @@ async function syncEKatanalotis() {
   
   const BASE_IMAGE_URL = "https://warply.s3.amazonaws.com/applications/ed840ad545884deeb6c6b699176797ed/products/";
 
-  logger.info("SYNC_EKAT_STARTED", { file: "ingestion/ekatanalotis/sync-ekatanalotis", productCount: products.length });
+  logger.info("SYNC_EKAT_STARTED", { event: "SYNC_EKAT_STARTED", module: "ingestion/ekatanalotis/sync-ekatanalotis", productCount: products.length });
   
   let count = 0;
 
@@ -78,13 +78,13 @@ async function syncEKatanalotis() {
       count++;
       if (count % 200 === 0) process.stdout.write(".");
     } catch (e) {
-      logger.error("SYNC_EKAT_ITEM_ERROR", { file: "ingestion/ekatanalotis/sync-ekatanalotis", barcode: item.barcode, message: e instanceof Error ? e.message : String(e) });
+      logger.error("SYNC_EKAT_ITEM_ERROR", { event: "SYNC_EKAT_ITEM_ERROR", module: "ingestion/ekatanalotis/sync-ekatanalotis", barcode: item.barcode, message: e instanceof Error ? e.message : String(e) });
     }
   }
   
-  logger.info("SYNC_EKAT_COMPLETE", { file: "ingestion/ekatanalotis/sync-ekatanalotis", processedCount: count });
+  logger.info("SYNC_EKAT_COMPLETE", { event: "SYNC_EKAT_COMPLETE", module: "ingestion/ekatanalotis/sync-ekatanalotis", processedCount: count });
 }
 
 syncEKatanalotis()
-  .catch(e => logger.error("SYNC_EKAT_FATAL", { file: "ingestion/ekatanalotis/sync-ekatanalotis", message: e instanceof Error ? e.message : String(e) }))
+  .catch(e => logger.error("SYNC_EKAT_FATAL", { event: "SYNC_EKAT_FATAL", module: "ingestion/ekatanalotis/sync-ekatanalotis", message: e instanceof Error ? e.message : String(e) }))
   .finally(async () => await prisma.$disconnect());

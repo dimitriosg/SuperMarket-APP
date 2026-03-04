@@ -7,7 +7,7 @@ const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const scrapeUrl = async (url: string): Promise<IngestedProductRow[]> => {
     try {
-        logger.info("SKLAVENITIS_SCRAPING", { file: "ingestion/sklavenitis/index", url });
+        logger.info("SKLAVENITIS_SCRAPING", { event: "SKLAVENITIS_SCRAPING", module: "ingestion/sklavenitis/index", url });
         const res = await fetch(url, { headers: HEADERS });
         if (!res.ok) return [];
 
@@ -47,14 +47,14 @@ export const sklavenitisIngestionPlugin = async (_storeId: string): Promise<Inge
     // 1. Προαιρετικά: Τρέχουμε το Discovery στην αρχή για να δούμε αν υπάρχουν νέα πράγματα
     // const discoveredMap = await discoverAllCategories();
 
-    logger.info("SKLAVENITIS_INGESTION_START", { file: "ingestion/sklavenitis/index" });
+    logger.info("SKLAVENITIS_INGESTION_START", { event: "SKLAVENITIS_INGESTION_START", module: "ingestion/sklavenitis/index" });
 
     for (const url of CATEGORY_URLS) {
         const products = await scrapeUrl(url);
         
         // Υβριδικός έλεγχος:
         if (products.length === 0) {
-            logger.warn("SKLAVENITIS_EMPTY_CATEGORY", { file: "ingestion/sklavenitis/index", url });
+            logger.warn("SKLAVENITIS_EMPTY_CATEGORY", { event: "SKLAVENITIS_EMPTY_CATEGORY", module: "ingestion/sklavenitis/index", url });
             // Εδώ μελλοντικά μπορούμε να προσθέσουμε αυτόματη διόρθωση
         }
 
@@ -67,7 +67,7 @@ export const sklavenitisIngestionPlugin = async (_storeId: string): Promise<Inge
 
 // Health Check
 const discoverAllCategories = async (): Promise<Record<string, string>> => {
-    logger.info("SKLAVENITIS_DISCOVERY_START", { file: "ingestion/sklavenitis/index" });
+    logger.info("SKLAVENITIS_DISCOVERY_START", { event: "SKLAVENITIS_DISCOVERY_START", module: "ingestion/sklavenitis/index" });
     try {
         const res = await fetch("https://www.sklavenitis.gr/katigories/", { headers: HEADERS });
         const html = await res.text();
@@ -89,7 +89,7 @@ const discoverAllCategories = async (): Promise<Record<string, string>> => {
 
         return discovered;
     } catch (err) {
-        logger.error("SKLAVENITIS_DISCOVERY_FAILED", { file: "ingestion/sklavenitis/index", message: err instanceof Error ? err.message : String(err) });
+        logger.error("SKLAVENITIS_DISCOVERY_FAILED", { event: "SKLAVENITIS_DISCOVERY_FAILED", module: "ingestion/sklavenitis/index", message: err instanceof Error ? err.message : String(err) });
         return {};
     }
 };

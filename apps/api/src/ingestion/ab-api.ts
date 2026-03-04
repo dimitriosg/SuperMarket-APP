@@ -4,7 +4,7 @@ import { logger } from "../utils/logger";
 const prisma = new PrismaClient();
 
 async function fetchFromAB(categoryCode: string) {
-  logger.info("AB_API_FETCHING", { file: "ingestion/ab-api", categoryCode });
+  logger.info("AB_API_FETCHING", { event: "AB_API_FETCHING", module: "ingestion/ab-api", categoryCode });
 
   const query = `
     query GetCategoryProductSearch($categoryCode: String, $currentPage: Int, $pageSize: Int, $sort: String) {
@@ -59,15 +59,15 @@ async function fetchFromAB(categoryCode: string) {
     const products = json.data?.categoryProductSearch?.products || [];
 
     if (products.length === 0) {
-      logger.warn("AB_API_NO_PRODUCTS", { file: "ingestion/ab-api", categoryCode });
+      logger.warn("AB_API_NO_PRODUCTS", { event: "AB_API_NO_PRODUCTS", module: "ingestion/ab-api", categoryCode });
       return;
     }
 
-    logger.info("AB_API_PRODUCTS_RECEIVED", { file: "ingestion/ab-api", count: products.length });
+    logger.info("AB_API_PRODUCTS_RECEIVED", { event: "AB_API_PRODUCTS_RECEIVED", module: "ingestion/ab-api", count: products.length });
     await saveToDb(products);
 
   } catch (error: any) {
-    logger.error("AB_API_FETCH_FAILED", { file: "ingestion/ab-api", message: error.message });
+    logger.error("AB_API_FETCH_FAILED", { event: "AB_API_FETCH_FAILED", module: "ingestion/ab-api", message: error.message });
   }
 }
 
@@ -99,7 +99,7 @@ async function saveToDb(products: any[]) {
       }
     });
   }
-  logger.info("AB_API_DB_UPDATED", { file: "ingestion/ab-api" });
+  logger.info("AB_API_DB_UPDATED", { event: "AB_API_DB_UPDATED", module: "ingestion/ab-api" });
 }
 
 // Κωδικοί κατηγοριών ΑΒ:

@@ -19,7 +19,7 @@ function normalizeText(text: string): string {
 async function syncEKatanalotis() {
   const filePath = path.join(__dirname, "13012026.json");
   if (!fs.existsSync(filePath)) {
-    logger.error("SYNC_EKAT_OLD_JSON_MISSING", { file: "ingestion/ekatanalotis/sync-ekatanalotis-OLD" });
+    logger.error("SYNC_EKAT_OLD_JSON_MISSING", { event: "SYNC_EKAT_OLD_JSON_MISSING", module: "ingestion/ekatanalotis/sync-ekatanalotis-OLD" });
     return;
   }
 
@@ -30,7 +30,7 @@ async function syncEKatanalotis() {
   // Base URL για τις εικόνες
   const BASE_IMAGE_URL = "https://warply.s3.amazonaws.com/applications/ed840ad545884deeb6c6b699176797ed/products/";
 
-  logger.info("SYNC_EKAT_OLD_STARTED", { file: "ingestion/ekatanalotis/sync-ekatanalotis-OLD" });
+  logger.info("SYNC_EKAT_OLD_STARTED", { event: "SYNC_EKAT_OLD_STARTED", module: "ingestion/ekatanalotis/sync-ekatanalotis-OLD" });
   
   let count = 0;
   for (const item of products) {
@@ -59,7 +59,7 @@ async function syncEKatanalotis() {
       // Ignored
     }
   }
-  logger.info("SYNC_EKAT_OLD_COMPLETE", { file: "ingestion/ekatanalotis/sync-ekatanalotis-OLD", updatedCount: count });
+  logger.info("SYNC_EKAT_OLD_COMPLETE", { event: "SYNC_EKAT_OLD_COMPLETE", module: "ingestion/ekatanalotis/sync-ekatanalotis-OLD", updatedCount: count });
 }
 
 syncEKatanalotis();

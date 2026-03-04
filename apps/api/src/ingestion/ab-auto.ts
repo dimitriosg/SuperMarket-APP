@@ -10,11 +10,11 @@ const prisma = new PrismaClient();
 async function saveProducts(products: any[]) {
     const store = await prisma.store.findFirst({ where: { name: { contains: "ab" } } });
     if (!store) {
-        logger.error("AB_AUTO_STORE_NOT_FOUND", { file: "ingestion/ab-auto" });
+        logger.error("AB_AUTO_STORE_NOT_FOUND", { event: "AB_AUTO_STORE_NOT_FOUND", module: "ingestion/ab-auto" });
         return;
     }
 
-    logger.info("AB_AUTO_SAVING", { file: "ingestion/ab-auto", count: products.length });
+    logger.info("AB_AUTO_SAVING", { event: "AB_AUTO_SAVING", module: "ingestion/ab-auto", count: products.length });
 
     for (const item of products) {
         try {
@@ -44,7 +44,7 @@ async function saveProducts(products: any[]) {
                 }
             });
         } catch (err) {
-            logger.error("AB_AUTO_PRODUCT_ERROR", { file: "ingestion/ab-auto", product: item.name, message: err instanceof Error ? err.message : String(err) });
+            logger.error("AB_AUTO_PRODUCT_ERROR", { event: "AB_AUTO_PRODUCT_ERROR", module: "ingestion/ab-auto", product: item.name, message: err instanceof Error ? err.message : String(err) });
         }
     }
 }
@@ -53,7 +53,7 @@ async function saveProducts(products: any[]) {
  * Κύρια συνάρτηση Scraping
  */
 async function scrapeABCategory(categoryUrl: string) {
-    logger.info("AB_AUTO_BROWSER_START", { file: "ingestion/ab-auto", categoryUrl });
+    logger.info("AB_AUTO_BROWSER_START", { event: "AB_AUTO_BROWSER_START", module: "ingestion/ab-auto", categoryUrl });
     
     const browser = await chromium.launch({ 
         headless: false, // Βάλτο false για να βλέπεις αν όντως ανοίγει!
@@ -74,7 +74,7 @@ async function scrapeABCategory(categoryUrl: string) {
                     const json = JSON.parse(text);
                     const products = json.data?.categoryProductSearch?.products || [];
                     if (products.length > 0) {
-                        logger.info("AB_AUTO_PRODUCTS_FOUND", { file: "ingestion/ab-auto", count: products.length });
+                        logger.info("AB_AUTO_PRODUCTS_FOUND", { event: "AB_AUTO_PRODUCTS_FOUND", module: "ingestion/ab-auto", count: products.length });
                         await saveProducts(products);
                     }
                 }
@@ -83,15 +83,15 @@ async function scrapeABCategory(categoryUrl: string) {
     });
 
     try {
-        logger.info("AB_AUTO_PAGE_LOADING", { file: "ingestion/ab-auto" });
+        logger.info("AB_AUTO_PAGE_LOADING", { event: "AB_AUTO_PAGE_LOADING", module: "ingestion/ab-auto" });
         await page.goto(categoryUrl, { waitUntil: 'domcontentloaded' });
         
         // Περιμένουμε να εμφανιστεί το banner των cookies και το κλείνουμε αν μπορούμε
         // ή απλά περιμένουμε λίγο να φορτώσει το API
-        logger.info("AB_AUTO_WAITING", { file: "ingestion/ab-auto" });
+        logger.info("AB_AUTO_WAITING", { event: "AB_AUTO_WAITING", module: "ingestion/ab-auto" });
         await page.waitForTimeout(10000);
 
-        logger.info("AB_AUTO_SCROLLING", { file: "ingestion/ab-auto" });
+        logger.info("AB_AUTO_SCROLLING", { event: "AB_AUTO_SCROLLING", module: "ingestion/ab-auto" });
         for (let i = 0; i < 3; i++) {
             await page.mouse.wheel(0, 1500);
             await page.waitForTimeout(3000);
@@ -99,10 +99,10 @@ async function scrapeABCategory(categoryUrl: string) {
         }
 
     } catch (err: any) {
-        logger.error("AB_AUTO_SCRAPE_ERROR", { file: "ingestion/ab-auto", message: err.message });
+        logger.error("AB_AUTO_SCRAPE_ERROR", { event: "AB_AUTO_SCRAPE_ERROR", module: "ingestion/ab-auto", message: err.message });
     } finally {
         await browser.close();
-        logger.info("AB_AUTO_BROWSER_CLOSED", { file: "ingestion/ab-auto" });
+        logger.info("AB_AUTO_BROWSER_CLOSED", { event: "AB_AUTO_BROWSER_CLOSED", module: "ingestion/ab-auto" });
     }
 }
 
@@ -117,6 +117,6 @@ const categories = [
     for (const url of categories) {
         await scrapeABCategory(url);
     }
-    logger.info("AB_AUTO_ALL_CATEGORIES_DONE", { file: "ingestion/ab-auto" });
+    logger.info("AB_AUTO_ALL_CATEGORIES_DONE", { event: "AB_AUTO_ALL_CATEGORIES_DONE", module: "ingestion/ab-auto" });
     process.exit(0);
 })();

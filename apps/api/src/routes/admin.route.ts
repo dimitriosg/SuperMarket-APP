@@ -1,17 +1,21 @@
 import { Elysia } from "elysia";
 import { ekatanalotisService } from "../services/ekatanalotisService";
-import { logger } from "../utils/logger";
+import { createRequestLogger, getRequestId, logger } from "../utils/logger";
 
 export const createAdminRoutes = () =>
   new Elysia({ prefix: "/admin" })
-  .post("/sync-prices", () => {
-    logger.info("ADMIN_SYNC_TRIGGERED", { route: "POST /admin/sync-prices" });
+  .post("/sync-prices", ({ headers }) => {
+    const requestId = getRequestId(headers);
+    const reqLog = createRequestLogger({ requestId });
+
+    reqLog.info("ADMIN_SYNC_TRIGGERED", { event: "ADMIN_SYNC_TRIGGERED", route: "POST /admin/sync-prices" });
     
     ekatanalotisService.syncAll().then((res) => {
-        logger.info("BACKGROUND_SYNC_FINISHED", { route: "POST /admin/sync-prices", result: res });
+        logger.info("BACKGROUND_SYNC_FINISHED", { event: "BACKGROUND_SYNC_FINISHED", module: "admin", result: res });
     }).catch(err => {
         logger.error("BACKGROUND_SYNC_CRASHED", {
-          route: "POST /admin/sync-prices",
+          event: "BACKGROUND_SYNC_CRASHED",
+          module: "admin",
           message: err instanceof Error ? err.message : String(err),
         });
     });

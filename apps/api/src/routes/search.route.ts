@@ -11,6 +11,7 @@ export const createSearchRoutes = () =>
       const requestId = getRequestId(headers);
       const reqLog = createRequestLogger({ requestId });
       reqLog.error("SUGGESTIONS_FAILED", {
+        event: "SUGGESTIONS_FAILED",
         route: "GET /products/suggestions",
         message: error instanceof Error ? error.message : String(error),
       });

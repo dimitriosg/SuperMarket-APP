@@ -63,7 +63,7 @@ function parseRemoteProducts(value: unknown): RemoteProduct[] {
   if (!Array.isArray(value)) return [];
   return value.filter((item, index) => {
     if (!isRemoteProduct(item)) {
-      logger.warn("INVALID_PRODUCT_PAYLOAD", { service: "ekatanalotisService", index });
+      logger.warn("INVALID_PRODUCT_PAYLOAD", { event: "INVALID_PRODUCT_PAYLOAD", module: "ekatanalotisService", index });
       return false;
     }
     return true;
@@ -73,7 +73,7 @@ function parseRemoteProducts(value: unknown): RemoteProduct[] {
 export const ekatanalotisService = {
   
   async syncAll() {
-    logger.info("SYNC_STARTED", { service: "ekatanalotisService" });
+    logger.info("SYNC_STARTED", { event: "SYNC_STARTED", module: "ekatanalotisService" });
     const startTime = Date.now();
     
     try {
@@ -93,7 +93,7 @@ export const ekatanalotisService = {
 
       if (products.length === 0) throw new Error("No products found.");
 
-      logger.info("SYNC_PRODUCTS_FOUND", { service: "ekatanalotisService", count: products.length });
+      logger.info("SYNC_PRODUCTS_FOUND", { event: "SYNC_PRODUCTS_FOUND", module: "ekatanalotisService", count: products.length });
 
       let stats = { productsUpserted: 0, pricesAdded: 0, errors: 0 };
       const today = new Date();
@@ -138,7 +138,8 @@ export const ekatanalotisService = {
               >((acc, priceItem) => {
                 if (!isRemotePrice(priceItem)) {
                   logger.warn("INVALID_PRICE_PAYLOAD", {
-                    service: "ekatanalotisService",
+                    event: "INVALID_PRICE_PAYLOAD",
+                    module: "ekatanalotisService",
                     ean: item.barcode,
                     merchant: String(
                       (priceItem as RemotePrice | undefined)?.merchant_uuid
@@ -151,7 +152,8 @@ export const ekatanalotisService = {
                 const storeId = MERCHANT_MAP[priceItem.merchant_uuid];
                 if (!storeId) {
                   logger.warn("UNKNOWN_MERCHANT", {
-                    service: "ekatanalotisService",
+                    event: "UNKNOWN_MERCHANT",
+                    module: "ekatanalotisService",
                     ean: item.barcode,
                     merchant: priceItem.merchant_uuid,
                   });
@@ -163,7 +165,8 @@ export const ekatanalotisService = {
                   typeof priceItem.price === "string" ? parseFloat(priceItem.price) : priceItem.price;
                 if (Number.isNaN(priceVal)) {
                   logger.warn("INVALID_PRICE_VALUE", {
-                    service: "ekatanalotisService",
+                    event: "INVALID_PRICE_VALUE",
+                    module: "ekatanalotisService",
                     ean: item.barcode,
                     merchant: priceItem.merchant_uuid,
                   });
@@ -189,7 +192,8 @@ export const ekatanalotisService = {
         } catch (err) {
           stats.errors++;
           logger.error("SYNC_ITEM_FAILED", {
-            service: "ekatanalotisService",
+            event: "SYNC_ITEM_FAILED",
+            module: "ekatanalotisService",
             ean: item.barcode,
             message: err instanceof Error ? err.message : String(err),
           });
@@ -197,12 +201,13 @@ export const ekatanalotisService = {
       }
 
       const duration = parseFloat(((Date.now() - startTime) / 1000).toFixed(1));
-      logger.info("SYNC_COMPLETE", { service: "ekatanalotisService", duration, stats });
+      logger.info("SYNC_COMPLETE", { event: "SYNC_COMPLETE", module: "ekatanalotisService", duration, stats });
       return { success: true, stats, duration };
 
     } catch (error) {
       logger.error("SYNC_FAILED", {
-        service: "ekatanalotisService",
+        event: "SYNC_FAILED",
+        module: "ekatanalotisService",
         message: error instanceof Error ? error.message : String(error),
       });
       return { success: false, error: String(error) };

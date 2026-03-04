@@ -21,7 +21,7 @@ const DATA = [
 ];
 
 async function main() {
-  logger.info("SEED_STARTED", { file: "seed" });
+  logger.info("SEED_STARTED", { event: "SEED_STARTED", module: "seed" });
 
   for (const item of DATA) {
     // 1. Δημιουργία ή Εύρεση της Αλυσίδας (Chain)
@@ -51,13 +51,13 @@ async function main() {
       }
     });
 
-    logger.info("SEED_CREATED", { file: "seed", name: item.name });
+    logger.info("SEED_CREATED", { event: "SEED_CREATED", module: "seed", name: item.name });
   }
 }
 
 main()
   .catch((e) => {
-    logger.error("SEED_FAILED", { file: "seed", message: e instanceof Error ? e.message : String(e) });
+    logger.error("SEED_FAILED", { event: "SEED_FAILED", module: "seed", message: e instanceof Error ? e.message : String(e) });
     process.exit(1);
   })
   .finally(async () => {

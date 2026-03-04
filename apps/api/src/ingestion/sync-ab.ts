@@ -9,10 +9,10 @@ async function sync() {
   // Χρησιμοποιούμε absolute path για να μη χθούμε
   const filePath = path.resolve("C:/DEV/SuperMarket/SuperMarket-APP/apps/api/src/ingestion/ab-data.json");
   
-  logger.info("SYNC_AB_READING", { file: "ingestion/sync-ab", filePath });
+  logger.info("SYNC_AB_READING", { event: "SYNC_AB_READING", module: "ingestion/sync-ab", filePath });
   
   if (!fs.existsSync(filePath)) {
-    logger.error("SYNC_AB_FILE_NOT_FOUND", { file: "ingestion/sync-ab", filePath });
+    logger.error("SYNC_AB_FILE_NOT_FOUND", { event: "SYNC_AB_FILE_NOT_FOUND", module: "ingestion/sync-ab", filePath });
     return;
   }
 
@@ -22,11 +22,11 @@ async function sync() {
 
   const store = await prisma.store.findFirst({ where: { name: { contains: "ab" } } });
   if (!store) {
-    logger.error("SYNC_AB_STORE_NOT_FOUND", { file: "ingestion/sync-ab" });
+    logger.error("SYNC_AB_STORE_NOT_FOUND", { event: "SYNC_AB_STORE_NOT_FOUND", module: "ingestion/sync-ab" });
     return;
   }
 
-  logger.info("SYNC_AB_STARTED", { file: "ingestion/sync-ab", productCount: products.length });
+  logger.info("SYNC_AB_STARTED", { event: "SYNC_AB_STARTED", module: "ingestion/sync-ab", productCount: products.length });
 
   for (const item of products) {
     const priceValue = item.price?.value || 0;
@@ -59,7 +59,7 @@ async function sync() {
     }
   }
 
-  logger.info("SYNC_AB_COMPLETE", { file: "ingestion/sync-ab" });
+  logger.info("SYNC_AB_COMPLETE", { event: "SYNC_AB_COMPLETE", module: "ingestion/sync-ab" });
 }
 
-sync().catch((err) => logger.error("SYNC_AB_FATAL", { file: "ingestion/sync-ab", message: err instanceof Error ? err.message : String(err) }));
+sync().catch((err) => logger.error("SYNC_AB_FATAL", { event: "SYNC_AB_FATAL", module: "ingestion/sync-ab", message: err instanceof Error ? err.message : String(err) }));

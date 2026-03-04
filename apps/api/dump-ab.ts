@@ -10,11 +10,11 @@ async function dump() {
   const data = JSON.parse(rawJson);
   const products = data.data.categoryProductSearch.products;
   
-  logger.info("DUMP_AB_STARTED", { file: "dump-ab", count: products.length });
+  logger.info("DUMP_AB_STARTED", { event: "DUMP_AB_STARTED", module: "dump-ab", count: products.length });
 
   const store = await prisma.store.findFirst({ where: { name: { contains: "ab" } } });
   if (!store) {
-    logger.error("DUMP_AB_STORE_NOT_FOUND", { file: "dump-ab" });
+    logger.error("DUMP_AB_STORE_NOT_FOUND", { event: "DUMP_AB_STORE_NOT_FOUND", module: "dump-ab" });
     return;
   }
 
@@ -35,7 +35,7 @@ async function dump() {
       data: { productId: dbProduct.id, price: price.toString(), collectedAt: new Date() }
     });
   }
-  logger.info("DUMP_AB_COMPLETE", { file: "dump-ab" });
+  logger.info("DUMP_AB_COMPLETE", { event: "DUMP_AB_COMPLETE", module: "dump-ab" });
 }
 
 dump();

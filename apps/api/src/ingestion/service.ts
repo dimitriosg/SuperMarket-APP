@@ -10,7 +10,7 @@ export const upsertIngestedRows = async (
   storeExternalId: string,
   rows: IngestedProductRow[]
 ) => {
-  logger.info("INGESTION_UPSERT_START", { file: "ingestion/service", chainName, rowCount: rows.length });
+  logger.info("INGESTION_UPSERT_START", { event: "INGESTION_UPSERT_START", module: "ingestion/service", chainName, rowCount: rows.length });
 
   let chain = await prisma.chain.findFirst({
     where: { OR: [{ slug: chainName.toLowerCase() }, { label: chainName }] },
@@ -75,7 +75,7 @@ export const upsertIngestedRows = async (
       },
     });
   }
-  logger.info("INGESTION_UPSERT_DONE", { file: "ingestion/service", chainName, rowCount: rows.length });
+  logger.info("INGESTION_UPSERT_DONE", { event: "INGESTION_UPSERT_DONE", module: "ingestion/service", chainName, rowCount: rows.length });
 };
 
 // "Τροχονόμος" συναρτηση

@@ -16,18 +16,18 @@ const HEADERS = {
 };
 
 async function forceIngest() {
-  logger.info("FORCE_AB_STARTED", { file: "force-ab" });
+  logger.info("FORCE_AB_STARTED", { event: "FORCE_AB_STARTED", module: "force-ab" });
   
   const res = await fetch(AB_URL, { headers: HEADERS });
   const json = await res.json() as any;
   const products = json.data?.categoryProductSearch?.products || [];
 
-  logger.info("FORCE_AB_PRODUCTS_FOUND", { file: "force-ab", count: products.length });
+  logger.info("FORCE_AB_PRODUCTS_FOUND", { event: "FORCE_AB_PRODUCTS_FOUND", module: "force-ab", count: products.length });
 
   // Βρίσκουμε το storeId του ΑΒ
   const store = await prisma.store.findFirst({ where: { name: { contains: "ab" } } });
   if (!store) {
-    logger.error("FORCE_AB_STORE_NOT_FOUND", { file: "force-ab" });
+    logger.error("FORCE_AB_STORE_NOT_FOUND", { event: "FORCE_AB_STORE_NOT_FOUND", module: "force-ab" });
     return;
   }
 
@@ -56,7 +56,7 @@ async function forceIngest() {
     });
   }
 
-  logger.info("FORCE_AB_COMPLETE", { file: "force-ab" });
+  logger.info("FORCE_AB_COMPLETE", { event: "FORCE_AB_COMPLETE", module: "force-ab" });
 }
 
 forceIngest();

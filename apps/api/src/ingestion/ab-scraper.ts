@@ -5,7 +5,7 @@ import { logger } from "../utils/logger";
 const prisma = new PrismaClient();
 
 async function run() {
-  logger.info("AB_SCRAPER_START", { file: "ingestion/ab-scraper" });
+  logger.info("AB_SCRAPER_START", { event: "AB_SCRAPER_START", module: "ingestion/ab-scraper" });
 
   const browser = await puppeteer.launch({
     headless: false,
@@ -29,7 +29,7 @@ async function run() {
                            json.data?.productSearch?.products || [];
           
           if (products.length > 0) {
-            logger.info("AB_SCRAPER_PRODUCTS_FOUND", { file: "ingestion/ab-scraper", count: products.length });
+            logger.info("AB_SCRAPER_PRODUCTS_FOUND", { event: "AB_SCRAPER_PRODUCTS_FOUND", module: "ingestion/ab-scraper", count: products.length });
             await saveToDb(products);
           }
         }
@@ -37,23 +37,23 @@ async function run() {
     }
   });
 
-  logger.info("AB_SCRAPER_NAVIGATING", { file: "ingestion/ab-scraper" });
+  logger.info("AB_SCRAPER_NAVIGATING", { event: "AB_SCRAPER_NAVIGATING", module: "ingestion/ab-scraper" });
   await page.goto('https://www.ab.gr/el/eshop/Vasika-typopoiimena-trofima/Zymarika/c/010002001', {
     waitUntil: 'networkidle2'
   });
 
-  logger.info("AB_SCRAPER_COOKIES", { file: "ingestion/ab-scraper" });
+  logger.info("AB_SCRAPER_COOKIES", { event: "AB_SCRAPER_COOKIES", module: "ingestion/ab-scraper" });
   await new Promise(r => setTimeout(r, 4000));
 
   // ΠΕΡΙΜΕΝΟΥΜΕ ΕΝΑ ΠΡΟΪΟΝ ΧΕΙΡΟΚΙΝΗΤΑ
-  logger.info("AB_SCRAPER_WAITING_LIST", { file: "ingestion/ab-scraper" });
+  logger.info("AB_SCRAPER_WAITING_LIST", { event: "AB_SCRAPER_WAITING_LIST", module: "ingestion/ab-scraper" });
   try {
     await page.waitForSelector('article', { timeout: 10000 });
   } catch (e) {
-    logger.warn("AB_SCRAPER_PRODUCTS_SLOW", { file: "ingestion/ab-scraper" });
+    logger.warn("AB_SCRAPER_PRODUCTS_SLOW", { event: "AB_SCRAPER_PRODUCTS_SLOW", module: "ingestion/ab-scraper" });
   }
 
-  logger.info("AB_SCRAPER_SCROLLING", { file: "ingestion/ab-scraper" });
+  logger.info("AB_SCRAPER_SCROLLING", { event: "AB_SCRAPER_SCROLLING", module: "ingestion/ab-scraper" });
   for (let i = 0; i < 15; i++) {
     // Κάνουμε scroll και κουνάμε το ποντίκι λίγο για να φανεί "ανθρώπινο"
     await page.mouse.wheel(0, 400);
@@ -64,7 +64,7 @@ async function run() {
     if (i % 3 === 0) await page.mouse.click(100, 100);
   }
 
-  logger.info("AB_SCRAPER_DONE", { file: "ingestion/ab-scraper" });
+  logger.info("AB_SCRAPER_DONE", { event: "AB_SCRAPER_DONE", module: "ingestion/ab-scraper" });
   await new Promise(r => setTimeout(r, 5000));
   await browser.close();
 }
@@ -94,11 +94,11 @@ async function saveToDb(products: any[]) {
       }
     });
   }
-  logger.info("AB_SCRAPER_DB_UPDATED", { file: "ingestion/ab-scraper" });
+  logger.info("AB_SCRAPER_DB_UPDATED", { event: "AB_SCRAPER_DB_UPDATED", module: "ingestion/ab-scraper" });
 }
 
 // ΑΥΤΟ ΕΙΝΑΙ ΤΟ ΚΛΕΙΔΙ: Global catch για να δούμε το σφάλμα
-logger.info("AB_SCRAPER_SCRIPT_STARTED", { file: "ingestion/ab-scraper" });
+logger.info("AB_SCRAPER_SCRIPT_STARTED", { event: "AB_SCRAPER_SCRIPT_STARTED", module: "ingestion/ab-scraper" });
 run().catch(err => {
-  logger.error("AB_SCRAPER_FATAL", { file: "ingestion/ab-scraper", message: err instanceof Error ? err.message : String(err), error: err });
+  logger.error("AB_SCRAPER_FATAL", { event: "AB_SCRAPER_FATAL", module: "ingestion/ab-scraper", message: err instanceof Error ? err.message : String(err), error: err });
 });

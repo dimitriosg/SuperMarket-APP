@@ -10,7 +10,7 @@ type BasketItem = {
 export class BasketService {
   
   static async calculateBasket(items: BasketItem[]) {
-    logger.info("BASKET_REQUEST", { service: "BasketService", items });
+    logger.info("BASKET_REQUEST", { event: "BASKET_REQUEST", module: "BasketService", items });
     
     const eans = items.map(i => i.ean);
 
@@ -20,7 +20,7 @@ export class BasketService {
       select: { id: true, ean: true, name: true, imageUrl: true }
     });
 
-    logger.info("BASKET_PRODUCTS_FOUND", { service: "BasketService", found: products.length, requested: items.length });
+    logger.info("BASKET_PRODUCTS_FOUND", { event: "BASKET_PRODUCTS_FOUND", module: "BasketService", found: products.length, requested: items.length });
     if (products.length === 0) return []; // Αν δεν βρήκαμε τίποτα, επιστρέφουμε κενό
 
     const productIds = products.map(p => p.id);
@@ -37,7 +37,7 @@ export class BasketService {
       orderBy: { collectedAt: 'desc' }
     });
 
-    logger.info("BASKET_PRICES_FOUND", { service: "BasketService", priceCount: prices.length });
+    logger.info("BASKET_PRICES_FOUND", { event: "BASKET_PRICES_FOUND", module: "BasketService", priceCount: prices.length });
 
     // 3. Οργάνωση ανά Κατάστημα
     const storeBaskets = new Map<string, {
@@ -60,7 +60,7 @@ export class BasketService {
       }
     }
 
-    logger.info("BASKET_UNIQUE_PRICES", { service: "BasketService", uniquePrices: latestPrices.size });
+    logger.info("BASKET_UNIQUE_PRICES", { event: "BASKET_UNIQUE_PRICES", module: "BasketService", uniquePrices: latestPrices.size });
 
     // 4. Υπολογισμός Συνόλων
     for (const price of latestPrices.values()) {
@@ -116,7 +116,7 @@ export class BasketService {
         return a.totalCost - b.totalCost;
       });
 
-    logger.info("BASKET_RESULTS", { service: "BasketService", storeOptions: results.length });
+    logger.info("BASKET_RESULTS", { event: "BASKET_RESULTS", module: "BasketService", storeOptions: results.length });
     return results;
   }
 }
