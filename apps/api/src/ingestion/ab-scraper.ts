@@ -100,6 +100,5 @@ async function saveToDb(products: any[]) {
 // ΑΥΤΟ ΕΙΝΑΙ ΤΟ ΚΛΕΙΔΙ: Global catch για να δούμε το σφάλμα
 logger.info("AB_SCRAPER_SCRIPT_STARTED", { file: "ingestion/ab-scraper" });
 run().catch(err => {
-  logger.error("AB_SCRAPER_FATAL", { file: "ingestion/ab-scraper", message: err instanceof Error ? err.message : String(err) });
-  logger.error("AB_SCRAPER_FATAL_DETAIL", { file: "ingestion/ab-scraper", error: err });
+  logger.error("AB_SCRAPER_FATAL", { file: "ingestion/ab-scraper", message: err instanceof Error ? err.message : String(err), error: err });
 });

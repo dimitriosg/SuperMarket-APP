@@ -196,7 +196,7 @@ export const ekatanalotisService = {
         }
       }
 
-      const duration = ((Date.now() - startTime) / 1000).toFixed(1);
+      const duration = parseFloat(((Date.now() - startTime) / 1000).toFixed(1));
       logger.info("SYNC_COMPLETE", { service: "ekatanalotisService", duration, stats });
       return { success: true, stats, duration };
 
