@@ -1,4 +1,4 @@
-import { LOCATIONS, STORES_DATA } from "../../services/api";
+import { LOCATIONS, STORES_DATA } from "../../constants/stores";
 import { ProductResult } from "../../types";
 import { ProductUI, RegionUI, StoreUI } from "./types";
 

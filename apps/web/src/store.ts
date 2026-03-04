@@ -7,7 +7,8 @@ import {
 } from "zustand/middleware";
 import { shallow } from "zustand/shallow";
 import { BasketComparisonResult, BasketItem, ProductResult } from "./types";
-import { compareBasketAPI, getStoreIdByName, STORES_DATA } from "./services/api";
+import { compareBasketAPI } from "./services/api";
+import { getStoreIdByName, STORES_DATA } from "./constants/stores";
 
 export type Filters = {
   priceMax: number | null;
