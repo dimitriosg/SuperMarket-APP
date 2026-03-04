@@ -10,6 +10,7 @@ import { createAiSuggestionsRoutes } from "./routes/ai-suggestions.route";
 import { createProductRoutes } from "./routes/products.route";
 import { createAuthRoutes } from "./routes/auth.route";
 import { createRequestLogger, getRequestId, logger, resolveUserId } from "./utils/logger";
+import { cronGuard } from "./utils/cron-guard";
 
 const withPrefix = (prefix: string) =>
   new Elysia({ prefix })
@@ -94,13 +95,19 @@ export const app = createApiApp();
 if (import.meta.main) {
   app.listen(process.env.PORT || 3001);
 
+  const guardedSync = cronGuard(
+    "daily-price-sync",
+    () => ekatanalotisService.syncAll(),
+    { maxAttempts: 3, initialDelayMs: 5_000, maxTotalMs: 300_000 },
+  );
+
   const job = new CronJob(
     '0 1 2 * * *',
     async function () {
       logger.info("CRON_DAILY_PRICE_SYNC_TRIGGERED", {
         event: "CRON_DAILY_PRICE_SYNC_TRIGGERED",
       });
-      await ekatanalotisService.syncAll();
+      await guardedSync();
     },
     null,
     true,
