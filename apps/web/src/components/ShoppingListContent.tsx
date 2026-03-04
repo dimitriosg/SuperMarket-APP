@@ -30,6 +30,7 @@ export const ShoppingListContent: React.FC<ShoppingListContentProps> = ({ items,
   };
 
   return (
+    <Card>
     <div className="bg-white p-6 rounded-lg shadow-md dark:bg-slate-950">
       <h2 className="text-2xl font-bold mb-4 text-slate-900 dark:text-slate-100">Το Καλάθι μου</h2>
       {items.length === 0 ? (
@@ -84,6 +85,7 @@ export const ShoppingListContent: React.FC<ShoppingListContentProps> = ({ items,
           ))}
         </ul>
       )}
+      </div>
     </Card>
   );
 };
