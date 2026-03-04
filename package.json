@@ -13,9 +13,9 @@
   ],
   "scripts": {
     "dev": "concurrently -k -n api,web \"bun run --cwd apps/api dev\" \"bun run --cwd apps/web dev\"",
-    "lint": "bun --cwd apps/api run lint && bun --cwd apps/web run lint",    
-    "typecheck": "bun --cwd apps/api run typecheck && bun --cwd apps/web run typecheck",
-    "format": "bun --cwd apps/api r:contentReference[oaicite:4]{index=4}d apps/web run format",
+    "lint": "bun run --cwd apps/api lint && bun run --cwd apps/web lint",
+    "typecheck": "bun run --cwd apps/api typecheck && bun run --cwd apps/web typecheck",
+    "format": "bun run --cwd apps/api format && bun run --cwd apps/web format",
     "test:e2e": "playwright test",
     "db:up": "docker compose up -d",
     "db:migrate": "bunx prisma migrate dev --schema packages/db/prisma/schema.prisma",
