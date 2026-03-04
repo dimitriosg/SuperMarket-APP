@@ -3,7 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { shallow } from "zustand/shallow";
 import { useStore } from "../store";
-import { STORES_DATA, getStoreIdByName, DEFAULT_IMG } from "../services/api";
+import { DEFAULT_IMG } from "../services/api";
+import { STORES_DATA, getStoreIdByName } from "../constants/stores";
 import { ProductResult } from "../types";
 
 export function ProductDetailsPage() {

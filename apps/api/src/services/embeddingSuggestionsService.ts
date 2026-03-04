@@ -1,5 +1,5 @@
 import { prisma } from "../db";
-import type { Suggestion } from "../ai/suggestions.service";
+import type { Suggestion } from "./ai-suggestions.service";
 
 const DEFAULT_LIMIT = 5;
 const LOCAL_EMBEDDING_DIMENSION = 128;

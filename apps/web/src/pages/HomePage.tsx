@@ -10,6 +10,7 @@ import {
 import { ProductCard } from "../components/ProductCard";
 import { SearchHeader } from "../components/SearchHeader";
 import { StoreFilters } from "../components/StoreFilters";
+import { getStoreIdByName } from "../constants/stores";
 import { Button } from "../components/ui/Button";
 import { useProductSearch } from "../hooks/useProductSearch";
 import { getStoreIdByName } from "../services/api";
