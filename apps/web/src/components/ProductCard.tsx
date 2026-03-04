@@ -49,7 +49,8 @@ export function ProductCard({ product, isInBasket, onAdd, selectedStoreFilter }:
 
   return (
     <div className="bg-white p-5 rounded-3xl shadow-sm border border-slate-200 flex flex-col hover:border-indigo-300 transition-all group h-full relative dark:bg-slate-950 dark:border-slate-800 dark:hover:border-indigo-500/40">
-      
+    
+    <Card>
       {isExclusive && (
         <div className="absolute top-4 left-4 z-10 bg-amber-400 text-white text-[9px] font-black px-2 py-1 rounded-md shadow-sm uppercase tracking-wider pointer-events-none dark:bg-amber-300 dark:text-slate-900">
           ΑΠΟΚΛΕΙΣΤΙΚΟ
@@ -126,5 +127,6 @@ export function ProductCard({ product, isInBasket, onAdd, selectedStoreFilter }:
         {isInBasket ? "✓ Στο καλαθι" : "Προσθηκη"}
       </Button>
     </Card>
+    </div>
   );
 }
