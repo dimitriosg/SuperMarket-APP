@@ -17,3 +17,4 @@ export type HealthResponse = {
 
 export * from './chains';
 export * from './ingestion';
+export * from './dtos';

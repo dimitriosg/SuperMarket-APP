@@ -1,17 +1,19 @@
-// apps/api/src/routes/basket.route.ts
+import type { BasketAnalyzeRequestDto, BasketAnalyzeResponseDto } from '@supermarket/shared';
 import { Elysia, t } from 'elysia';
 import { BasketService } from '../services/basket.service';
 
 export const createBasketRoutes = () =>
-  new Elysia({ prefix: '/basket' })
-    .post('/analyze', async ({ body, set }) => {
+  new Elysia({ prefix: '/basket' }).post(
+    '/analyze',
+    async ({ body, set }): Promise<BasketAnalyzeResponseDto> => {
       try {
-        const result = await BasketService.calculateBasket(body.items);
+        const typedBody: BasketAnalyzeRequestDto = body;
+        const result = await BasketService.calculateBasket(typedBody.items);
         return {
           success: true,
           data: result
         };
-      } catch (error) {
+      } catch (_error) {
         set.status = 500;
         return {
           success: false,
@@ -20,13 +22,17 @@ export const createBasketRoutes = () =>
           }
         };
       }
-    }, {
+    },
+    {
       body: t.Object({
-        items: t.Array(t.Object({
-          ean: t.String(),
-          quantity: t.Number({ default: 1 })
-        }))
+        items: t.Array(
+          t.Object({
+            ean: t.String(),
+            quantity: t.Number({ default: 1 })
+          })
+        )
       })
-    });
+    }
+  );
 
 export const basketController = createBasketRoutes();
