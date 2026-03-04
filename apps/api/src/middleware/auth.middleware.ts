@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import { verifyJwt, type JwtPayload } from "../utils/jwt";
+import { getRequestId } from "../utils/logger";
 
 export const authMiddleware = new Elysia({ name: "authMiddleware" })
   .derive(({ headers, set }) => {
@@ -20,9 +21,10 @@ export const authMiddleware = new Elysia({ name: "authMiddleware" })
 
     return { userId: result.payload.userId, authError: false };
   })
-  .onBeforeHandle(({ authError, set }) => {
+  .onBeforeHandle(({ authError, set, headers }) => {
     if (authError) {
+      const requestId = getRequestId(headers);
       set.status = 401;
-      return { error: "UNAUTHORIZED", message: "Unauthorized" };
+      return { error: { code: "UNAUTHORIZED", message: "Unauthorized", requestId } };
     }
   });

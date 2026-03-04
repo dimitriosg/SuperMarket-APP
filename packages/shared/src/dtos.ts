@@ -51,3 +51,12 @@ export type BasketAnalyzeResponseDto =
         message: string;
       };
     };
+
+export type ApiErrorDto = {
+  error: {
+    code: string;
+    message: string;
+    requestId?: string;
+    details?: unknown;
+  };
+};
