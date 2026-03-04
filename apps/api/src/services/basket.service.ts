@@ -1,14 +1,10 @@
 // apps/api/src/services/basket.service.ts
+import type { CompareBasketItemDto, CompareBasketResultDto, CompareBasketStoreItemDto } from "@shared/contracts";
 import { db } from "../db";
-
-type BasketItem = {
-  ean: string;
-  quantity: number;
-};
 
 export class BasketService {
   
-  static async calculateBasket(items: BasketItem[]) {
+  static async calculateBasket(items: CompareBasketItemDto[]): Promise<CompareBasketResultDto[]> {
     console.log("🔍 Basket Request for items:", items);
     
     const eans = items.map(i => i.ean);
@@ -45,11 +41,11 @@ export class BasketService {
       totalCost: number;
       foundItems: number;
       missingItems: number;
-      items: any[];
+      items: CompareBasketStoreItemDto[];
     }>();
 
     // Κρατάμε μόνο την τελευταία τιμή για κάθε ζεύγος Store-Product
-    const latestPrices = new Map<string, any>(); 
+    const latestPrices = new Map<string, (typeof prices)[number]>(); 
 
     for (const p of prices) {
       const key = `${p.storeId}-${p.productId}`;

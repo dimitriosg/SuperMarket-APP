@@ -1,5 +1,6 @@
 // apps/api/src/routes/basket.route.ts
 import { Elysia, t } from 'elysia';
+import type { CompareBasketResponseDto } from '@shared/contracts';
 import { BasketService } from '../services/basket.service';
 
 export const basketController = new Elysia({ prefix: '/basket' })
@@ -7,10 +8,11 @@ export const basketController = new Elysia({ prefix: '/basket' })
     try {
       // body.items = [{ ean: "...", quantity: 1 }, ...]
       const result = await BasketService.calculateBasket(body.items);
-      return {
+      const response: CompareBasketResponseDto = {
         success: true,
         data: result
       };
+      return response;
     } catch (error) {
       set.status = 500;
       return {

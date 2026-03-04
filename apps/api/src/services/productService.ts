@@ -1,8 +1,9 @@
 // apps/api/src/services/productService.ts
 import type { Prisma } from "@prisma/client";
+import type { ProductSearchResultDto } from "@shared/contracts";
 import { prisma } from "../db";
 
-type ProductWithPrices = Prisma.ProductGetPayload<{
+type ProductSearchRecord = Prisma.ProductGetPayload<{
   include: {
     prices: {
       include: {
@@ -16,7 +17,7 @@ type ProductWithPrices = Prisma.ProductGetPayload<{
   };
 }>;
 
-type ProductPrice = ProductWithPrices["prices"][number];
+type ProductPrice = ProductSearchRecord["prices"][number];
 
 interface ProductOffer {
   store: string;
@@ -91,7 +92,7 @@ export const productService = {
 };
 
 // Helper για να μην γράφουμε διπλό κώδικα mapping
-function mapProductToFrontend(p: ProductWithPrices) {
+function mapProductToFrontend(p: ProductSearchRecord): ProductSearchResultDto {
   const uniqueOffers = new Map<string, ProductOffer>();
   p.prices.forEach((price: ProductPrice) => {
     const storeName = price.store?.chain?.label || price.store?.name || "Unknown";

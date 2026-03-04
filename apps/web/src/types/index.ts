@@ -1,3 +1,5 @@
+import type { CompareBasketResultDto } from "@shared/contracts";
+
 export type Offer = {
   store: string;
   price: string;
@@ -30,16 +32,4 @@ export interface StoreComparisonStat {
 }
 
 // ΝΕΟ: Η μορφή που στέλνει το Backend για το καλάθι
-export interface BasketComparisonResult {
-  storeName: string;
-  logo: string;
-  totalCost: number;
-  foundItems: number;
-  missingItems: number;
-  items: {
-    name: string;
-    price: number;
-    quantity: number;
-    subtotal: number;
-  }[];
-}
+export type BasketComparisonResult = CompareBasketResultDto;
