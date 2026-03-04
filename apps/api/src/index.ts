@@ -43,7 +43,8 @@ const app = new Elysia()
 
     const requestId = getRequestId(request?.headers);
     const userId = resolveUserId(request?.headers);
-    const requestLogger = createRequestLogger({ requestId, userId });
+    const route = `${request?.method ?? 'UNKNOWN'} ${new URL(request?.url ?? 'http://localhost/').pathname}`;
+    const requestLogger = createRequestLogger({ requestId, userId, route });
 
     if (status >= 500) {
       requestLogger.error('REQUEST_ERROR', {

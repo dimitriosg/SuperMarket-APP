@@ -139,7 +139,6 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: '/api/ai' })
   )
   .onError(({ code, error, set }) => {
     if (code === 'VALIDATION') {
-      set.status = 400;
       return sendApiError(set, {
         status: 400,
         code: 'INVALID_INPUT',
@@ -166,7 +165,6 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: '/api/ai' })
 
       try {
         if (!resolvedUserId) {
-          set.status = 401;
           return sendApiError(set, { status: 401, code: 'UNAUTHORIZED', message: 'Unauthorized' });
         }
 
@@ -237,16 +235,15 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: '/api/ai' })
           const errorMessage =
             result.error.error === 'AI_TIMEOUT' ? 'AI request timed out' : 'AI provider error';
 
-          set.status = 503;
-          return {
-            ...sendApiError(set, {
-              status: 503,
-              code: result.error.error,
-              message: errorMessage,
-            }),
-            fallback_suggestions: result.error.fallback_suggestions,
-            metadata: result.metadata,
-          };
+          return sendApiError(set, {
+            status: 503,
+            code: result.error.error,
+            message: errorMessage,
+            details: {
+              fallback_suggestions: result.error.fallback_suggestions,
+              metadata: result.metadata,
+            },
+          });
         }
 
         const responsePayload: SuggestionsResponse = {
@@ -272,7 +269,6 @@ export const aiSuggestionsRoutes = new Elysia({ prefix: '/api/ai' })
           error_type: error instanceof Error ? error.message : 'Unknown error',
         });
 
-        set.status = 500;
         return sendApiError(set, {
           status: 500,
           code: 'AI_ERROR',

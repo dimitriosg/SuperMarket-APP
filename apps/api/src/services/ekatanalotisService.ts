@@ -71,8 +71,8 @@ function isRemoteProduct(value: unknown): value is RemoteProduct {
   return true;
 }
 
-function parseRemoteProducts(value: unknown, route: string): RemoteProduct[] {
-  const requestLogger = createRequestLogger({ requestId: getRequestId(), route });
+function parseRemoteProducts(value: unknown, route: string, requestId: string): RemoteProduct[] {
+  const requestLogger = createRequestLogger({ requestId, route });
   if (!Array.isArray(value)) return [];
   return value.filter((item, index) => {
     if (!isRemoteProduct(item)) {
@@ -89,8 +89,8 @@ function parseRemoteProducts(value: unknown, route: string): RemoteProduct[] {
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const ekatanalotisService = {
-  async syncAll(route = 'system'): Promise<SyncResult> {
-    const requestLogger = createRequestLogger({ requestId: getRequestId(), route });
+  async syncAll(route = 'system', requestId = getRequestId()): Promise<SyncResult> {
+    const requestLogger = createRequestLogger({ requestId, route });
     requestLogger.info('SYNC_STARTED', { event: 'SYNC_STARTED' });
     const startTime = Date.now();
 
@@ -107,7 +107,11 @@ export const ekatanalotisService = {
       if (!response.ok) throw new Error(`Fetch failed: ${response.status}`);
 
       const json = await response.json();
-      const products = parseRemoteProducts(json.context?.MAPP_PRODUCTS?.result?.products, route);
+      const products = parseRemoteProducts(
+        json.context?.MAPP_PRODUCTS?.result?.products,
+        route,
+        requestId
+      );
 
       if (products.length === 0) throw new Error('No products found.');
 
@@ -241,7 +245,8 @@ export const ekatanalotisService = {
     maxDelayMs: number;
     route: string;
   }): Promise<SyncResult & { attempts: number }> {
-    const requestLogger = createRequestLogger({ requestId: getRequestId(), route: params.route });
+    const retryRequestId = getRequestId();
+    const requestLogger = createRequestLogger({ requestId: retryRequestId, route: params.route });
 
     let attempt = 0;
     let delayMs = params.initialDelayMs;
@@ -255,7 +260,7 @@ export const ekatanalotisService = {
         max_attempts: params.maxAttempts,
       });
 
-      lastResult = await this.syncAll(params.route);
+      lastResult = await this.syncAll(params.route, retryRequestId);
       if (lastResult.success) {
         return { ...lastResult, attempts: attempt };
       }
