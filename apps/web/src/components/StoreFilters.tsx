@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { shallow } from "zustand/shallow";
-import { STORES_DATA, LOCATIONS } from "../services/api";
+import { STORES_DATA, LOCATIONS } from "../constants/stores";
 import { useStore } from "../store";
 
 type Props = {

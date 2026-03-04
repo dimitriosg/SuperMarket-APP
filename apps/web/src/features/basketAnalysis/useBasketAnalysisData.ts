@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
-import { api, LOCATIONS, STORES_DATA, getStoreIdByName } from "../../services/api";
+import { api } from "../../services/api";
+import { LOCATIONS, STORES_DATA, getStoreIdByName } from "../../constants/stores";
 import { ProductResult } from "../../types";
 import { toProductUI, toRegionUI, toStoreUI, ProductDataRow } from "./adapters";
 import { ProductUI, RegionUI, StoreUI } from "./types";

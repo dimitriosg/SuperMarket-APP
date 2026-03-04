@@ -6,7 +6,7 @@ import { SearchHeader } from "../components/SearchHeader";
 import { ProductCard } from "../components/ProductCard";
 import { BasketSidebar } from "../components/BasketSidebar";
 import { StoreFilters } from "../components/StoreFilters";
-import { getStoreIdByName } from "../services/api";
+import { getStoreIdByName } from "../constants/stores";
 import { Button } from "../components/ui/Button";
 
 // --- WELCOME HERO (Το κρατάμε ίδιο) ---

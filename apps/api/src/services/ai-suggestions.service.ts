@@ -42,7 +42,7 @@ export interface SuggestionsResponse {
  * Rule-based fallback suggestions
  * Triggered when AI fails or times out
  */
-async function generateFallbackSuggestions(items: string[]): Promise<Suggestion[]> {
+export async function generateFallbackSuggestions(items: string[]): Promise<Suggestion[]> {
   const embeddingSuggestions = await embeddingSuggestionsService.getSuggestions(items, 5);
   if (embeddingSuggestions.length > 0) {
     return embeddingSuggestions;

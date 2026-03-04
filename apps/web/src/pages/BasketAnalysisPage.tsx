@@ -3,7 +3,8 @@ import { Link } from "react-router-dom";
 import { shallow } from "zustand/shallow";
 import { BasketBuilder } from "../components/BasketBuilder";
 import { useStore } from "../store";
-import { DEFAULT_IMG, getStoreIdByName } from "../services/api";
+import { DEFAULT_IMG } from "../services/api";
+import { getStoreIdByName } from "../constants/stores";
 
 export function BasketAnalysisPage() {
   const {
