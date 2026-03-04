@@ -13,8 +13,8 @@
   ],
   "scripts": {
     "dev": "concurrently -k -n api,web \"bun run --cwd apps/api dev\" \"bun run --cwd apps/web dev\"",
-    "lint": "bun run lint --cwd apps/api && bun run lint --cwd apps/web",
-    "typecheck": "bun run typecheck --cwd apps/api && bun run typecheck --cwd apps/web",
+    "lint": "bun --cwd apps/api run lint && bun --cwd apps/web run lint",
+    "typecheck": "bun --cwd apps/api run typecheck && bun --cwd apps/web run typecheck",
     "format": "bun run format --cwd apps/api && bun run format --cwd apps/web",
     "test:e2e": "playwright test",
     "db:up": "docker compose up -d",
