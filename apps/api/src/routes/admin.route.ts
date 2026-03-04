@@ -1,7 +1,8 @@
 import { Elysia } from "elysia";
 import { ekatanalotisService } from "../services/ekatanalotisService";
 
-export const adminRoutes = new Elysia({ prefix: "/admin" })
+export const createAdminRoutes = () =>
+  new Elysia({ prefix: "/admin" })
   .post("/sync-prices", () => {
     // ΔΕΝ βάζουμε await εδώ. Το αφήνουμε να τρέξει στο background.
     console.log("⚡ Admin Trigger received. Starting background task...");
@@ -18,3 +19,5 @@ export const adminRoutes = new Elysia({ prefix: "/admin" })
       message: "Sync started in the background. Check server logs for progress."
     };
   });
+
+export const adminRoutes = createAdminRoutes();

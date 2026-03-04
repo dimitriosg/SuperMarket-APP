@@ -120,7 +120,8 @@ const buildCacheKey = async (params: {
   return `ai:suggestions:dedupe:${hash}`;
 };
 
-export const aiSuggestionsRoutes = new Elysia({ prefix: "/api/ai" })
+export const createAiSuggestionsRoutes = () =>
+  new Elysia({ prefix: "/ai" })
   .use(
     rateLimitMiddleware({
       redis,
@@ -320,3 +321,6 @@ async function logSuggestionRequest(data: {
     });
   }
 }
+
+
+export const aiSuggestionsRoutes = createAiSuggestionsRoutes();
