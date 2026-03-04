@@ -2,7 +2,7 @@ Repo: dimitriosg/SuperMarket-APP
 Base branch: adjustments-190126
 
 Goal:
-Fix my local branch divergence and get PR1 ready by rebasing PR1 on top of the latest adjustments-190126, then ensure the repo passes the practical merge gates (shared typecheck + web build).
+Fix my local branch divergence and get PR1 ready by rebasing PR1 on top of the latest adjustments-190126, then ensure the repo passes the practical merge gates (shared typecheck + web build). If adjustments-190126 has diverged, do not change it directly. Create a new branch from the current state (backup-<date>) and open a PR if it contains meaningful changes. Otherwise proceed with PR1 rebase only.”
 
 Scope:
 1) Determine whether my local adjustments-190126 has unpushed commits.
