@@ -60,7 +60,7 @@ export const AISuggestionsPanel: React.FC<AISuggestionsPanelProps> = ({
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium dark:bg-blue-500 dark:hover:bg-blue-400"
           >
             🎯 Δώσε μου ιδέες
-          </Button>
+          </button>
         </div>
       )}
 
@@ -89,7 +89,7 @@ export const AISuggestionsPanel: React.FC<AISuggestionsPanelProps> = ({
             className="mt-2 text-sm text-red-600 hover:text-red-700 font-medium underline dark:text-red-300 dark:hover:text-red-200"
           >
             Δοκίμασε ξανά
-          </Button>
+          </button>
         </div>
       )}
 

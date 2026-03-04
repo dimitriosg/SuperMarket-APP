@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { ShoppingItem } from "../hooks/useShoppingList";
 import { Button } from "./ui/Button";
-import { Card } from "./ui/Card";
 import { Input } from "./ui/Input";
 
 interface ShoppingListContentProps {
@@ -84,6 +83,6 @@ export const ShoppingListContent: React.FC<ShoppingListContentProps> = ({ items,
           ))}
         </ul>
       )}
-    </Card>
+    </div>
   );
 };

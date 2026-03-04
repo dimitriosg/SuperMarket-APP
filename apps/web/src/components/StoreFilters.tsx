@@ -32,6 +32,8 @@ export function StoreFilters({ isOpen, onToggle, showOnboarding, onDismissOnboar
   
   const [isStoresListExpanded, setIsStoresListExpanded] = useState(true);
 
+  const enabledStores = selectedStores;
+
   // --- 1. ΚΛΕΙΣΤΗ ΜΟΡΦΗ (SLIM) ---
   if (!isOpen) {
     return (
