@@ -1,7 +1,7 @@
 import { Elysia, t } from 'elysia';
 import { db } from '../db';
 
-export const productRoutes = new Elysia({ prefix: '/products' })
+export const createProductRoutes = () => new Elysia({ prefix: '/products' })
   .get('/search', async ({ query: { q } }) => {
     // 1. Validation
     if (!q || q.length < 2) return [];
@@ -61,4 +61,8 @@ export const productRoutes = new Elysia({ prefix: '/products' })
         offers
       };
     });
+  }, {
+    query: t.Object({ q: t.String() })
   });
+
+export const productRoutes = createProductRoutes();

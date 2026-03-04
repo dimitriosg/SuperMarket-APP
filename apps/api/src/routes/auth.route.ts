@@ -11,7 +11,8 @@ const invalidCredentialsResponse = (set: { status: number }) => {
   return { error: "INVALID_CREDENTIALS", message: "Invalid email or password" };
 };
 
-export const authRoutes = new Elysia({ prefix: "/api/auth" })
+export const createAuthRoutes = () =>
+  new Elysia({ prefix: "/auth" })
   .post(
     "/login",
     async ({ body, set }) => {
@@ -99,3 +100,6 @@ export const authRoutes = new Elysia({ prefix: "/api/auth" })
       }),
     }
   );
+
+
+export const authRoutes = createAuthRoutes();
