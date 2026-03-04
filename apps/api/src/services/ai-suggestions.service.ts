@@ -1,17 +1,6 @@
 // apps/api/src/services/ai-suggestions.service.ts
 
-import OpenAI, {
-  APIConnectionError,
-  APIError,
-  AuthenticationError,
-  BadRequestError,
-  ConflictError,
-  InternalServerError,
-  NotFoundError,
-  PermissionDeniedError,
-  RateLimitError,
-  UnprocessableEntityError,
-} from "@openai/sdk";
+import OpenAI from "openai";
 import { embeddingSuggestionsService } from "./embeddingSuggestionsService";
 
 export interface SuggestionsRequest {
@@ -196,16 +185,17 @@ export async function generateSuggestions(
 
     const isTimeout = error instanceof Error && error.name === "AbortError";
     const isParseError = error instanceof Error && error.message === "AI_PARSE_ERROR";
-    const isRateLimited = error instanceof RateLimitError;
-    const isBadRequest = error instanceof BadRequestError;
+    const isRateLimited = error instanceof Error && error.name === "RateLimitError";
+    const isBadRequest = error instanceof Error && error.name === "BadRequestError";
     const isAuthError =
-      error instanceof AuthenticationError || error instanceof PermissionDeniedError;
-    const isNotFound = error instanceof NotFoundError;
-    const isConflict = error instanceof ConflictError;
-    const isUnprocessable = error instanceof UnprocessableEntityError;
-    const isInternalError = error instanceof InternalServerError;
-    const isConnectionError = error instanceof APIConnectionError;
-    const isApiError = error instanceof APIError;
+      (error instanceof Error && error.name === "AuthenticationError") ||
+      (error instanceof Error && error.name === "PermissionDeniedError");
+    const isNotFound = error instanceof Error && error.name === "NotFoundError";
+    const isConflict = error instanceof Error && error.name === "ConflictError";
+    const isUnprocessable = error instanceof Error && error.name === "UnprocessableEntityError";
+    const isInternalError = error instanceof Error && error.name === "InternalServerError";
+    const isConnectionError = error instanceof Error && error.name === "APIConnectionError";
+    const isApiError = error instanceof OpenAI.APIError;
     const openAiErrorType = [
       isRateLimited && "RateLimitError",
       isBadRequest && "BadRequestError",
