@@ -1,27 +1,29 @@
 import { Elysia, t } from "elysia";
 import { db } from "../db";
 import { signJwt, verifyJwt, type JwtPayload } from "../utils/jwt";
+import { getRequestId } from "../utils/logger";
 import { verifyPassword } from "../utils/password";
 
 const ACCESS_TOKEN_TTL_SECONDS = 60 * 60 * 24;
 const REFRESH_TOKEN_TTL_SECONDS = 60 * 60 * 24 * 7;
 
-const invalidCredentialsResponse = (set: { status: number }) => {
+const invalidCredentialsResponse = (set: { status?: number | string }, requestId: string) => {
   set.status = 401;
-  return { error: "INVALID_CREDENTIALS", message: "Invalid email or password" };
+  return { error: { code: "INVALID_CREDENTIALS", message: "Invalid email or password", requestId } };
 };
 
 export const createAuthRoutes = () =>
   new Elysia({ prefix: "/auth" })
   .post(
     "/login",
-    async ({ body, set }) => {
+    async ({ body, set, headers }) => {
       const { email, password } = body;
       const secret = process.env.JWT_SECRET;
+      const requestId = getRequestId(headers);
 
       if (!secret) {
         set.status = 500;
-        return { error: "AUTH_UNAVAILABLE", message: "Authentication unavailable" };
+        return { error: { code: "AUTH_UNAVAILABLE", message: "Authentication unavailable", requestId } };
       }
 
       const user = await db.user.findUnique({
@@ -30,12 +32,12 @@ export const createAuthRoutes = () =>
       });
 
       if (!user) {
-        return invalidCredentialsResponse(set);
+        return invalidCredentialsResponse(set, requestId);
       }
 
       const isValid = await verifyPassword(password, user.passwordHash);
       if (!isValid) {
-        return invalidCredentialsResponse(set);
+        return invalidCredentialsResponse(set, requestId);
       }
 
       const accessToken = signJwt(
@@ -63,19 +65,20 @@ export const createAuthRoutes = () =>
   )
   .post(
     "/refresh",
-    async ({ body, set }) => {
+    async ({ body, set, headers }) => {
       const { refreshToken } = body;
       const secret = process.env.JWT_SECRET;
+      const requestId = getRequestId(headers);
 
       if (!secret) {
         set.status = 500;
-        return { error: "AUTH_UNAVAILABLE", message: "Authentication unavailable" };
+        return { error: { code: "AUTH_UNAVAILABLE", message: "Authentication unavailable", requestId } };
       }
 
       const result = verifyJwt<JwtPayload>(refreshToken, secret);
       if (!result.valid || result.payload.tokenType !== "refresh") {
         set.status = 401;
-        return { error: "INVALID_TOKEN", message: "Invalid refresh token" };
+        return { error: { code: "INVALID_TOKEN", message: "Invalid refresh token", requestId } };
       }
 
       const accessToken = signJwt(

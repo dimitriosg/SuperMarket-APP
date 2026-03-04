@@ -83,6 +83,7 @@ export const createApiApp = () =>
         error: {
           code,
           message,
+          requestId,
           ...(details ? { details } : {}),
         },
       };

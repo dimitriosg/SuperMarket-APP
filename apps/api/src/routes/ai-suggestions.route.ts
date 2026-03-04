@@ -131,13 +131,17 @@ export const createAiSuggestionsRoutes = () =>
       getUserId,
     })
   )
-  .onError(({ code, error, set }) => {
+  .onError(({ code, error, set, request }) => {
     if (code === "VALIDATION") {
+      const requestId = getRequestId(request?.headers);
       set.status = 400;
       return {
-        error: "INVALID_INPUT",
-        message: "Request validation failed",
-        details: formatValidationErrors(error),
+        error: {
+          code: "INVALID_INPUT",
+          message: "Request validation failed",
+          requestId,
+          details: formatValidationErrors(error),
+        },
       };
     }
   })
@@ -156,7 +160,7 @@ export const createAiSuggestionsRoutes = () =>
       try {
         if (!resolvedUserId) {
           set.status = 401;
-          return { error: "UNAUTHORIZED", message: "Unauthorized" };
+          return { error: { code: "UNAUTHORIZED", message: "Unauthorized", requestId } };
         }
 
         requestLogger.info("AI_SUGGESTION_REQUEST", {
@@ -228,8 +232,11 @@ export const createAiSuggestionsRoutes = () =>
 
           set.status = 503;
           return {
-            error: result.error.error,
-            message: errorMessage,
+            error: {
+              code: result.error.error,
+              message: errorMessage,
+              requestId,
+            },
             fallback_suggestions: result.error.fallback_suggestions,
             metadata: result.metadata,
           };
@@ -260,8 +267,11 @@ export const createAiSuggestionsRoutes = () =>
 
         set.status = 500;
         return {
-          error: "AI_ERROR",
-          message: error instanceof Error ? error.message : "Unknown error",
+          error: {
+            code: "AI_ERROR",
+            message: error instanceof Error ? error.message : "Unknown error",
+            requestId,
+          },
         };
       } finally {
         const latencyMs = Date.now() - startTime;
