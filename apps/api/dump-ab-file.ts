@@ -1,5 +1,6 @@
 // apps/api/dump-ab-file.ts
 import { PrismaClient } from "@prisma/client";
+import { logger } from "./src/utils/logger";
 
 const prisma = new PrismaClient();
 
@@ -9,12 +10,12 @@ async function dumpFromFile() {
     const file = Bun.file(path);
 
     if (!(await file.exists())) {
-      console.error("❌ Το αρχείο δεν βρέθηκε!");
+      logger.error("DUMP_AB_FILE_NOT_FOUND", { event: "DUMP_AB_FILE_NOT_FOUND", module: "dump-ab-file" });
       return;
     }
 
     const text = await file.text();
-    console.log("🧹 Εκτελώ 'Brute Force' καθαρισμό...");
+    logger.info("DUMP_AB_FILE_CLEANING", { event: "DUMP_AB_FILE_CLEANING", module: "dump-ab-file" });
 
     // 1. Αφαιρούμε ΟΛΟΥΣ τους χαρακτήρες αλλαγής γραμμής και tabs
     // 2. Αντικαθιστούμε τα NBSP (\u00A0) με κανονικά κενά
@@ -28,19 +29,19 @@ async function dumpFromFile() {
       .replace(/\s+/g, " ")         // Σύμπτυξη πολλαπλών κενών σε ένα
       .trim();
 
-    console.log("🎯 Προσπάθεια Parsing...");
+    logger.info("DUMP_AB_FILE_PARSING", { event: "DUMP_AB_FILE_PARSING", module: "dump-ab-file" });
     const json = JSON.parse(cleanJson);
     const products = json.data?.categoryProductSearch?.products || [];
 
     if (products.length === 0) {
-      console.error("❌ Το JSON διαβάστηκε αλλά η λίστα προϊόντων είναι άδεια.");
+      logger.error("DUMP_AB_FILE_EMPTY_LIST", { event: "DUMP_AB_FILE_EMPTY_LIST", module: "dump-ab-file" });
       return;
     }
 
     const store = await prisma.store.findFirst({ where: { name: { contains: "ab" } } });
     if (!store) throw new Error("Store AB not found");
 
-    console.log(`🚀 Βρέθηκαν ${products.length} προϊόντα. Ενημέρωση DB...`);
+    logger.info("DUMP_AB_FILE_SYNCING", { event: "DUMP_AB_FILE_SYNCING", module: "dump-ab-file", count: products.length });
 
     for (const item of products) {
       const priceValue = item.price?.current?.value || 0;
@@ -65,13 +66,12 @@ async function dumpFromFile() {
           collectedAt: new Date() 
         }
       });
-      console.log(`✅ Καταχωρήθηκε: ${item.name}`);
+      logger.info("DUMP_AB_FILE_ITEM_SAVED", { event: "DUMP_AB_FILE_ITEM_SAVED", module: "dump-ab-file", name: item.name });
     }
 
-    console.log("\n✨ ΕΠΙΤΥΧΙΑ! Ο συγχρονισμός ολοκληρώθηκε.");
+    logger.info("DUMP_AB_FILE_COMPLETE", { event: "DUMP_AB_FILE_COMPLETE", module: "dump-ab-file" });
   } catch (err: any) {
-    console.error("❌ ΑΠΟΤΥΧΙΑ PARSING:");
-    console.error(err.message);
+    logger.error("DUMP_AB_FILE_PARSE_FAILED", { event: "DUMP_AB_FILE_PARSE_FAILED", module: "dump-ab-file", message: err.message });
     
     // Αν αποτύχει, θα μας δείξει πού ακριβώς "σκαλώνει"
     const pos = err.message.match(/at position (\d+)/);

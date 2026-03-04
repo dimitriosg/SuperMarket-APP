@@ -1,5 +1,6 @@
 // apps/api/force-ab.ts
 import { PrismaClient } from "@prisma/client";
+import { logger } from "./src/utils/logger";
 
 const prisma = new PrismaClient();
 
@@ -15,17 +16,20 @@ const HEADERS = {
 };
 
 async function forceIngest() {
-  console.log("🚀 Starting Force Ingestion for AB...");
+  logger.info("FORCE_AB_STARTED", { event: "FORCE_AB_STARTED", module: "force-ab" });
   
   const res = await fetch(AB_URL, { headers: HEADERS });
   const json = await res.json() as any;
   const products = json.data?.categoryProductSearch?.products || [];
 
-  console.log(`📦 Found ${products.length} products. Syncing to DB...`);
+  logger.info("FORCE_AB_PRODUCTS_FOUND", { event: "FORCE_AB_PRODUCTS_FOUND", module: "force-ab", count: products.length });
 
   // Βρίσκουμε το storeId του ΑΒ
   const store = await prisma.store.findFirst({ where: { name: { contains: "ab" } } });
-  if (!store) return console.error("AB Store not found in DB");
+  if (!store) {
+    logger.error("FORCE_AB_STORE_NOT_FOUND", { event: "FORCE_AB_STORE_NOT_FOUND", module: "force-ab" });
+    return;
+  }
 
   for (const item of products) {
     const price = item.price?.current?.value || item.price?.unitPrice || 0;
@@ -52,7 +56,7 @@ async function forceIngest() {
     });
   }
 
-  console.log("✅ Sync Complete!");
+  logger.info("FORCE_AB_COMPLETE", { event: "FORCE_AB_COMPLETE", module: "force-ab" });
 }
 
 forceIngest();

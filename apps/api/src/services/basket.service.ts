@@ -1,5 +1,6 @@
 // apps/api/src/services/basket.service.ts
 import { db } from "../db";
+import { logger } from "../utils/logger";
 
 type BasketItem = {
   ean: string;
@@ -9,7 +10,7 @@ type BasketItem = {
 export class BasketService {
   
   static async calculateBasket(items: BasketItem[]) {
-    console.log("🔍 Basket Request for items:", items);
+    logger.info("BASKET_REQUEST", { event: "BASKET_REQUEST", module: "BasketService", items });
     
     const eans = items.map(i => i.ean);
 
@@ -19,7 +20,7 @@ export class BasketService {
       select: { id: true, ean: true, name: true, imageUrl: true }
     });
 
-    console.log(`✅ Found ${products.length} / ${items.length} products in DB.`);
+    logger.info("BASKET_PRODUCTS_FOUND", { event: "BASKET_PRODUCTS_FOUND", module: "BasketService", found: products.length, requested: items.length });
     if (products.length === 0) return []; // Αν δεν βρήκαμε τίποτα, επιστρέφουμε κενό
 
     const productIds = products.map(p => p.id);
@@ -36,7 +37,7 @@ export class BasketService {
       orderBy: { collectedAt: 'desc' }
     });
 
-    console.log(`💰 Found ${prices.length} price records.`);
+    logger.info("BASKET_PRICES_FOUND", { event: "BASKET_PRICES_FOUND", module: "BasketService", priceCount: prices.length });
 
     // 3. Οργάνωση ανά Κατάστημα
     const storeBaskets = new Map<string, {
@@ -59,7 +60,7 @@ export class BasketService {
       }
     }
 
-    console.log(`📉 Unique Prices (Latest): ${latestPrices.size}`);
+    logger.info("BASKET_UNIQUE_PRICES", { event: "BASKET_UNIQUE_PRICES", module: "BasketService", uniquePrices: latestPrices.size });
 
     // 4. Υπολογισμός Συνόλων
     for (const price of latestPrices.values()) {
@@ -115,7 +116,7 @@ export class BasketService {
         return a.totalCost - b.totalCost;
       });
 
-    console.log(`🏁 Returning ${results.length} store options.`);
+    logger.info("BASKET_RESULTS", { event: "BASKET_RESULTS", module: "BasketService", storeOptions: results.length });
     return results;
   }
 }

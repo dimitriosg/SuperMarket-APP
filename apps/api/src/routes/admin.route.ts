@@ -1,16 +1,23 @@
 import { Elysia } from "elysia";
 import { ekatanalotisService } from "../services/ekatanalotisService";
+import { createRequestLogger, getRequestId } from "../utils/logger";
 
 export const createAdminRoutes = () =>
   new Elysia({ prefix: "/admin" })
-  .post("/sync-prices", () => {
-    // ΔΕΝ βάζουμε await εδώ. Το αφήνουμε να τρέξει στο background.
-    console.log("⚡ Admin Trigger received. Starting background task...");
+  .post("/sync-prices", ({ headers }) => {
+    const requestId = getRequestId(headers);
+    const reqLog = createRequestLogger({ requestId });
+
+    reqLog.info("ADMIN_SYNC_TRIGGERED", { event: "ADMIN_SYNC_TRIGGERED", route: "POST /admin/sync-prices" });
     
     ekatanalotisService.syncAll().then((res) => {
-        console.log("🏁 Background Sync Finished:", res);
+        reqLog.info("BACKGROUND_SYNC_FINISHED", { event: "BACKGROUND_SYNC_FINISHED", module: "admin", result: res });
     }).catch(err => {
-        console.error("💥 Background Sync Crashed:", err);
+        reqLog.error("BACKGROUND_SYNC_CRASHED", {
+          event: "BACKGROUND_SYNC_CRASHED",
+          module: "admin",
+          message: err instanceof Error ? err.message : String(err),
+        });
     });
 
     // Απαντάμε αμέσως στον χρήστη/curl

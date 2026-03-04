@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import fs from "fs";
 import path from "path";
+import { logger } from "../utils/logger";
 
 const prisma = new PrismaClient();
 
@@ -8,10 +9,10 @@ async function sync() {
   // Χρησιμοποιούμε absolute path για να μη χθούμε
   const filePath = path.resolve("C:/DEV/SuperMarket/SuperMarket-APP/apps/api/src/ingestion/ab-data.json");
   
-  console.log(`📂 Ανάγνωση από: ${filePath}`);
+  logger.info("SYNC_AB_READING", { event: "SYNC_AB_READING", module: "ingestion/sync-ab", filePath });
   
   if (!fs.existsSync(filePath)) {
-    console.error("❌ ΤΟ ΑΡΧΕΙΟ ΔΕΝ ΒΡΕΘΗΚΕ ΣΤΗ ΔΙΑΔΡΟΜΗ!");
+    logger.error("SYNC_AB_FILE_NOT_FOUND", { event: "SYNC_AB_FILE_NOT_FOUND", module: "ingestion/sync-ab", filePath });
     return;
   }
 
@@ -21,11 +22,11 @@ async function sync() {
 
   const store = await prisma.store.findFirst({ where: { name: { contains: "ab" } } });
   if (!store) {
-    console.error("❌ Δεν βρέθηκε το κατάστημα AB στη βάση. Τρέξε πρώτα το seed!");
+    logger.error("SYNC_AB_STORE_NOT_FOUND", { event: "SYNC_AB_STORE_NOT_FOUND", module: "ingestion/sync-ab" });
     return;
   }
 
-  console.log(`🚀 Συγχρονισμός ${products.length} προϊόντων...`);
+  logger.info("SYNC_AB_STARTED", { event: "SYNC_AB_STARTED", module: "ingestion/sync-ab", productCount: products.length });
 
   for (const item of products) {
     const priceValue = item.price?.value || 0;
@@ -58,7 +59,7 @@ async function sync() {
     }
   }
 
-  console.log("✨ ΤΕΛΟΣ! Ο ΑΒ συγχρονίστηκε.");
+  logger.info("SYNC_AB_COMPLETE", { event: "SYNC_AB_COMPLETE", module: "ingestion/sync-ab" });
 }
 
-sync().catch(console.error);
+sync().catch((err) => logger.error("SYNC_AB_FATAL", { event: "SYNC_AB_FATAL", module: "ingestion/sync-ab", message: err instanceof Error ? err.message : String(err) }));

@@ -1,5 +1,6 @@
 // apps/api/dump-ab.ts
 import { PrismaClient } from "@prisma/client";
+import { logger } from "./src/utils/logger";
 const prisma = new PrismaClient();
 
 // ΚΑΝΕ PASTE ΟΛΟ ΤΟ JSON ΠΟΥ ΑΝΤΙΓΡΑΨΕΣ ΜΕΣΑ ΣΤΑ BACKTICKS
@@ -9,10 +10,13 @@ async function dump() {
   const data = JSON.parse(rawJson);
   const products = data.data.categoryProductSearch.products;
   
-  console.log(`🚀 Φορτώνω ${products.length} προϊόντα στη βάση...`);
+  logger.info("DUMP_AB_STARTED", { event: "DUMP_AB_STARTED", module: "dump-ab", count: products.length });
 
   const store = await prisma.store.findFirst({ where: { name: { contains: "ab" } } });
-  if (!store) return console.error("Δεν βρέθηκε ο ΑΒ στη βάση!");
+  if (!store) {
+    logger.error("DUMP_AB_STORE_NOT_FOUND", { event: "DUMP_AB_STORE_NOT_FOUND", module: "dump-ab" });
+    return;
+  }
 
   for (const item of products) {
     const price = item.price?.current?.value || item.price?.unitPrice || 0;
@@ -31,7 +35,7 @@ async function dump() {
       data: { productId: dbProduct.id, price: price.toString(), collectedAt: new Date() }
     });
   }
-  console.log("✅ Τέλος! Κάνε refresh το frontend σου.");
+  logger.info("DUMP_AB_COMPLETE", { event: "DUMP_AB_COMPLETE", module: "dump-ab" });
 }
 
 dump();
