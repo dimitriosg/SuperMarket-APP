@@ -100,7 +100,12 @@ const storeCreator: StateCreator<StoreState, [], [], StoreState> = (set, get) =>
           .filter((item) => item.quantity > 0)
       })),
     clearBasket: () => set({ basket: [] }),
-    setBasket: (items) => set({ basket: items }),
+    setBasket: (items) =>
+      set({
+        basket: items.filter(
+          (item) => typeof item.id === "string" && item.id !== "" && item.quantity > 0
+        ),
+      }),
     toggleBasket: () => set((state) => ({ isBasketOpen: !state.isBasketOpen })),
     togglePin: () => set((state) => ({ isPinned: !state.isPinned })),
     setBasketOpen: (open) => set({ isBasketOpen: open }),

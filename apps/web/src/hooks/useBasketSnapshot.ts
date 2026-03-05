@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useRef } from "react";
 import { useStore } from "../store";
 import { useLocalStorageState } from "./useLocalStorageState";
 import {
@@ -11,6 +11,14 @@ export type BasketSnapshot = {
   items: BasketItem[];
   savedAt: string;
 };
+
+/** Stable signature derived from basket contents (sorted id:qty pairs). */
+function basketSignature(items: BasketItem[]): string {
+  return items
+    .map((i) => `${i.id}:${i.quantity}`)
+    .sort()
+    .join(",");
+}
 
 /**
  * Persists the last non-empty basket to localStorage and exposes
@@ -30,11 +38,16 @@ export function useBasketSnapshot() {
     false,
   );
 
+  const prevSigRef = useRef<string>("");
+
   useEffect(() => {
-    // Save snapshot whenever basket is non-empty
-    if (basket.length > 0) {
-      setSnapshot({ items: basket, savedAt: new Date().toISOString() });
-    }
+    if (basket.length === 0) return;
+
+    const sig = basketSignature(basket);
+    if (sig === prevSigRef.current) return;
+
+    prevSigRef.current = sig;
+    setSnapshot({ items: basket, savedAt: new Date().toISOString() });
     // Note: we intentionally do NOT clear the snapshot when basket becomes empty,
     // because that is when we want to offer restore.
   }, [basket, setSnapshot]);
