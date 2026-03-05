@@ -2,11 +2,12 @@ import { useStore } from "../../store";
 import { useLocalStorageState } from "../../hooks/useLocalStorageState";
 import { Card } from "../ui/Card";
 import { Button } from "../ui/Button";
+import { QUICKSTART_DISMISSED_KEY } from "../../constants/onboarding";
 
 export function QuickStartBasketPrompt() {
   const setBasketOpen = useStore((s) => s.actions.setBasketOpen);
   const [dismissed, setDismissed] = useLocalStorageState<boolean>(
-    "quickstart_v1_dismissed",
+    QUICKSTART_DISMISSED_KEY,
     false
   );
 
@@ -38,7 +39,7 @@ export function QuickStartBasketPrompt() {
           Διάλεξε έτοιμη λίστα
         </Button>
         <Button variant="secondary" size="md" onClick={handleDismiss}>
-          Οχι τώρα
+          Όχι τώρα
         </Button>
       </div>
     </Card>

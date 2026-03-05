@@ -14,6 +14,7 @@ import { useOnboardingProgress } from "../hooks/useOnboardingProgress";
 import { GuidedEmptyState } from "../components/empty-states/GuidedEmptyState";
 import { QuickStartBasketPrompt } from "../components/basket/QuickStartBasketPrompt";
 import { useLocalStorageState } from "../hooks/useLocalStorageState";
+import { QUICKSTART_DISMISSED_KEY } from "../constants/onboarding";
 
 // --- WELCOME HERO (Το κρατάμε ίδιο) ---
 type HeroProps = {
@@ -100,7 +101,7 @@ export function HomePage() {
   // --- Onboarding progress tracking ---
   const onboarding = useOnboardingProgress();
   const prevBasketLen = useRef(basket.length);
-  const [quickstartDismissed] = useLocalStorageState<boolean>("quickstart_v1_dismissed", false);
+  const [quickstartDismissed] = useLocalStorageState<boolean>(QUICKSTART_DISMISSED_KEY, false);
 
   const showQuickStart =
     onboarding.progress.firstSearchSuccess &&
