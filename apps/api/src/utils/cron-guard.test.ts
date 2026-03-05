@@ -1,4 +1,4 @@
-import { describe, it, expect, mock, beforeEach } from "bun:test";
+import { describe, it, expect, mock } from "bun:test";
 import { cronGuard } from "./cron-guard";
 
 /* Silence logger output during tests */
