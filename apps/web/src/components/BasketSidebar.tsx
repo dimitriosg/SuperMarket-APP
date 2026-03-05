@@ -195,7 +195,7 @@ export function BasketSidebar() {
                {loadingSuggestions ? (
                    <div className="animate-pulse text-indigo-400 font-bold dark:text-indigo-300">Φόρτωση προτάσεων...</div>
                ) : (
-                   <div className="w-full space-y-3">
+                   <div id="basket-quick-lists" className="w-full space-y-3">
                       <div className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 text-left dark:text-slate-500">
                         Εξοικονομείς χρόνο με έτοιμες λίστες
                       </div>

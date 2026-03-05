@@ -12,6 +12,9 @@ import { Button } from "../components/ui/Button";
 import { OnboardingChecklist } from "../components/onboarding/OnboardingChecklist";
 import { useOnboardingProgress } from "../hooks/useOnboardingProgress";
 import { GuidedEmptyState } from "../components/empty-states/GuidedEmptyState";
+import { QuickStartBasketPrompt } from "../components/basket/QuickStartBasketPrompt";
+import { useLocalStorageState } from "../hooks/useLocalStorageState";
+import { QUICKSTART_DISMISSED_KEY } from "../constants/onboarding";
 
 // --- WELCOME HERO (Το κρατάμε ίδιο) ---
 type HeroProps = {
@@ -98,6 +101,15 @@ export function HomePage() {
   // --- Onboarding progress tracking ---
   const onboarding = useOnboardingProgress();
   const prevBasketLen = useRef(basket.length);
+  const [quickstartDismissed] = useLocalStorageState<boolean>(QUICKSTART_DISMISSED_KEY, false);
+
+  const showQuickStart =
+    onboarding.progress.firstSearchSuccess &&
+    !onboarding.progress.firstProductAdded &&
+    basket.length === 0 &&
+    results.length > 0 &&
+    !isBasketOpen &&
+    !quickstartDismissed;
 
   // Track location selection (non-default)
   useEffect(() => {
@@ -284,6 +296,8 @@ export function HomePage() {
                    </span>
                 )}
               </div>
+
+              {showQuickStart && <QuickStartBasketPrompt />}
 
               {filteredResults.length > 0 ? (
                 <div className={`grid gap-6 ${
