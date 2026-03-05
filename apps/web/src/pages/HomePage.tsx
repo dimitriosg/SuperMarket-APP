@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { shallow } from "zustand/shallow";
+import { SearchX } from "lucide-react";
 import { useStore } from "../store";
 import { useProductSearch } from "../hooks/useProductSearch";
 import { SearchHeader } from "../components/SearchHeader";
@@ -55,7 +56,7 @@ const WelcomeHero = ({ onTagClick }: HeroProps) => (
     <div className="space-y-4">
       <p className="text-xs font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">ΔΗΜΟΦΙΛΕΙΣ ΑΝΑΖΗΤΗΣΕΙΣ</p>
       <div className="flex flex-wrap justify-center gap-3">
-        {["Γάλα", "Φέτα", "Ελαιόλαδο", "Καφές", "Αυγά", "Γιαούρτι"].map(tag => (
+        {popularSearches.map(tag => (
           <Button 
             key={tag}
             onClick={() => onTagClick(tag)}
@@ -301,7 +302,9 @@ export function HomePage() {
               ) : (
                 results.length > 0 && !isSearching && (
                   <div className="text-center py-20">
-                    <div className="text-6xl mb-4">🤷‍♂️</div>
+                    <div className="flex justify-center mb-4 text-slate-300 dark:text-slate-600">
+                      <SearchX size={64} strokeWidth={1.5} />
+                    </div>
                     <h3 className="text-xl font-bold text-slate-700 dark:text-slate-100">Δεν βρέθηκαν προϊόντα με αυτά τα φίλτρα</h3>
                     <p className="text-slate-400 mt-2 dark:text-slate-500">
                       Τα φίλτρα μπορεί να κρύβουν διαθέσιμα προϊόντα. Δοκίμασε να τα καθαρίσεις ή άλλαξε αναζήτηση.

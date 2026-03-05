@@ -1,5 +1,5 @@
 // apps/web/src/components/SearchHeader.tsx
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, ShoppingCart } from "lucide-react";
 import { useTheme } from "../hooks/useTheme";
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
@@ -69,8 +69,10 @@ export function SearchHeader({
         {/* ΚΟΥΜΠΙ ΚΑΛΑΘΙΟΥ ΣΤΟ HEADER */}
         <Button 
           onClick={onCartClick}
+          aria-label="Καλάθι αγορών"
           className="relative p-2 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-100 transition-colors dark:bg-indigo-500/10 dark:text-indigo-300 dark:hover:bg-indigo-500/20"
         >
+          <ShoppingCart size={20} />
           {cartCount > 0 && (
             <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white dark:border-slate-950">
               {cartCount}
