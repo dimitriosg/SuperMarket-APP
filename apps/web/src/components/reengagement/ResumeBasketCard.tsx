@@ -17,18 +17,18 @@ export function ResumeBasketCard({ snapshot, restore, dismiss }: Props) {
   return (
     <Card className="mb-6 p-5 dark:border-slate-800 dark:bg-slate-900">
       <p className="text-lg font-bold text-slate-800 dark:text-slate-100">
-        🛒 Εχεις ενα αποθηκευμενο καλαθι
+        🛒 Έχεις ένα αποθηκευμένο καλάθι
       </p>
       <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-        {itemCount} {itemCount === 1 ? "προϊον" : "προϊοντα"} - αποθηκευτηκε{" "}
+        {itemCount} {itemCount === 1 ? "προϊόν" : "προϊόντα"} - αποθηκεύτηκε{" "}
         {timeAgo}
       </p>
       <div className="mt-4 flex items-center gap-3">
         <Button variant="primary" size="md" onClick={restore}>
-          Επαναφορα καλαθιου
+          Επαναφορά καλαθιού
         </Button>
         <Button variant="secondary" size="md" onClick={dismiss}>
-          Απορριψη
+          Απόρριψη
         </Button>
       </div>
     </Card>
@@ -39,10 +39,10 @@ function formatTimeAgo(date: Date): string {
   const now = Date.now();
   const diffMs = now - date.getTime();
   const diffMin = Math.floor(diffMs / 60_000);
-  if (diffMin < 1) return "μολις τωρα";
-  if (diffMin < 60) return `πριν ${diffMin} λεπτα`;
+  if (diffMin < 1) return "μόλις τώρα";
+  if (diffMin < 60) return `πριν ${diffMin} λεπτά`;
   const diffHours = Math.floor(diffMin / 60);
-  if (diffHours < 24) return `πριν ${diffHours} ωρ${diffHours === 1 ? "α" : "ες"}`;
+  if (diffHours < 24) return `πριν ${diffHours} ώρ${diffHours === 1 ? "α" : "ες"}`;
   const diffDays = Math.floor(diffHours / 24);
-  return `πριν ${diffDays} ημερ${diffDays === 1 ? "α" : "ες"}`;
+  return `πριν ${diffDays} ημέρ${diffDays === 1 ? "α" : "ες"}`;
 }

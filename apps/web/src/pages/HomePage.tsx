@@ -388,7 +388,7 @@ export function HomePage() {
         >
           <span className="font-bold">
             {basket.length > 0 && !isBasketOpen
-              ? `🛒 Συνεχισε το καλαθι (${basket.length})`
+              ? `🛒 Συνέχισε το καλάθι (${basket.length})`
               : `🛒 ${basket.length}`}
           </span>
         </Button>
