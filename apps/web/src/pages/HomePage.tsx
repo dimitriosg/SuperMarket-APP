@@ -15,6 +15,8 @@ import { GuidedEmptyState } from "../components/empty-states/GuidedEmptyState";
 import { QuickStartBasketPrompt } from "../components/basket/QuickStartBasketPrompt";
 import { useLocalStorageState } from "../hooks/useLocalStorageState";
 import { QUICKSTART_DISMISSED_KEY } from "../constants/onboarding";
+import { useBasketSnapshot } from "../hooks/useBasketSnapshot";
+import { ResumeBasketCard } from "../components/reengagement/ResumeBasketCard";
 
 // --- WELCOME HERO (Το κρατάμε ίδιο) ---
 type HeroProps = {
@@ -102,6 +104,9 @@ export function HomePage() {
   const onboarding = useOnboardingProgress();
   const prevBasketLen = useRef(basket.length);
   const [quickstartDismissed] = useLocalStorageState<boolean>(QUICKSTART_DISMISSED_KEY, false);
+
+  // --- Re-engagement: basket snapshot ---
+  const basketSnap = useBasketSnapshot();
 
   const showQuickStart =
     onboarding.progress.firstSearchSuccess &&
@@ -276,6 +281,15 @@ export function HomePage() {
             </div>
           )}
 
+          {/* Re-engagement: restore previous basket */}
+          {basketSnap.canRestore && (
+            <ResumeBasketCard
+              snapshot={basketSnap.snapshot}
+              restore={basketSnap.restore}
+              dismiss={basketSnap.dismiss}
+            />
+          )}
+
           {!isSearching && results.length === 0 && !searchTerm && !error && (
             <WelcomeHero onTagClick={(tag) => {
               setSearchTerm(tag);
@@ -366,13 +380,17 @@ export function HomePage() {
 
       <BasketSidebar />
 
-      {/* Floating Basket Button (Εμφανίζεται αν δεν είναι pinned ή αν είναι κλειστό) */}
+      {/* Floating Basket Button / Continue basket CTA */}
       {(!isPinned || !isBasketOpen) && (
         <Button
           onClick={toggleBasket}
           className="fixed bottom-6 right-6 z-40 bg-indigo-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-all flex items-center gap-2 dark:bg-indigo-500"
         >
-          <span className="font-bold">🛒 {basket.length}</span>
+          <span className="font-bold">
+            {basket.length > 0 && !isBasketOpen
+              ? `🛒 Συνέχισε το καλάθι (${basket.length})`
+              : `🛒 ${basket.length}`}
+          </span>
         </Button>
       )}
 
