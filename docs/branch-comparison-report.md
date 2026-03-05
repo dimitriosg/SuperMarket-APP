@@ -12,7 +12,7 @@
 |---|---|---|
 | `bun install` | OK (605 packages) | OK (1046 packages) |
 | `bunx prisma generate` | OK (v6.19.1) | OK (v6.19.1) |
-| **Web lint** (`bun run --cwd apps/web lint`) | FAIL - 22 errors (21 errors, 1 warning) | FAIL - 1715 errors (1704 from dist/ bundle, 11 source) |
+| **Web lint** (`bun run --cwd apps/web lint`) | FAIL - 22 problems (21 errors, 1 warning) | FAIL - 1715 problems (1704 from dist/ bundle, 11 source) |
 | **Web typecheck** (`bun run --cwd apps/web typecheck`) | FAIL - 72 errors in 10 files | PASS - 0 errors |
 | **Web build** (`bun run --cwd apps/web build`) | PASS (4.04s, 2445 modules) | PASS (2.97s, 737 modules) |
 | **API lint** (`bun run --cwd apps/api lint`) | FAIL - 40 errors | FAIL - 27 errors |
