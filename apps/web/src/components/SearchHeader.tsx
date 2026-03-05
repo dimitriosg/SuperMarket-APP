@@ -1,9 +1,9 @@
 // apps/web/src/components/SearchHeader.tsx
-import { ShoppingCart, Moon, Sun } from "lucide-react"; // Αν έχεις lucide, αλλιώς βάλε emoji 🛒
+import { Moon, Sun } from "lucide-react";
 import { useTheme } from "../hooks/useTheme";
-import { ShoppingCart } from "lucide-react"; // Αν έχεις lucide, αλλιώς βάλε emoji 🛒
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
+import { ShortcutHint } from "./shortcuts/ShortcutHint";
 
 type Props = {
   searchTerm: string;
@@ -32,24 +32,29 @@ export function SearchHeader({
           MARKETWISE
         </h1>
 
-        <div className="flex-1 max-w-2xl relative">
-          <Input
-            id="product-search-input"
-            type="text"
-            label="Αναζήτηση προϊόντων"
-            hideLabel
-            value={searchTerm}
-            onChange={(e) => onSearchChange(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && onSearchSubmit()} // Για να δουλεύει το Enter
-            placeholder="Ψάξε προϊόντα (π.χ. φέτα, γάλα)..."
-            className="w-full p-3 pl-5 bg-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium transition-all text-slate-900 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-indigo-300"
-          />
-          
-          {loading && (
-            <div className="absolute right-3 top-3 flex items-center">
-              <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin dark:border-indigo-300"></div>
-            </div>
-          )}
+        <div className="flex-1 max-w-2xl">
+          <div className="relative">
+            <Input
+              id="product-search-input"
+              type="text"
+              label="Αναζήτηση προϊόντων"
+              hideLabel
+              value={searchTerm}
+              onChange={(e) => onSearchChange(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && onSearchSubmit()}
+              placeholder="Ψάξε προϊόντα (π.χ. φέτα, γάλα)..."
+              className="w-full p-3 pl-5 bg-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-medium transition-all text-slate-900 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-indigo-300"
+            />
+            
+            {loading && (
+              <div className="absolute right-3 top-3 flex items-center">
+                <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin dark:border-indigo-300"></div>
+              </div>
+            )}
+          </div>
+          <div className="mt-1 hidden sm:block">
+            <ShortcutHint />
+          </div>
         </div>
 
         <button

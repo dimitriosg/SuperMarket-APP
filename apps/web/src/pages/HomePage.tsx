@@ -1,13 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { shallow } from "zustand/shallow";
 import { useStore } from "../store";
-import { useProductSearch } from "../hooks/useProductSearch"; // Χρησιμοποιούμε το δικό σου hook!
+import { useProductSearch } from "../hooks/useProductSearch";
 import { SearchHeader } from "../components/SearchHeader";
 import { ProductCard } from "../components/ProductCard";
 import { BasketSidebar } from "../components/BasketSidebar";
 import { StoreFilters } from "../components/StoreFilters";
 import { getStoreIdByName } from "../constants/stores";
 import { Button } from "../components/ui/Button";
+import { OnboardingChecklist } from "../components/onboarding/OnboardingChecklist";
+import { useOnboardingProgress } from "../hooks/useOnboardingProgress";
+import { GuidedEmptyState } from "../components/empty-states/GuidedEmptyState";
 
 // --- WELCOME HERO (Το κρατάμε ίδιο) ---
 type HeroProps = {
@@ -90,6 +93,40 @@ export function HomePage() {
 
   const { searchTerm, setSearchTerm, results, isSearching, performSearch, error, retrySearch } =
     useProductSearch();
+
+  // --- Onboarding progress tracking ---
+  const onboarding = useOnboardingProgress();
+  const prevBasketLen = useRef(basket.length);
+
+  // Track location selection (non-default)
+  useEffect(() => {
+    // selectedStores being shorter than full list implies a location filter was applied
+    if (!onboarding.progress.locationSelected && selectedStores.length > 0) {
+      onboarding.markStep("locationSelected");
+    }
+  }, [selectedStores.length, onboarding]);
+
+  // Track store selection
+  useEffect(() => {
+    if (!onboarding.progress.storeSelected && selectedStores.length > 0) {
+      onboarding.markStep("storeSelected");
+    }
+  }, [selectedStores.length, onboarding]);
+
+  // Track first search returning results
+  useEffect(() => {
+    if (!onboarding.progress.firstSearchSuccess && results.length > 0 && !isSearching) {
+      onboarding.markStep("firstSearchSuccess");
+    }
+  }, [results.length, isSearching, onboarding]);
+
+  // Track first product added to basket
+  useEffect(() => {
+    if (!onboarding.progress.firstProductAdded && basket.length > prevBasketLen.current) {
+      onboarding.markStep("firstProductAdded");
+    }
+    prevBasketLen.current = basket.length;
+  }, [basket.length, onboarding]);
 
   // --- NEW: State για τα Φίλτρα (Collapsible) ---
   const [isFiltersOpen, setIsFiltersOpen] = useState(true);
@@ -189,6 +226,20 @@ export function HomePage() {
              showOnboarding={isFirstVisit}
              onDismissOnboarding={handleDismissOnboarding}
           />
+
+          {/* Onboarding checklist */}
+          {onboarding.visible && isFiltersOpen && (
+            <div className="mt-4">
+              <OnboardingChecklist progress={onboarding.progress} />
+              <button
+                type="button"
+                onClick={onboarding.dismiss}
+                className="mt-2 w-full text-center text-xs text-slate-400 hover:text-slate-600 transition-colors dark:text-slate-500 dark:hover:text-slate-300"
+              >
+                Απορριψη
+              </button>
+            </div>
+          )}
         </div>
 
         {/* 3. CENTER COLUMN: RESULTS / HERO */}
@@ -271,13 +322,19 @@ export function HomePage() {
                 )
               )}
 
-              {/* EMPTY STATE */}
+              {/* GUIDED EMPTY STATE */}
               {results.length === 0 && !isSearching && searchTerm && !error && (
-                <div className="text-center py-20">
-                  <div className="text-6xl mb-4">🤷‍♂️</div>
-                  <h3 className="text-xl font-bold text-slate-700 dark:text-slate-100">Δεν βρέθηκαν προϊόντα</h3>
-                  <p className="text-slate-400 dark:text-slate-500">Δοκίμασε να ψάξεις με διαφορετικούς όρους (π.χ. "τυρί" αντί για "τυριά").</p>
-                </div>
+                <GuidedEmptyState
+                  searchTerm={searchTerm}
+                  onClearSearch={() => {
+                    setSearchTerm("");
+                  }}
+                  onClearFilters={selectAllStores}
+                  onSuggestedSearch={(tag) => {
+                    setSearchTerm(tag);
+                    performSearch(tag);
+                  }}
+                />
               )}
             </>
           )}
