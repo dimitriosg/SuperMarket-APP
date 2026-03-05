@@ -18,7 +18,7 @@ export function OnboardingChecklist({ progress }: Props) {
     <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm dark:bg-slate-950 dark:border-slate-800">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">
-          Ξεκινα εδω
+          Ξεκίνα εδώ
         </h3>
         <span className="text-xs text-slate-400 dark:text-slate-500">
           {completedCount}/{steps.length}

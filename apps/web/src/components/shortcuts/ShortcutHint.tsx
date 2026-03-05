@@ -4,10 +4,10 @@ import { useLocalStorageState } from "../../hooks/useLocalStorageState";
 const FIRST_VISIT_KEY = "mw_seen_shortcut_tooltip";
 
 const shortcuts: { key: string; description: string }[] = [
-  { key: "/", description: "Εστιαση στην αναζητηση" },
-  { key: "B", description: "Ανοιγμα/κλεισιμο καλαθιου" },
-  { key: "F", description: "Ανοιγμα/κλεισιμο φιλτρων" },
-  { key: "?", description: "Εμφανιση συντομευσεων" },
+  { key: "/", description: "Εστίαση στην αναζήτηση" },
+  { key: "B", description: "Άνοιγμα/κλείσιμο καλαθιού" },
+  { key: "F", description: "Άνοιγμα/κλείσιμο φίλτρων" },
+  { key: "?", description: "Εμφάνιση συντομεύσεων" },
 ];
 
 export function ShortcutHint() {
@@ -93,22 +93,22 @@ export function ShortcutHint() {
         <kbd className="px-1 py-0.5 bg-slate-100 border border-slate-200 rounded text-[10px] font-mono dark:bg-slate-800 dark:border-slate-700">
           /
         </kbd>{" "}
-        αναζητηση{" "}
+        αναζήτηση{" "}
         <kbd className="px-1 py-0.5 bg-slate-100 border border-slate-200 rounded text-[10px] font-mono dark:bg-slate-800 dark:border-slate-700">
           ?
         </kbd>{" "}
-        συντομευσεις
+        συντομεύσεις
       </button>
 
       {/* First-visit tooltip */}
       {showTooltip && (
         <div className="absolute top-full left-0 mt-2 z-50 animate-fade-in">
           <div className="bg-indigo-600 text-white text-xs font-medium px-3 py-2 rounded-lg shadow-lg whitespace-nowrap dark:bg-indigo-500">
-            Πατησε{" "}
+            Πάτησε{" "}
             <kbd className="px-1 py-0.5 bg-indigo-500 rounded text-[10px] font-mono dark:bg-indigo-400">
               /
             </kbd>{" "}
-            για γρηγορη αναζητηση!
+            για γρήγορη αναζήτηση!
             <div className="absolute -top-1 left-4 w-2 h-2 bg-indigo-600 rotate-45 dark:bg-indigo-500" />
           </div>
         </div>
@@ -122,7 +122,7 @@ export function ShortcutHint() {
         >
           <div className="bg-white border border-slate-200 rounded-xl shadow-xl p-4 min-w-[220px] dark:bg-slate-950 dark:border-slate-800">
             <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 dark:text-slate-500">
-              Συντομευσεις
+              Συντομεύσεις
             </h4>
             <ul className="space-y-2">
               {shortcuts.map((s) => (

@@ -236,7 +236,7 @@ export function HomePage() {
                 onClick={onboarding.dismiss}
                 className="mt-2 w-full text-center text-xs text-slate-400 hover:text-slate-600 transition-colors dark:text-slate-500 dark:hover:text-slate-300"
               >
-                Απορριψη
+                Απόρριψη
               </button>
             </div>
           )}

@@ -19,11 +19,11 @@ export function GuidedEmptyState({
     <div className="text-center py-16 animate-fade-in">
       <div className="text-6xl mb-4">🔎</div>
       <h3 className="text-xl font-bold text-slate-700 dark:text-slate-100 mb-2">
-        Δεν βρεθηκαν αποτελεσματα
+        Δεν βρέθηκαν αποτελέσματα
       </h3>
       <p className="text-slate-400 dark:text-slate-500 mb-6 max-w-md mx-auto">
-        Δεν βρηκαμε προϊοντα για &quot;{searchTerm}&quot;. Δοκιμασε μια απο τις
-        παρακατω ενεργειες:
+        Δεν βρήκαμε προϊόντα για &quot;{searchTerm}&quot;. Δοκίμασε μία από τις
+        παρακάτω ενέργειες:
       </p>
 
       <div className="flex flex-wrap justify-center gap-3 mb-8">
@@ -31,20 +31,20 @@ export function GuidedEmptyState({
           onClick={onClearSearch}
           className="px-5 py-2.5 bg-indigo-600 text-white rounded-full font-bold text-sm hover:bg-indigo-500 transition-all dark:bg-indigo-500 dark:hover:bg-indigo-400"
         >
-          Καθαρισε αναζητηση
+          Καθάρισε αναζήτηση
         </Button>
         <Button
           onClick={onClearFilters}
           variant="secondary"
           className="px-5 py-2.5 rounded-full font-bold text-sm"
         >
-          Καθαρισε φιλτρα
+          Καθάρισε φίλτρα
         </Button>
       </div>
 
       <div className="space-y-3">
         <p className="text-xs font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">
-          Δοκιμασε αυτες τις αναζητησεις
+          Δοκίμασε αυτές τις αναζητήσεις
         </p>
         <div className="flex flex-wrap justify-center gap-2">
           {suggestedSearches.map((term) => (
