@@ -27,6 +27,7 @@ type StoreActions = {
   addToBasket: (product: ProductResult) => void;
   removeFromBasket: (id: string) => void;
   updateQuantity: (id: string, delta: number) => void;
+  setBasket: (items: BasketItem[]) => void;
   clearBasket: () => void;
   toggleBasket: () => void;
   togglePin: () => void;
@@ -99,6 +100,7 @@ const storeCreator: StateCreator<StoreState, [], [], StoreState> = (set, get) =>
           .filter((item) => item.quantity > 0)
       })),
     clearBasket: () => set({ basket: [] }),
+    setBasket: (items) => set({ basket: items }),
     toggleBasket: () => set((state) => ({ isBasketOpen: !state.isBasketOpen })),
     togglePin: () => set((state) => ({ isPinned: !state.isPinned })),
     setBasketOpen: (open) => set({ isBasketOpen: open }),
