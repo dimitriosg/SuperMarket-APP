@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { shallow } from "zustand/shallow";
+import { useShallow } from "zustand/react/shallow";
 import { SearchX } from "lucide-react";
 import { useStore } from "../store";
 import { useProductSearch } from "../hooks/useProductSearch";
@@ -85,7 +85,7 @@ export function HomePage() {
     addToBasket, 
     selectAllStores
   } = useStore(
-    (state) => ({
+    useShallow((state) => ({
       basket: state.basket,
       isBasketOpen: state.isBasketOpen,
       isPinned: state.isPinned,
@@ -93,8 +93,7 @@ export function HomePage() {
       selectedStores: state.selectedStores,
       addToBasket: state.actions.addToBasket,
       selectAllStores: state.actions.selectAllStores
-    }),
-    shallow
+    }))
   );
 
   const { searchTerm, setSearchTerm, results, isSearching, performSearch, error, retrySearch } =
@@ -209,12 +208,12 @@ export function HomePage() {
     if (activeOffers.length === 0) return null;
 
     // Recalculate best price based on filters
-    activeOffers.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+    activeOffers.sort((a, b) => a.price - b.price);
     
     return {
       ...product,
       offers: activeOffers,
-      bestPrice: parseFloat(activeOffers[0].price),
+      bestPrice: activeOffers[0].price,
       activeOffer: activeOffers[0]
     };
   }).filter(Boolean) as typeof results; // Remove nulls
@@ -323,7 +322,9 @@ export function HomePage() {
                     <ProductCard 
                       key={product.id} 
                       product={product} 
-                      onAdd={() => addToBasket(product)} 
+                      onAdd={() => addToBasket(product)}
+                      isInBasket={basket.some((item) => item.id === product.id)}
+                      selectedStoreFilter={null}
                     />
                   ))}
                 </div>

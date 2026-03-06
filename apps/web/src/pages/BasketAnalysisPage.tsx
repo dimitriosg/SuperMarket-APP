@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { shallow } from "zustand/shallow";
+import { useShallow } from "zustand/react/shallow";
 import { BasketBuilder } from "../components/BasketBuilder";
 import { useStore } from "../store";
 import { DEFAULT_IMG } from "../services/api";
@@ -16,7 +16,7 @@ export function BasketAnalysisPage() {
     addToBasket,
     clearBasket
   } = useStore(
-    (state) => ({
+    useShallow((state) => ({
       basket: state.basket,
       comparison: state.comparison,
       updateQuantity: state.actions.updateQuantity,
@@ -24,8 +24,7 @@ export function BasketAnalysisPage() {
       selectedStores: state.selectedStores,
       addToBasket: state.actions.addToBasket,
       clearBasket: state.actions.clearBasket
-    }),
-    shallow
+    }))
   );
 
   const bestSingleStore = comparison.full[0];
