@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { shallow } from "zustand/shallow";
+import { useShallow } from "zustand/react/shallow";
 import { DEFAULT_IMG } from "../services/api";
 import { BasketComparison } from "./BasketComparison";
 import { getRelativeTime } from "../utils/date";
@@ -19,7 +19,7 @@ export function BasketSidebar() {
     removeFromBasket,
     setBasketOpen
   } = useStore(
-    (state) => ({
+    useShallow((state) => ({
       isOpen: state.isBasketOpen,
       isPinned: state.isPinned,
       basket: state.basket,
@@ -30,8 +30,7 @@ export function BasketSidebar() {
       updateQuantity: state.actions.updateQuantity,
       removeFromBasket: state.actions.removeFromBasket,
       setBasketOpen: state.actions.setBasketOpen
-    }),
-    shallow
+    }))
   );
   
   const [showStaleDetails, setShowStaleDetails] = useState(false);
@@ -119,7 +118,7 @@ export function BasketSidebar() {
         <div className="p-6 border-b border-slate-200 flex justify-between items-center bg-white sticky top-0 z-10 dark:border-slate-800 dark:bg-slate-950">
           <div className="flex items-center gap-3">
             <h2 className="text-2xl font-black italic tracking-tighter text-slate-900 dark:text-slate-100">ΚΑΛΑΘΙ</h2>
-            <button onClick={onTogglePin} className={`hidden lg:block p-2 rounded-lg transition-colors ${isPinned ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400 hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-500 dark:hover:bg-slate-800"}`}>
+            <button onClick={togglePin} className={`hidden lg:block p-2 rounded-lg transition-colors ${isPinned ? "bg-indigo-600 text-white" : "bg-slate-100 text-slate-400 hover:bg-slate-200 dark:bg-slate-900 dark:text-slate-500 dark:hover:bg-slate-800"}`}>
               📌
             </button>
           </div>
@@ -134,7 +133,7 @@ export function BasketSidebar() {
                   🗑️
                 </button>
              )}
-             <button onClick={onClose} className="text-slate-400 hover:text-slate-600 text-2xl font-light dark:text-slate-500 dark:hover:text-slate-300">✕</button>
+             <button onClick={() => setBasketOpen(false)} className="text-slate-400 hover:text-slate-600 text-2xl font-light dark:text-slate-500 dark:hover:text-slate-300">✕</button>
           </div>
         </div>
 
@@ -228,7 +227,7 @@ export function BasketSidebar() {
                        <Link
                          key={item.id}
                          to={`/product/${item.id}`}
-                         onClick={() => { if (!isPinned) onClose(); }}
+                         onClick={() => { if (!isPinned) setBasketOpen(false); }}
                          className="flex items-center gap-3 rounded-xl border border-slate-100 bg-white p-2 hover:border-indigo-200 hover:bg-indigo-50 transition-colors dark:border-slate-800 dark:bg-slate-950 dark:hover:border-indigo-500/60 dark:hover:bg-indigo-500/10"
                        >
                          <div className="h-10 w-10 rounded-lg bg-slate-50 p-1 flex items-center justify-center dark:bg-slate-900">
@@ -265,14 +264,14 @@ export function BasketSidebar() {
                     </h4>
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-1 bg-slate-100 rounded-lg p-1 dark:bg-slate-900">
-                        <button onClick={() => onUpdateQty(item.id, -1)} className="w-6 h-6 flex items-center justify-center font-black text-indigo-600 hover:bg-white rounded-md transition-colors dark:text-indigo-300 dark:hover:bg-slate-800">-</button>
+                        <button onClick={() => updateQuantity(item.id, -1)} className="w-6 h-6 flex items-center justify-center font-black text-indigo-600 hover:bg-white rounded-md transition-colors dark:text-indigo-300 dark:hover:bg-slate-800">-</button>
                         <span className="text-xs font-black w-6 text-center text-slate-900 dark:text-slate-100">{item.quantity}</span>
-                        <button onClick={() => onUpdateQty(item.id, 1)} className="w-6 h-6 flex items-center justify-center font-black text-indigo-600 hover:bg-white rounded-md transition-colors dark:text-indigo-300 dark:hover:bg-slate-800">+</button>
+                        <button onClick={() => updateQuantity(item.id, 1)} className="w-6 h-6 flex items-center justify-center font-black text-indigo-600 hover:bg-white rounded-md transition-colors dark:text-indigo-300 dark:hover:bg-slate-800">+</button>
                       </div>
                       <span className="font-black text-sm text-slate-900 dark:text-slate-100">
                         {(item.bestPrice * item.quantity).toFixed(2)}€
                       </span>
-                      <button onClick={() => onRemove(item.id)} className="text-red-300 hover:text-red-500 transition-colors dark:text-red-400 dark:hover:text-red-300">🗑️</button>
+                      <button onClick={() => removeFromBasket(item.id)} className="text-red-300 hover:text-red-500 transition-colors dark:text-red-400 dark:hover:text-red-300">🗑️</button>
                     </div>
                   </div>
                 </div>
@@ -289,7 +288,7 @@ export function BasketSidebar() {
                 <Link 
                     to="/analysis"
                     className="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl transition-all shadow-lg hover:shadow-indigo-200 dark:bg-indigo-500 dark:hover:bg-indigo-400"
-                    onClick={() => { if (!isPinned) onClose(); }}
+                    onClick={() => { if (!isPinned) setBasketOpen(false); }}
                 >
                     📊 Λεπτομερής Ανάλυση
                 </Link>

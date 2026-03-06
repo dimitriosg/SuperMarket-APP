@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { shallow } from "zustand/shallow";
+import { useShallow } from "zustand/react/shallow";
 import { STORES_DATA, LOCATIONS } from "../constants/stores";
 import { useStore } from "../store";
 
@@ -19,15 +19,14 @@ export function StoreFilters({ isOpen, onToggle, showOnboarding, onDismissOnboar
     selectAllStores, 
     deselectAllStores 
   } = useStore(
-    (state) => ({
+    useShallow((state) => ({
       selectedStores: state.selectedStores,
       toggleStoreFilter: state.actions.toggleStoreFilter,
       selectedLocation: state.selectedLocation,
       changeLocation: state.actions.changeLocation,
       selectAllStores: state.actions.selectAllStores,
       deselectAllStores: state.actions.deselectAllStores
-    }),
-    shallow
+    }))
   );
   
   const [isStoresListExpanded, setIsStoresListExpanded] = useState(true);
@@ -59,7 +58,7 @@ export function StoreFilters({ isOpen, onToggle, showOnboarding, onDismissOnboar
         <div className="flex flex-col items-center gap-1">
             <span className="text-[10px] text-slate-400 dark:text-slate-500">Stores</span>
             <span className="bg-indigo-100 text-indigo-700 text-xs font-bold w-7 h-7 flex items-center justify-center rounded-full dark:bg-indigo-500/20 dark:text-indigo-300">
-                {enabledStores.length}
+                {selectedStores.length}
             </span>
         </div>
       </div>
@@ -128,7 +127,7 @@ export function StoreFilters({ isOpen, onToggle, showOnboarding, onDismissOnboar
           <div className="font-black text-slate-800 flex items-center gap-2 text-sm uppercase tracking-wide group-hover:text-indigo-600 transition-colors dark:text-slate-100 dark:group-hover:text-indigo-300">
             🏢 Καταστήματα
             <span className="text-xs text-slate-400 font-normal normal-case bg-slate-100 px-2 py-0.5 rounded-full dark:bg-slate-900 dark:text-slate-400">
-              {enabledStores.length}
+              {selectedStores.length}
             </span>
           </div>
           <span className={`text-slate-400 transform transition-transform duration-300 dark:text-slate-500 ${isStoresListExpanded ? 'rotate-180' : 'rotate-0'}`}>

@@ -14,7 +14,7 @@ export function ProductSearch({ basket, onAdd }: Props) {
   const { results, isSearching, searchTerm, setSearchTerm, debouncedSearch, performSearch } = useProductSearch();
 
   const basketLookup = useMemo(() => {
-    const entries = basket.map((item) => [item.id, item.quantity]);
+    const entries = basket.map((item) => [item.id, item.quantity] as const);
     return new Map(entries);
   }, [basket]);
 
