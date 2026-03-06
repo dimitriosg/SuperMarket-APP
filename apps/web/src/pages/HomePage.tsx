@@ -46,7 +46,7 @@ export function HomePage() {
   const { results, isSearching, searchTerm, setSearchTerm } = useProductSearch();
   const { 
     basket, isBasketOpen, isPinned, selectedStores,
-    addToBasket, toggleBasket, setBasketOpen
+    addToBasket, toggleBasket, setBasketOpen, selectAllStores
   } = useStore(
     useShallow((state) => ({
       basket: state.basket,
@@ -56,6 +56,7 @@ export function HomePage() {
       addToBasket: state.actions.addToBasket,
       toggleBasket: state.actions.toggleBasket,
       setBasketOpen: state.actions.setBasketOpen,
+      selectAllStores: state.actions.selectAllStores,
     }))
   );
 
@@ -123,7 +124,7 @@ export function HomePage() {
               {results.length > 0 && filteredResults.length === 0 && (
                 <div className="text-center py-20">
                   <p className="text-slate-400 font-medium">Τα προϊόντα υπάρχουν, αλλά όχι στα επιλεγμένα καταστήματα.</p>
-                  <p className="text-sm text-indigo-500 mt-2 cursor-pointer hover:underline" onClick={() => window.location.reload()}>
+                  <p className="text-sm text-indigo-500 mt-2 cursor-pointer hover:underline" onClick={selectAllStores}>
                     Καθαρισμός φίλτρων
                   </p>
                 </div>
