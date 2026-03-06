@@ -7,7 +7,8 @@ import { getRelativeTime } from "../utils/date";
 import { useStore } from "../store";
 import type { BasketComparisonResult } from "../types";
 
-/** Extension for stale-item fields returned by the API but not yet in the shared DTO */
+/** Extension for stale-item fields returned by the API but not yet in the shared DTO.
+ *  TODO: add staleCount/staleItems to BasketAnalyzeStoreResultDto in packages/shared */
 type ComparisonResultWithStale = BasketComparisonResult & {
   staleCount?: number;
   staleItems?: { name: string; date: string }[];
