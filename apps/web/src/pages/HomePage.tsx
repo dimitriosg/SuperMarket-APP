@@ -1,6 +1,4 @@
-import { useState, useEffect, useRef } from "react";
-import { shallow } from "zustand/shallow";
-import { SearchX } from "lucide-react";
+import { useShallow } from "zustand/react/shallow";
 import { useStore } from "../store";
 import { useProductSearch } from "../hooks/useProductSearch";
 import { SearchHeader } from "../components/SearchHeader";
@@ -8,67 +6,36 @@ import { ProductCard } from "../components/ProductCard";
 import { BasketSidebar } from "../components/BasketSidebar";
 import { StoreFilters } from "../components/StoreFilters";
 import { getStoreIdByName } from "../constants/stores";
-import { Button } from "../components/ui/Button";
-import { OnboardingChecklist } from "../components/onboarding/OnboardingChecklist";
-import { useOnboardingProgress } from "../hooks/useOnboardingProgress";
-import { GuidedEmptyState } from "../components/empty-states/GuidedEmptyState";
-import { QuickStartBasketPrompt } from "../components/basket/QuickStartBasketPrompt";
-import { useLocalStorageState } from "../hooks/useLocalStorageState";
-import { QUICKSTART_DISMISSED_KEY } from "../constants/onboarding";
-import { useBasketSnapshot } from "../hooks/useBasketSnapshot";
-import { ResumeBasketCard } from "../components/reengagement/ResumeBasketCard";
 
-// --- WELCOME HERO (Το κρατάμε ίδιο) ---
+// --- WELCOME HERO COMPONENT ---
 type HeroProps = {
   onTagClick: (tag: string) => void;
 };
 
-const popularSearches = ["Γάλα", "Φέτα", "Ελαιόλαδο", "Καφές", "Αυγά", "Γιαούρτι"];
-
-const PopularSearches = ({ onTagClick }: HeroProps) => (
-  <div className="space-y-4">
-    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">ΔΗΜΟΦΙΛΕΙΣ ΑΝΑΖΗΤΗΣΕΙΣ</p>
-    <div className="flex flex-wrap justify-center gap-3">
-      {popularSearches.map(tag => (
-        <Button 
-          key={tag}
-          onClick={() => onTagClick(tag)}
-          className="px-4 py-2 bg-white border border-slate-200 rounded-full text-slate-600 font-bold text-sm hover:border-indigo-400 hover:text-indigo-600 hover:shadow-md transition-all active:scale-95 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:border-indigo-500/60 dark:hover:text-indigo-300"
-        >
-          {tag}
-        </Button>
-      ))}
-    </div>
-  </div>
-);
-
 const WelcomeHero = ({ onTagClick }: HeroProps) => (
   <div className="flex flex-col items-center justify-center py-10 md:py-20 text-center animate-fade-in">
-    <div className="bg-indigo-50 p-6 rounded-full mb-6 shadow-sm border border-indigo-100 dark:bg-indigo-500/10 dark:border-indigo-500/30">
+    <div className="bg-indigo-50 p-6 rounded-full mb-6 shadow-sm border border-indigo-100">
       <span className="text-6xl">🛒</span>
     </div>
-    <h2 className="text-3xl md:text-5xl font-black text-slate-800 mb-4 tracking-tight dark:text-slate-100">
-      Καλώς ήρθες στο <span className="text-indigo-600 dark:text-indigo-300">MarketWise</span>
+    <h2 className="text-3xl md:text-5xl font-black text-slate-800 mb-4 tracking-tight">
+      Καλώς ήρθες στο <span className="text-indigo-600">MarketWise</span>
     </h2>
-    <p className="text-slate-500 text-lg max-w-lg mb-8 leading-relaxed font-medium dark:text-slate-400">
+    <p className="text-slate-500 text-lg max-w-lg mb-8 leading-relaxed font-medium">
       Ο έξυπνος βοηθός σου για το σούπερ μάρκετ. <br className="hidden md:block" />
       Επίλεξε την περιοχή σου από αριστερά και ξεκίνα!
     </p>
-    <p className="text-slate-400 text-sm md:text-base max-w-lg mb-8 dark:text-slate-500">
-      Βήμα 1: επίλεξε περιοχή/κατάστημα για να δεις τις καλύτερες επιλογές.
-    </p>
     
-    <div className="space-y-4">
-      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest dark:text-slate-500">ΔΗΜΟΦΙΛΕΙΣ ΑΝΑΖΗΤΗΣΕΙΣ</p>
-      <div className="flex flex-wrap justify-center gap-3">
-        {popularSearches.map(tag => (
-          <Button 
-            key={tag}
+    <div className="space-y-3">
+      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">ΔΗΜΟΦΙΛΕΙΣ ΑΝΑΖΗΤΗΣΕΙΣ</p>
+      <div className="flex flex-wrap justify-center gap-3 max-w-2xl">
+        {["Φέτα", "Γάλα", "Αυγά", "Καφές", "Απορρυπαντικό", "Ελαιόλαδο", "Γιαούρτι"].map(tag => (
+          <button 
+            key={tag} 
             onClick={() => onTagClick(tag)}
-            className="px-4 py-2 bg-white border border-slate-200 rounded-full text-slate-600 font-bold text-sm hover:border-indigo-400 hover:text-indigo-600 hover:shadow-md transition-all active:scale-95 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300 dark:hover:border-indigo-500/60 dark:hover:text-indigo-300"
+            className="px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-slate-600 text-sm font-bold shadow-sm hover:shadow-md hover:border-indigo-300 hover:text-indigo-600 hover:-translate-y-0.5 transition-all cursor-pointer active:scale-95"
           >
-            {tag}
-          </Button>
+            🔍 {tag}
+          </button>
         ))}
       </div>
     </div>
@@ -76,324 +43,109 @@ const WelcomeHero = ({ onTagClick }: HeroProps) => (
 );
 
 export function HomePage() {
+  const { results, isSearching, searchTerm, setSearchTerm } = useProductSearch();
   const { 
-    basket, 
-    isBasketOpen, 
-    isPinned, 
-    toggleBasket, 
-    selectedStores, 
-    addToBasket, 
-    selectAllStores
+    basket, isBasketOpen, isPinned, selectedStores,
+    addToBasket, toggleBasket, setBasketOpen
   } = useStore(
-    (state) => ({
+    useShallow((state) => ({
       basket: state.basket,
       isBasketOpen: state.isBasketOpen,
       isPinned: state.isPinned,
-      toggleBasket: state.actions.toggleBasket,
       selectedStores: state.selectedStores,
       addToBasket: state.actions.addToBasket,
-      selectAllStores: state.actions.selectAllStores
-    }),
-    shallow
+      toggleBasket: state.actions.toggleBasket,
+      setBasketOpen: state.actions.setBasketOpen,
+    }))
   );
 
-  const { searchTerm, setSearchTerm, results, isSearching, performSearch, error, retrySearch } =
-    useProductSearch();
-
-  // --- Onboarding progress tracking ---
-  const onboarding = useOnboardingProgress();
-  const prevBasketLen = useRef(basket.length);
-  const [quickstartDismissed] = useLocalStorageState<boolean>(QUICKSTART_DISMISSED_KEY, false);
-
-  // --- Re-engagement: basket snapshot ---
-  const basketSnap = useBasketSnapshot();
-
-  const showQuickStart =
-    onboarding.progress.firstSearchSuccess &&
-    !onboarding.progress.firstProductAdded &&
-    basket.length === 0 &&
-    results.length > 0 &&
-    !isBasketOpen &&
-    !quickstartDismissed;
-
-  // Track location selection (non-default)
-  useEffect(() => {
-    // selectedStores being shorter than full list implies a location filter was applied
-    if (!onboarding.progress.locationSelected && selectedStores.length > 0) {
-      onboarding.markStep("locationSelected");
-    }
-  }, [selectedStores.length, onboarding]);
-
-  // Track store selection
-  useEffect(() => {
-    if (!onboarding.progress.storeSelected && selectedStores.length > 0) {
-      onboarding.markStep("storeSelected");
-    }
-  }, [selectedStores.length, onboarding]);
-
-  // Track first search returning results
-  useEffect(() => {
-    if (!onboarding.progress.firstSearchSuccess && results.length > 0 && !isSearching) {
-      onboarding.markStep("firstSearchSuccess");
-    }
-  }, [results.length, isSearching, onboarding]);
-
-  // Track first product added to basket
-  useEffect(() => {
-    if (!onboarding.progress.firstProductAdded && basket.length > prevBasketLen.current) {
-      onboarding.markStep("firstProductAdded");
-    }
-    prevBasketLen.current = basket.length;
-  }, [basket.length, onboarding]);
-
-  // --- NEW: State για τα Φίλτρα (Collapsible) ---
-  const [isFiltersOpen, setIsFiltersOpen] = useState(true);
-  const [isFirstVisit, setIsFirstVisit] = useState(false);
-  const firstVisitKey = "marketwise_has_seen_filters_hint";
-
-  useEffect(() => {
-    const hasSeenHint = localStorage.getItem(firstVisitKey);
-    setIsFirstVisit(!hasSeenHint);
-  }, []);
-
-  const handleDismissOnboarding = () => {
-    localStorage.setItem(firstVisitKey, "true");
-    setIsFirstVisit(false);
-  };
-
-  useEffect(() => {
-    const handleGlobalKeys = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement | null;
-      const isTypingTarget =
-        target?.tagName === "INPUT" ||
-        target?.tagName === "TEXTAREA" ||
-        target?.isContentEditable;
-
-      if (isTypingTarget || event.metaKey || event.ctrlKey || event.altKey) {
-        return;
-      }
-
-      if (event.key === "/") {
-        event.preventDefault();
-        const searchInput = document.getElementById("search-input") as HTMLInputElement | null;
-        searchInput?.focus();
-        searchInput?.select();
-        return;
-      }
-
-      if (event.key.toLowerCase() === "b") {
-        event.preventDefault();
-        toggleBasket();
-        return;
-      }
-
-      if (event.key.toLowerCase() === "f") {
-        event.preventDefault();
-        setIsFiltersOpen((prev) => !prev);
-      }
-    };
-
-    window.addEventListener("keydown", handleGlobalKeys);
-    return () => window.removeEventListener("keydown", handleGlobalKeys);
-  }, [toggleBasket]);
-
-  // Filter logic (Client side filtering of backend results based on store availability)
+  // Φιλτράρισμα αποτελεσμάτων βάσει των ΕΝΕΡΓΩΝ καταστημάτων
   const filteredResults = results.map(product => {
-    // Φιλτράρουμε τις προσφορές βάσει των ενεργών καταστημάτων
-    const activeOffers = product.offers.filter(offer => 
-       selectedStores.includes(getStoreIdByName(offer.store))
+    const activeOffers = product.offers.filter(o => 
+      selectedStores.includes(getStoreIdByName(o.store))
     );
-    
-    // Αν δεν μείνει καμία προσφορά, ίσως θέλουμε να το κρύψουμε ή να το δείξουμε ως "unavailable"
-    // Εδώ το δείχνουμε, αλλά με recalculate του bestPrice
     if (activeOffers.length === 0) return null;
-
-    // Recalculate best price based on filters
-    activeOffers.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+    
+    const newBestPrice = Math.min(...activeOffers.map(o => Number(o.price)));
     
     return {
       ...product,
-      offers: activeOffers,
-      bestPrice: parseFloat(activeOffers[0].price),
-      activeOffer: activeOffers[0]
+      bestPrice: newBestPrice,
+      offers: activeOffers
     };
-  }).filter(Boolean) as typeof results; // Remove nulls
-
+  }).filter(p => p !== null);
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans pb-20 flex flex-col dark:bg-slate-950">
+    <div className={`min-h-screen bg-slate-50 font-sans text-slate-900 flex flex-col transition-all duration-300 ${isPinned && isBasketOpen ? 'pr-[400px]' : ''}`}>
       
-      {/* 1. HEADER */}
-      <SearchHeader 
-        searchTerm={searchTerm} 
-        onSearchChange={(newValue) => setSearchTerm(newValue)} 
-        onSearchSubmit={() => performSearch(searchTerm)}
-        loading={isSearching}
-        cartCount={basket.length}
-        onCartClick={toggleBasket}
-      />
+      <SearchHeader searchTerm={searchTerm} onSearchTermChange={setSearchTerm} loading={isSearching} />
 
-      <main className="flex-1 max-w-[1920px] mx-auto w-full p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative">
+      <main className="max-w-[1400px] mx-auto p-4 md:p-6 w-full flex gap-6 items-start">
         
-        {/* 2. LEFT COLUMN: FILTERS (Collapsible) */}
-        {/* Αν είναι ανοιχτό πιάνει 3 στήλες. Αν κλειστό πιάνει "auto" (όσο χρειάζεται το κλειστό component) */}
-        <div className={`transition-all duration-300 ${isFiltersOpen ? 'lg:col-span-3' : 'lg:col-span-1 lg:max-w-[80px]'}`}>
-          <StoreFilters 
-             isOpen={isFiltersOpen} 
-             onToggle={() => setIsFiltersOpen(!isFiltersOpen)} 
-             showOnboarding={isFirstVisit}
-             onDismissOnboarding={handleDismissOnboarding}
-          />
-
-          {/* Onboarding checklist */}
-          {onboarding.visible && isFiltersOpen && (
-            <div className="mt-4">
-              <OnboardingChecklist progress={onboarding.progress} />
-              <button
-                type="button"
-                onClick={onboarding.dismiss}
-                className="mt-2 w-full text-center text-xs text-slate-400 hover:text-slate-600 transition-colors dark:text-slate-500 dark:hover:text-slate-300"
-              >
-                Απόρριψη
-              </button>
-            </div>
-          )}
+        {/* LEFT COLUMN: FILTERS */}
+        <div className="hidden lg:block w-64 flex-shrink-0 sticky top-24">
+          <StoreFilters />
         </div>
 
-        {/* 3. CENTER COLUMN: RESULTS / HERO */}
-        {/* Αν τα φίλτρα είναι κλειστά, μεγαλώνει (11 στήλες). Αν ανοιχτά, κανονικό (9 στήλες). Αν το καλάθι είναι pinned, μικραίνει κι άλλο. */}
-        <div className={`transition-all duration-300 ${
-            isFiltersOpen 
-              ? (isPinned && isBasketOpen ? 'lg:col-span-6' : 'lg:col-span-9') 
-              : (isPinned && isBasketOpen ? 'lg:col-span-8' : 'lg:col-span-11')
-        }`}>
+        {/* MIDDLE COLUMN: RESULTS or HERO */}
+        <div className="flex-1">
           
-          {/* A. Welcome State */}
-          {error && !isSearching && (
-            <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
-              <p>{error}</p>
-              <button
-                onClick={retrySearch}
-                className="mt-2 text-sm font-bold text-red-600 underline underline-offset-2"
-              >
-                Δοκίμασε ξανά
-              </button>
-            </div>
+          {/* SHOW HERO */}
+          {!searchTerm && results.length === 0 && (
+            <WelcomeHero onTagClick={setSearchTerm} />
           )}
 
-          {/* Re-engagement: restore previous basket */}
-          {basketSnap.canRestore && (
-            <ResumeBasketCard
-              snapshot={basketSnap.snapshot}
-              restore={basketSnap.restore}
-              dismiss={basketSnap.dismiss}
-            />
-          )}
-
-          {!isSearching && results.length === 0 && !searchTerm && !error && (
-            <WelcomeHero onTagClick={(tag) => {
-              setSearchTerm(tag);
-              performSearch(tag);
-            }} />
-          )}
-
-          {/* B. Results Grid */}
-          {(isSearching || results.length > 0 || searchTerm) && (
+          {/* SHOW RESULTS */}
+          {searchTerm && (
             <>
-              <div className="flex justify-between items-end mb-6">
-                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-100">
-                  {results.length > 0 ? `Βρέθηκαν ${results.length} προϊόντα` : 'Αποτελέσματα'}
-                </h2>
-                {filteredResults.length < results.length && (
-                   <span className="text-sm text-orange-500 font-medium dark:text-orange-300">
-                     ⚠️ Μερικά προϊόντα κρύφτηκαν λόγω φίλτρων
-                   </span>
-                )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+                {filteredResults.map((product) => (
+                  <ProductCard 
+                    key={product.id}
+                    product={product}
+                    isInBasket={!!basket.find(b => b.id === product.id)}
+                    onAdd={addToBasket}
+                    selectedStoreFilter={null}
+                  />
+                ))}
               </div>
 
-              {showQuickStart && <QuickStartBasketPrompt />}
-
-              {filteredResults.length > 0 ? (
-                <div className={`grid gap-6 ${
-                    isFiltersOpen 
-                      ? (isPinned && isBasketOpen ? 'grid-cols-1 xl:grid-cols-2' : 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3') 
-                      : (isPinned && isBasketOpen ? 'grid-cols-1 md:grid-cols-2 xl:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4')
-                }`}>
-                  {filteredResults.map((product) => (
-                    <ProductCard 
-                      key={product.id} 
-                      product={product} 
-                      onAdd={() => addToBasket(product)} 
-                    />
-                  ))}
+              {/* EMPTY STATE */}
+              {results.length === 0 && !isSearching && (
+                <div className="text-center py-20 animate-fade-in">
+                  <div className="text-6xl mb-4">🤷‍♂️</div>
+                  <h3 className="text-xl font-bold text-slate-700">Δεν βρέθηκαν προϊόντα</h3>
+                  <p className="text-slate-400 mt-2">Δοκίμασε να ψάξεις με διαφορετικούς όρους (π.χ. "τυρί" αντί για "τυριά").</p>
                 </div>
-              ) : (
-                results.length > 0 && !isSearching && (
-                  <div className="text-center py-20">
-                    <div className="flex justify-center mb-4 text-slate-300 dark:text-slate-600">
-                      <SearchX size={64} strokeWidth={1.5} />
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-700 dark:text-slate-100">Δεν βρέθηκαν προϊόντα με αυτά τα φίλτρα</h3>
-                    <p className="text-slate-400 mt-2 dark:text-slate-500">
-                      Τα φίλτρα μπορεί να κρύβουν διαθέσιμα προϊόντα. Δοκίμασε να τα καθαρίσεις ή άλλαξε αναζήτηση.
-                    </p>
-                    <div className="flex flex-col items-center gap-4 mt-6">
-                      <Button
-                        onClick={selectAllStores}
-                        className="px-6 py-3 bg-indigo-600 text-white rounded-full font-bold shadow-md hover:bg-indigo-500 transition-all dark:bg-indigo-500 dark:hover:bg-indigo-400"
-                      >
-                        Καθάρισε φίλτρα
-                      </Button>
-                      <PopularSearches onTagClick={(tag) => {
-                        setSearchTerm(tag);
-                        performSearch(tag);
-                      }} />
-                    </div>
-                  </div>
-                )
               )}
-
-              {/* GUIDED EMPTY STATE */}
-              {results.length === 0 && !isSearching && searchTerm && !error && (
-                <GuidedEmptyState
-                  searchTerm={searchTerm}
-                  onClearSearch={() => {
-                    setSearchTerm("");
-                  }}
-                  onClearFilters={selectAllStores}
-                  onSuggestedSearch={(tag) => {
-                    setSearchTerm(tag);
-                    performSearch(tag);
-                  }}
-                />
+              
+              {/* FILTER EMPTY STATE */}
+              {results.length > 0 && filteredResults.length === 0 && (
+                <div className="text-center py-20">
+                  <p className="text-slate-400 font-medium">Τα προϊόντα υπάρχουν, αλλά όχι στα επιλεγμένα καταστήματα.</p>
+                  <p className="text-sm text-indigo-500 mt-2 cursor-pointer hover:underline" onClick={() => window.location.reload()}>
+                    Καθαρισμός φίλτρων
+                  </p>
+                </div>
               )}
             </>
           )}
         </div>
 
-        {/* 4. RIGHT COLUMN: BASKET SIDEBAR (Original Logic) */}
-        {/* Εδώ το βάζουμε "χύμα" στο τέλος του Grid ή absolute/fixed ανάλογα το BasketSidebar implementation.
-            Εφόσον το BasketSidebar έχει `fixed` positioning μέσα του, δεν επηρεάζει το grid flow άμεσα,
-            αλλά ελέγχουμε το πλάτος της κεντρικής στήλης παραπάνω με βάση το `isPinned`. 
-        */}
       </main>
 
-      <BasketSidebar />
-
-      {/* Floating Basket Button / Continue basket CTA */}
+      {/* Floating Basket Button */}
       {(!isPinned || !isBasketOpen) && (
-        <Button
+        <button 
           onClick={toggleBasket}
-          className="fixed bottom-6 right-6 z-40 bg-indigo-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-all flex items-center gap-2 dark:bg-indigo-500"
+          className="fixed bottom-6 right-6 z-40 bg-indigo-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-all flex items-center gap-2"
         >
-          <span className="font-bold">
-            {basket.length > 0 && !isBasketOpen
-              ? `🛒 Συνέχισε το καλάθι (${basket.length})`
-              : `🛒 ${basket.length}`}
-          </span>
-        </Button>
+          <span className="font-bold">🛒 {basket.length}</span>
+        </button>
       )}
 
+      {/* BASKET SIDEBAR */}
+      <BasketSidebar />
     </div>
   );
 }

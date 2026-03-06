@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react"; // <--- Προσθήκη useMemo
 import { useParams, useNavigate } from "react-router-dom";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { shallow } from "zustand/shallow";
+import { useShallow } from "zustand/react/shallow";
 import { useStore } from "../store";
 import { DEFAULT_IMG } from "../services/api";
 import { STORES_DATA, getStoreIdByName } from "../constants/stores";
@@ -11,11 +11,10 @@ export function ProductDetailsPage() {
   const { id } = useParams(); 
   const navigate = useNavigate();
   const { addToBasket, basket } = useStore(
-    (state) => ({
+    useShallow((state) => ({
       addToBasket: state.actions.addToBasket,
       basket: state.basket
-    }),
-    shallow
+    }))
   );
   
   const [product, setProduct] = useState<ProductResult | null>(null);
