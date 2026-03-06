@@ -101,7 +101,7 @@ export function ComparisonView({ basket, onBasketChange, regionId, onRegionChang
           </div>
         </header>
 
-        {error && (
+        {error != null && (
           <div className="rounded-2xl border border-red-100 bg-red-50 p-4 text-sm font-semibold text-red-600 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">
             Παρουσιάστηκε πρόβλημα κατά τη φόρτωση δεδομένων.
           </div>

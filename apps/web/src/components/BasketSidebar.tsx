@@ -5,6 +5,13 @@ import { DEFAULT_IMG } from "../services/api";
 import { BasketComparison } from "./BasketComparison";
 import { getRelativeTime } from "../utils/date";
 import { useStore } from "../store";
+import type { BasketComparisonResult } from "../types";
+
+/** Extension for stale-item fields returned by the API but not yet in the shared DTO */
+type ComparisonResultWithStale = BasketComparisonResult & {
+  staleCount?: number;
+  staleItems?: { name: string; date: string }[];
+};
 
 export function BasketSidebar() {
   const {
@@ -38,7 +45,7 @@ export function BasketSidebar() {
   const [quickListsData, setQuickListsData] = useState<{ student: any[], family: any[], healthy: any[] } | null>(null);
   const [recentlyViewed, setRecentlyViewed] = useState<{ id: string; name: string; image?: string; bestPrice?: number }[]>([]);
 
-  const recommendedStore = comparison.full[0] || comparison.partial[0];
+  const recommendedStore = (comparison.full[0] || comparison.partial[0]) as ComparisonResultWithStale | undefined;
   // FIX: Χρήση optional chaining γιατί το recommendedStore μπορεί να είναι undefined στην αρχή
   const hasStaleItems = recommendedStore && (recommendedStore.staleCount || 0) > 0;
 
