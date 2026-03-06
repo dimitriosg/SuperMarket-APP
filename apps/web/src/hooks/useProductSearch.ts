@@ -26,7 +26,7 @@ export function useProductSearch() {
   // API Call
   useEffect(() => {
     if (!debouncedSearch || debouncedSearch.length < 2) {
-      setResults([]);
+      setProducts([]);
       setError(null);
       return;
     }
@@ -42,12 +42,12 @@ export function useProductSearch() {
       })
       .then((data: any[]) => {
         console.log("✅ Hook: Βρήκα", data.length, "προϊόντα"); // <--- Πρέπει να το δεις στο F12
-        setResults(data);
+        setProducts(data);
         setError(null);
       })
       .catch((err) => {
         console.error("❌ Hook Error:", err);
-        setResults([]);
+        setProducts([]);
         setError("Η αναζήτηση απέτυχε. Δοκίμασε ξανά.");
       })
       .finally(() => setLoading(false));

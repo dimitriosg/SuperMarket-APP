@@ -208,20 +208,25 @@ const storeCreator: StateCreator<StoreState, [], [], StoreState> = (set, get) =>
 });
 
 const withDevtools = devtools(storeCreator, { name: "MarketWise Store" });
-const withPersist = import.meta.env.DEV
-  ? persist(withDevtools, {
-      name: "marketwise-store",
-      storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        basket: state.basket,
-        selectedStores: state.selectedStores,
-        selectedLocation: state.selectedLocation,
-        filters: state.filters
-      })
-    })
-  : withDevtools;
 
-export const useStore = create<StoreState>()(subscribeWithSelector(withPersist));
+const withPersisted = persist(withDevtools, {
+  name: "marketwise-store",
+  storage: createJSONStorage(() => localStorage),
+  partialize: (state) => ({
+    basket: state.basket,
+    selectedStores: state.selectedStores,
+    selectedLocation: state.selectedLocation,
+    filters: state.filters,
+  }),
+});
+
+// persist is only added in DEV; cast keeps the middleware signature consistent
+// so subscribeWithSelector sees a single type instead of a union.
+const withPersistOrNot = (
+  import.meta.env.DEV ? withPersisted : withDevtools
+) as typeof withDevtools;
+
+export const useStore = create<StoreState>()(subscribeWithSelector(withPersistOrNot));
 
 let comparisonTimer: ReturnType<typeof setTimeout> | undefined;
 const scheduleComparisonRefresh = () => {
