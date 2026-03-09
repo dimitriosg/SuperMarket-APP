@@ -1,5 +1,5 @@
 import { prisma } from "../db";
-import { IngestedProductRow } from "@repo/shared";
+import { IngestedProductRow } from "@supermarket/shared";
 import { woltIngestionPlugin } from "./wolt-fallback/wolt";
 import { sklavenitisIngestionPlugin } from "./sklavenitis/index";
 import { abIngestionPlugin } from "./ab/index";

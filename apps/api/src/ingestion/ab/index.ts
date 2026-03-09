@@ -1,5 +1,5 @@
 // apps/api/src/ingestion/ab/index.ts
-import { IngestedProductRow } from "@repo/shared";
+import { IngestedProductRow } from "@supermarket/shared";
 import { AB_HEADERS, AB_CATEGORIES } from "./config";
 import { logger } from "../../utils/logger";
 

@@ -1,4 +1,4 @@
-import { IngestedProductRow } from "@repo/shared";
+import { IngestedProductRow } from "@supermarket/shared";
 import * as cheerio from "cheerio";
 import { HEADERS, CATEGORY_URLS } from "./config";
 import { logger } from "../../utils/logger";
