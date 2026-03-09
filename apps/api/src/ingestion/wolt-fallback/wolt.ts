@@ -1,5 +1,4 @@
-import type { IngestionPlugin, IngestedProductRow } from '@shared/ingestion';
-import type { GroceryChainSlug } from '@shared/chains';
+import type { IngestionPlugin, IngestedProductRow, GroceryChainSlug } from '@supermarket/shared';
 
 const WOLT_CHAIN: GroceryChainSlug = 'wolt';
 
