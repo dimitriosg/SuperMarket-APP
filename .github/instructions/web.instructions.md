@@ -1,7 +1,6 @@
 ---
 applyTo: "apps/web/**/*.{ts,tsx}"
 ---
-
 - Prefer isolated components and hooks.
 - Do not add new dependencies unless explicitly requested.
 - localStorage keys must live in a constants file, not inline strings.
