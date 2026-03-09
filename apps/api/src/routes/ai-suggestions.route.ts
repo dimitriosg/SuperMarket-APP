@@ -1,5 +1,6 @@
 // apps/api/src/routes/ai-suggestions.route.ts
 import { Elysia, t } from "elysia";
+import { Prisma } from "@prisma/client";
 import {
   generateSuggestions,
   type Suggestion,
@@ -148,7 +149,12 @@ export const createAiSuggestionsRoutes = () =>
   .use(authMiddleware)
   .post(
     "/suggestions",
-    async ({ body, set, headers, userId }) => {
+    async (ctx) => {
+      // Elysia v1.4: derive() types from plugins do not propagate through plugin
+      // boundaries in a factory-function pattern. AuthCtx names the derived property.
+      type AuthCtx = { userId?: string };
+      const { body, set, headers } = ctx;
+      const userId = (ctx as typeof ctx & AuthCtx).userId;
       const startTime = Date.now();
 
       const { items, budget, preferences } = body;
@@ -317,7 +323,9 @@ async function logSuggestionRequest(data: {
         requestPayload: { items: data.items, budget: data.budget, preferences: data.preferences },
         requestItemsCount: data.items.length,
         requestBudget: data.budget,
-        responsePayload: data.result.data || data.result.error,
+        // SuggestionsResponse lacks an index signature, so a cast through `unknown` is
+        // required for Prisma's InputJsonValue. The value is JSON-serializable at runtime.
+        responsePayload: (data.result.data ?? data.result.error ?? Prisma.JsonNull) as unknown as Prisma.InputJsonValue,
         suggestionsCount:
           data.result.data?.suggestions?.length || data.result.error?.fallback_suggestions?.length || 0,
         modelUsed: data.result.metadata.model,
