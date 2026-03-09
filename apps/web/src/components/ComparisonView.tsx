@@ -2,7 +2,8 @@ import { useMemo, Dispatch, SetStateAction } from "react";
 import { BasketBuilder } from "./BasketBuilder";
 import { findBestMultiStore, findBestSingleStore } from "../features/basketAnalysis/analysis";
 import { useBasketAnalysisData } from "../features/basketAnalysis/useBasketAnalysisData";
-import { BasketItemUI, ProductUI } from "../features/basketAnalysis/types";
+import { BasketItemUI } from "../features/basketAnalysis/types";
+import { BasketItem, ProductResult } from "../types";
 
 const EMPTY_TEXT = "Πρόσθεσε προϊόντα για να δεις άμεσα την καλύτερη επιλογή.";
 
@@ -40,7 +41,22 @@ export function ComparisonView({ basket, onBasketChange, regionId, onRegionChang
     [basket, stores, priceMap]
   );
 
-  const handleAddProduct = (product: ProductUI) => {
+  const enrichedBasket = useMemo((): BasketItem[] =>
+    basket.map((item) => {
+      const product = productLookup.get(item.productId);
+      return {
+        id: item.productId,
+        name: product?.name ?? "",
+        image: null,
+        bestPrice: 0,
+        offers: [],
+        quantity: item.quantity,
+      };
+    }),
+    [basket, productLookup]
+  );
+
+  const handleAddProduct = (product: ProductResult) => {
     onBasketChange((prev) => {
       const existing = prev.find((item) => item.productId === product.id);
       if (existing) {
@@ -110,11 +126,7 @@ export function ComparisonView({ basket, onBasketChange, regionId, onRegionChang
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-4 space-y-6">
             <BasketBuilder
-              basket={basket}
-              products={products}
-              productLookup={productLookup}
-              isSearching={isLoading}
-              onSearch={searchProducts}
+              basket={enrichedBasket}
               onUpdateQty={handleUpdateQty}
               onRemove={handleRemove}
               onClear={handleClear}

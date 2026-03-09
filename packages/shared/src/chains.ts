@@ -1,4 +1,4 @@
-export type GroceryChainSlug = 'wolt' | 'efood' | 'ab' | 'my-market';
+export type GroceryChainSlug = 'wolt' | 'efood' | 'ab' | 'my-market' | 'sklavenitis';
 
 export interface ChainMeta {
   slug: GroceryChainSlug;
@@ -10,4 +10,5 @@ export const SUPPORTED_CHAINS: ChainMeta[] = [
   { slug: 'efood', label: 'efood Market / Retail' },
   { slug: 'ab', label: 'AB Βασιλόπουλος' },
   { slug: 'my-market', label: 'My Market' },
+  { slug: 'sklavenitis', label: 'Σκλαβενίτης' },
 ];

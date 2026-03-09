@@ -1,5 +1,5 @@
 import { prisma } from "../db";
-import { IngestedProductRow } from "@repo/shared";
+import { IngestedProductRow } from "@supermarket/shared";
 import { woltIngestionPlugin } from "./wolt-fallback/wolt";
 import { sklavenitisIngestionPlugin } from "./sklavenitis/index";
 import { abIngestionPlugin } from "./ab/index";
@@ -44,34 +44,55 @@ export const upsertIngestedRows = async (
   }
 
   for (const row of rows) {
-    let product = await prisma.product.findFirst({
-      where: { storeId: store.id, externalId: row.externalId },
+    // Look up existing product via store-specific code
+    const existingCode = await prisma.storeProductCode.findUnique({
+      where: { storeId_externalCode: { storeId: store.id, externalCode: row.productExternalId } },
+      include: { product: true },
     });
 
+    let product = existingCode?.product ?? null;
+
     if (!product) {
-      product = await prisma.product.create({
+      // Try to find by EAN when available
+      if (row.ean) {
+        product = await prisma.product.findUnique({ where: { ean: row.ean } });
+      }
+
+      if (!product) {
+        product = await prisma.product.create({
+          data: {
+            // Use real EAN when available; fall back to a synthetic store-scoped key
+            // when the scraper cannot provide a barcode (e.g. Sklavenitis HTML scraping).
+            ean: row.ean ?? `${row.productExternalId}@${store.id}`,
+            name: row.name,
+            imageUrl: row.imageUrl,
+          },
+        });
+      }
+
+      // Link product to this store via StoreProductCode
+      await prisma.storeProductCode.create({
         data: {
           storeId: store.id,
-          externalId: row.externalId,
-          name: row.name,
-          imageUrl: row.image,
-          isActive: true
+          productId: product.id,
+          externalCode: row.productExternalId,
         },
       });
     } else {
       await prisma.product.update({
         where: { id: product.id },
-        data: { imageUrl: row.image, name: row.name }
+        data: { imageUrl: row.imageUrl, name: row.name }
       });
     }
 
     await prisma.priceSnapshot.create({
       data: {
         productId: product.id,
+        storeId: store.id,
         price: row.price,
-        promoPrice: row.isOffer ? row.offerPrice : null, 
-        inStock: true,
-        collectedAt: new Date(),
+        promoPrice: row.promoPrice ?? null,
+        inStock: row.inStock,
+        collectedAt: new Date(row.collectedAt),
       },
     });
   }
@@ -88,10 +109,9 @@ export const runIngestionForStore = async (
   if (chainName.toLowerCase() === "sklavenitis") {
     rows = await sklavenitisIngestionPlugin(storeExternalId);
   } else if (chainName.toLowerCase() === "ab" || chainName.toLowerCase() === "ab vassilopoulos") {
-    // ΚΑΛΕΣΜΑ ΤΟΥ AB PLUGIN
     rows = await abIngestionPlugin(storeExternalId);
   } else if (chainName.toLowerCase() === "wolt") {
-    rows = await woltIngestionPlugin(storeExternalId);
+    rows = await woltIngestionPlugin.fetchStoreSnapshot(storeExternalId);
   }
 
   if (rows.length > 0) {

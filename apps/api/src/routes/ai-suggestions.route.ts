@@ -1,5 +1,6 @@
 // apps/api/src/routes/ai-suggestions.route.ts
 import { Elysia, t } from "elysia";
+import { Prisma } from "@prisma/client";
 import {
   generateSuggestions,
   type Suggestion,
@@ -148,7 +149,9 @@ export const createAiSuggestionsRoutes = () =>
   .use(authMiddleware)
   .post(
     "/suggestions",
-    async ({ body, set, headers, userId }) => {
+    async (ctx) => {
+      const { body, set, headers } = ctx;
+      const userId = (ctx as typeof ctx & { userId?: string }).userId;
       const startTime = Date.now();
 
       const { items, budget, preferences } = body;
@@ -317,7 +320,7 @@ async function logSuggestionRequest(data: {
         requestPayload: { items: data.items, budget: data.budget, preferences: data.preferences },
         requestItemsCount: data.items.length,
         requestBudget: data.budget,
-        responsePayload: data.result.data || data.result.error,
+        responsePayload: (data.result.data ?? data.result.error ?? {}) as unknown as Prisma.InputJsonValue,
         suggestionsCount:
           data.result.data?.suggestions?.length || data.result.error?.fallback_suggestions?.length || 0,
         modelUsed: data.result.metadata.model,

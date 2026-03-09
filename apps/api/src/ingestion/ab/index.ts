@@ -1,11 +1,11 @@
 // apps/api/src/ingestion/ab/index.ts
-import { IngestedProductRow } from "@repo/shared";
+import { IngestedProductRow } from "@supermarket/shared";
 import { AB_HEADERS, AB_CATEGORIES } from "./config";
 import { logger } from "../../utils/logger";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const fetchAbCategory = async (categoryId: string): Promise<IngestedProductRow[]> => {
+const fetchAbCategory = async (categoryId: string, storeExternalId: string): Promise<IngestedProductRow[]> => {
   const variables = {
     lang: "gr",
     searchQuery: "",
@@ -56,16 +56,20 @@ try {
         imageUrl = `https://www.ab.gr${imageUrl}`;
       }
 
-      return {
-        externalId: item.code,
+      const isPromotion: boolean = item.price?.isPromotion || false;
+
+      const row: IngestedProductRow = {
+        chain: "ab",
+        storeExternalId,
+        productExternalId: item.code,
         name: item.name,
         price: currentPrice,
-        isOffer: item.price?.isPromotion || false,
-        offerPrice: currentPrice,
-        image: imageUrl || "https://via.placeholder.com/150",
-        url: `https://www.ab.gr${item.url}`,
-        categories: [item.categoryName || ""],
+        promoPrice: isPromotion ? currentPrice : undefined,
+        inStock: true,
+        imageUrl: imageUrl || undefined,
+        collectedAt: new Date().toISOString(),
       };
+      return row;
     });
   } catch (err) {
     logger.error("AB_CATEGORY_FETCH_FAILED", { event: "AB_CATEGORY_FETCH_FAILED", module: "ingestion/ab/index", categoryId, message: err instanceof Error ? err.message : String(err) });
@@ -73,13 +77,13 @@ try {
   }
 };
 
-export const abIngestionPlugin = async (_storeId: string): Promise<IngestedProductRow[]> => {
+export const abIngestionPlugin = async (storeId: string): Promise<IngestedProductRow[]> => {
   let allProducts: IngestedProductRow[] = [];
   logger.info("AB_INGESTION_START", { event: "AB_INGESTION_START", module: "ingestion/ab/index", categoryCount: AB_CATEGORIES.length });
 
   for (const cat of AB_CATEGORIES) {
     logger.info("AB_SCANNING_CATEGORY", { event: "AB_SCANNING_CATEGORY", module: "ingestion/ab/index", name: cat.name, id: cat.id });
-    const products = await fetchAbCategory(cat.id);
+    const products = await fetchAbCategory(cat.id, storeId);
     logger.info("AB_CATEGORY_RESULTS", { event: "AB_CATEGORY_RESULTS", module: "ingestion/ab/index", name: cat.name, productCount: products.length });
     allProducts = [...allProducts, ...products];
     await wait(1000);

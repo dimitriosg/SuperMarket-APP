@@ -4,10 +4,13 @@
     "outDir": "./dist",
     "types": ["bun"],                  // Λέει στην TS να φορτώσει τους τύπους του Bun
     "module": "ESNext",                // Απαραίτητο για το import.meta
-    "moduleResolution": "bundler"      // Βοηθάει στην εύρεση των πακέτων
+    "moduleResolution": "bundler",     // Βοηθάει στην εύρεση των πακέτων
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": [
-    "src", 
-    "*.ts"                             // Επιτρέπει αρχεία .ts που είναι στο root του apps/api
+    "src"
   ]
 }

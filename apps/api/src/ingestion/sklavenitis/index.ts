@@ -1,11 +1,11 @@
-import { IngestedProductRow } from "@repo/shared";
+import { IngestedProductRow } from "@supermarket/shared";
 import * as cheerio from "cheerio";
 import { HEADERS, CATEGORY_URLS } from "./config";
 import { logger } from "../../utils/logger";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const scrapeUrl = async (url: string): Promise<IngestedProductRow[]> => {
+const scrapeUrl = async (url: string, storeExternalId: string): Promise<IngestedProductRow[]> => {
     try {
         logger.info("SKLAVENITIS_SCRAPING", { event: "SKLAVENITIS_SCRAPING", module: "ingestion/sklavenitis/index", url });
         const res = await fetch(url, { headers: HEADERS });
@@ -21,17 +21,22 @@ const scrapeUrl = async (url: string): Promise<IngestedProductRow[]> => {
             const priceText = el.find(".price").text().replace("€", "").replace(",", ".").trim();
             const price = parseFloat(priceText);
             
-            let image = el.find("img").attr("data-src") || el.find("img").attr("src") || "";
-            if (image && !image.startsWith("http")) image = `https://www.sklavenitis.gr${image}`;
+            let imageUrl = el.find("img").attr("data-src") || el.find("img").attr("src") || "";
+            if (imageUrl && !imageUrl.startsWith("http")) imageUrl = `https://www.sklavenitis.gr${imageUrl}`;
             
             const link = el.find(".product__title a").attr("href") || "";
-            const externalId = link.split("/").filter(Boolean).pop() || name;
+            const productExternalId = link.split("/").filter(Boolean).pop() || name;
 
             if (name && !isNaN(price)) {
                 products.push({
-                    externalId, name, price, isOffer: false, offerPrice: price, image,
-                    url: link.startsWith("http") ? link : `https://www.sklavenitis.gr${link}`,
-                    categories: [],
+                    chain: "sklavenitis",
+                    storeExternalId,
+                    productExternalId,
+                    name,
+                    price,
+                    inStock: true,
+                    imageUrl: imageUrl || undefined,
+                    collectedAt: new Date().toISOString(),
                 });
             }
         });
@@ -41,7 +46,7 @@ const scrapeUrl = async (url: string): Promise<IngestedProductRow[]> => {
     }
 };
 
-export const sklavenitisIngestionPlugin = async (_storeId: string): Promise<IngestedProductRow[]> => {
+export const sklavenitisIngestionPlugin = async (storeId: string): Promise<IngestedProductRow[]> => {
     let allProducts: IngestedProductRow[] = [];
     
     // 1. Προαιρετικά: Τρέχουμε το Discovery στην αρχή για να δούμε αν υπάρχουν νέα πράγματα
@@ -50,7 +55,7 @@ export const sklavenitisIngestionPlugin = async (_storeId: string): Promise<Inge
     logger.info("SKLAVENITIS_INGESTION_START", { event: "SKLAVENITIS_INGESTION_START", module: "ingestion/sklavenitis/index" });
 
     for (const url of CATEGORY_URLS) {
-        const products = await scrapeUrl(url);
+        const products = await scrapeUrl(url, storeId);
         
         // Υβριδικός έλεγχος:
         if (products.length === 0) {
