@@ -4,7 +4,11 @@
     "outDir": "./dist",
     "types": ["bun"],                  // Λέει στην TS να φορτώσει τους τύπους του Bun
     "module": "ESNext",                // Απαραίτητο για το import.meta
-    "moduleResolution": "bundler"      // Βοηθάει στην εύρεση των πακέτων
+    "moduleResolution": "bundler",     // Βοηθάει στην εύρεση των πακέτων
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]                 // Path alias used by test files (e.g. @/utils/validation)
+    }
   },
   "include": [
     "src", 

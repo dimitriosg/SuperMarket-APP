@@ -2,7 +2,8 @@ import { useMemo, Dispatch, SetStateAction } from "react";
 import { BasketBuilder } from "./BasketBuilder";
 import { findBestMultiStore, findBestSingleStore } from "../features/basketAnalysis/analysis";
 import { useBasketAnalysisData } from "../features/basketAnalysis/useBasketAnalysisData";
-import { BasketItemUI, ProductUI } from "../features/basketAnalysis/types";
+import { BasketItemUI } from "../features/basketAnalysis/types";
+import { BasketItem, ProductResult } from "../types";
 
 const EMPTY_TEXT = "Πρόσθεσε προϊόντα για να δεις άμεσα την καλύτερη επιλογή.";
 
@@ -17,18 +18,24 @@ export function ComparisonView({ basket, onBasketChange, regionId, onRegionChang
   const {
     regions,
     stores,
-    products,
     productLookup,
+    rawProductLookup,
     priceMap,
-    isLoading,
     error,
-    searchProducts
   } = useBasketAnalysisData(regionId);
 
   const storeLookup = useMemo(() => {
     const map = new Map(stores.map((store) => [store.id, store.name] as const));
     return map;
   }, [stores]);
+
+  const basketForBuilder = useMemo<BasketItem[]>(() => {
+    return basket.flatMap((item) => {
+      const product = rawProductLookup.get(item.productId);
+      if (!product) return [];
+      return [{ ...product, quantity: item.quantity }];
+    });
+  }, [basket, rawProductLookup]);
 
   const bestSingleStore = useMemo(
     () => findBestSingleStore(basket, stores, priceMap),
@@ -40,7 +47,7 @@ export function ComparisonView({ basket, onBasketChange, regionId, onRegionChang
     [basket, stores, priceMap]
   );
 
-  const handleAddProduct = (product: ProductUI) => {
+  const handleAddProduct = (product: ProductResult) => {
     onBasketChange((prev) => {
       const existing = prev.find((item) => item.productId === product.id);
       if (existing) {
@@ -110,11 +117,7 @@ export function ComparisonView({ basket, onBasketChange, regionId, onRegionChang
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-4 space-y-6">
             <BasketBuilder
-              basket={basket}
-              products={products}
-              productLookup={productLookup}
-              isSearching={isLoading}
-              onSearch={searchProducts}
+              basket={basketForBuilder}
               onUpdateQty={handleUpdateQty}
               onRemove={handleRemove}
               onClear={handleClear}

@@ -12,6 +12,7 @@ type BasketAnalysisData = {
   stores: StoreUI[];
   products: ProductUI[];
   productLookup: Map<string, ProductUI>;
+  rawProductLookup: Map<string, ProductDataRow>;
   priceMap: PriceMap;
   isLoading: boolean;
   error?: unknown;
@@ -64,12 +65,14 @@ export function useBasketAnalysisData(regionId: string): BasketAnalysisData {
 
   const products = useMemo(() => searchResults.map(toProductUI), [searchResults]);
 
-  const productLookup = useMemo(() => {
-    const map = new Map<string, ProductUI>();
+  const { productLookup, rawProductLookup } = useMemo(() => {
+    const lookup = new Map<string, ProductUI>();
+    const rawLookup = new Map<string, ProductDataRow>();
     Object.values(productCatalog).forEach((product) => {
-      map.set(product.id, toProductUI(product));
+      lookup.set(product.id, toProductUI(product));
+      rawLookup.set(product.id, product);
     });
-    return map;
+    return { productLookup: lookup, rawProductLookup: rawLookup };
   }, [productCatalog]);
 
   const priceMap = useMemo(() => {
@@ -107,6 +110,7 @@ export function useBasketAnalysisData(regionId: string): BasketAnalysisData {
     stores,
     products,
     productLookup,
+    rawProductLookup,
     priceMap,
     isLoading,
     error,
