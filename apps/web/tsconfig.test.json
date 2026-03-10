@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // TODO(PR #83): add vitest and @testing-library/react to devDependencies,
+    // then replace the types array below with the actual packages.
+    "types": ["vitest/globals"]
+  },
+  "include": ["src/**/*.test.ts", "src/**/*.test.tsx"]
+}
