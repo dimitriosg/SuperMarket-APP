@@ -5,7 +5,7 @@ import { logger } from "../../utils/logger";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const scrapeUrl = async (url: string): Promise<IngestedProductRow[]> => {
+const scrapeUrl = async (url: string, storeExternalId: string): Promise<IngestedProductRow[]> => {
     try {
         logger.info("SKLAVENITIS_SCRAPING", { event: "SKLAVENITIS_SCRAPING", module: "ingestion/sklavenitis/index", url });
         const res = await fetch(url, { headers: HEADERS });
@@ -28,10 +28,16 @@ const scrapeUrl = async (url: string): Promise<IngestedProductRow[]> => {
             const externalId = link.split("/").filter(Boolean).pop() || name;
 
             if (name && !isNaN(price)) {
+                const now = new Date().toISOString();
                 products.push({
-                    externalId, name, price, isOffer: false, offerPrice: price, image,
-                    url: link.startsWith("http") ? link : `https://www.sklavenitis.gr${link}`,
-                    categories: [],
+                    chain: 'sklavenitis' as const,
+                    storeExternalId,
+                    productExternalId: externalId,
+                    name,
+                    price,
+                    inStock: true,
+                    imageUrl: image || undefined,
+                    collectedAt: now,
                 });
             }
         });
@@ -41,7 +47,7 @@ const scrapeUrl = async (url: string): Promise<IngestedProductRow[]> => {
     }
 };
 
-export const sklavenitisIngestionPlugin = async (_storeId: string): Promise<IngestedProductRow[]> => {
+export const sklavenitisIngestionPlugin = async (storeExternalId: string): Promise<IngestedProductRow[]> => {
     let allProducts: IngestedProductRow[] = [];
     
     // 1. Προαιρετικά: Τρέχουμε το Discovery στην αρχή για να δούμε αν υπάρχουν νέα πράγματα
@@ -50,7 +56,7 @@ export const sklavenitisIngestionPlugin = async (_storeId: string): Promise<Inge
     logger.info("SKLAVENITIS_INGESTION_START", { event: "SKLAVENITIS_INGESTION_START", module: "ingestion/sklavenitis/index" });
 
     for (const url of CATEGORY_URLS) {
-        const products = await scrapeUrl(url);
+        const products = await scrapeUrl(url, storeExternalId);
         
         // Υβριδικός έλεγχος:
         if (products.length === 0) {

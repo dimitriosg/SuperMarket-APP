@@ -5,7 +5,7 @@ import { logger } from "../../utils/logger";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const fetchAbCategory = async (categoryId: string): Promise<IngestedProductRow[]> => {
+const fetchAbCategory = async (categoryId: string, storeExternalId: string): Promise<IngestedProductRow[]> => {
   const variables = {
     lang: "gr",
     searchQuery: "",
@@ -56,15 +56,17 @@ try {
         imageUrl = `https://www.ab.gr${imageUrl}`;
       }
 
+      const now = new Date().toISOString();
       return {
-        externalId: item.code,
+        chain: 'ab' as const,
+        storeExternalId,
+        productExternalId: item.code,
         name: item.name,
         price: currentPrice,
-        isOffer: item.price?.isPromotion || false,
-        offerPrice: currentPrice,
-        image: imageUrl || "https://via.placeholder.com/150",
-        url: `https://www.ab.gr${item.url}`,
-        categories: [item.categoryName || ""],
+        promoPrice: item.price?.isPromotion ? currentPrice : undefined,
+        inStock: true,
+        imageUrl: imageUrl || undefined,
+        collectedAt: now,
       };
     });
   } catch (err) {
@@ -73,13 +75,13 @@ try {
   }
 };
 
-export const abIngestionPlugin = async (_storeId: string): Promise<IngestedProductRow[]> => {
+export const abIngestionPlugin = async (storeExternalId: string): Promise<IngestedProductRow[]> => {
   let allProducts: IngestedProductRow[] = [];
   logger.info("AB_INGESTION_START", { event: "AB_INGESTION_START", module: "ingestion/ab/index", categoryCount: AB_CATEGORIES.length });
 
   for (const cat of AB_CATEGORIES) {
     logger.info("AB_SCANNING_CATEGORY", { event: "AB_SCANNING_CATEGORY", module: "ingestion/ab/index", name: cat.name, id: cat.id });
-    const products = await fetchAbCategory(cat.id);
+    const products = await fetchAbCategory(cat.id, storeExternalId);
     logger.info("AB_CATEGORY_RESULTS", { event: "AB_CATEGORY_RESULTS", module: "ingestion/ab/index", name: cat.name, productCount: products.length });
     allProducts = [...allProducts, ...products];
     await wait(1000);

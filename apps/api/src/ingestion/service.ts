@@ -44,34 +44,69 @@ export const upsertIngestedRows = async (
   }
 
   for (const row of rows) {
-    let product = await prisma.product.findFirst({
-      where: { storeId: store.id, externalId: row.externalId },
-    });
+    // Look up product by EAN if available, otherwise via StoreProductCode
+    let product = row.ean
+      ? await prisma.product.findUnique({ where: { ean: row.ean } })
+      : null;
+
+    if (!product) {
+      const storeCode = await prisma.storeProductCode.findUnique({
+        where: {
+          storeId_externalCode: {
+            storeId: store.id,
+            externalCode: row.productExternalId,
+          },
+        },
+        include: { product: true },
+      });
+      if (storeCode) product = storeCode.product;
+    }
+
+    // Determine a unique EAN: use provided EAN or synthesize from chain + externalId
+    const ean = row.ean ?? `${chainName.toLowerCase()}-${row.productExternalId}`;
 
     if (!product) {
       product = await prisma.product.create({
         data: {
-          storeId: store.id,
-          externalId: row.externalId,
+          ean,
           name: row.name,
-          imageUrl: row.image,
-          isActive: true
+          brand: row.brand,
+          quantity: row.quantity,
+          imageUrl: row.imageUrl,
+          isActive: true,
         },
       });
     } else {
       await prisma.product.update({
         where: { id: product.id },
-        data: { imageUrl: row.image, name: row.name }
+        data: { imageUrl: row.imageUrl ?? product.imageUrl, name: row.name }
       });
     }
+
+    // Ensure StoreProductCode link exists
+    await prisma.storeProductCode.upsert({
+      where: {
+        storeId_externalCode: {
+          storeId: store.id,
+          externalCode: row.productExternalId,
+        },
+      },
+      update: {},
+      create: {
+        storeId: store.id,
+        productId: product.id,
+        externalCode: row.productExternalId,
+      },
+    });
 
     await prisma.priceSnapshot.create({
       data: {
         productId: product.id,
+        storeId: store.id,
         price: row.price,
-        promoPrice: row.isOffer ? row.offerPrice : null, 
-        inStock: true,
-        collectedAt: new Date(),
+        promoPrice: row.promoPrice ?? null,
+        inStock: row.inStock,
+        collectedAt: new Date(row.collectedAt),
       },
     });
   }
@@ -88,10 +123,9 @@ export const runIngestionForStore = async (
   if (chainName.toLowerCase() === "sklavenitis") {
     rows = await sklavenitisIngestionPlugin(storeExternalId);
   } else if (chainName.toLowerCase() === "ab" || chainName.toLowerCase() === "ab vassilopoulos") {
-    // ΚΑΛΕΣΜΑ ΤΟΥ AB PLUGIN
     rows = await abIngestionPlugin(storeExternalId);
   } else if (chainName.toLowerCase() === "wolt") {
-    rows = await woltIngestionPlugin(storeExternalId);
+    rows = await woltIngestionPlugin.fetchStoreSnapshot(storeExternalId);
   }
 
   if (rows.length > 0) {
