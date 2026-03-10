@@ -63,7 +63,7 @@ export const upsertIngestedRows = async (
     }
 
     // Determine a unique EAN: use provided EAN or synthesize from chain + externalId
-    const ean = row.ean ?? `${chainName.toLowerCase()}-${row.productExternalId}`;
+    const ean = row.ean ?? `NO_EAN:${chainName.toLowerCase()}:${row.productExternalId}`;
 
     if (!product) {
       product = await prisma.product.create({
