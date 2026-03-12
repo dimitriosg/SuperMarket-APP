@@ -5,6 +5,12 @@ import { sklavenitisIngestionPlugin } from "./sklavenitis/index";
 import { abIngestionPlugin } from "./ab/index";
 import { logger } from "../utils/logger";
 
+const SYNTHETIC_EAN_PREFIX = "NO_EAN:";
+
+/** Returns true when the EAN is a synthetic fallback (not a real barcode). */
+export const isSyntheticEan = (ean: string): boolean =>
+  ean.startsWith(SYNTHETIC_EAN_PREFIX);
+
 export const upsertIngestedRows = async (
   chainName: string,
   storeExternalId: string,
@@ -77,9 +83,46 @@ export const upsertIngestedRows = async (
         },
       });
     } else {
+      // --- EAN promotion: upgrade synthetic EAN to real EAN when safe ---
+      let promotedEan = false;
+      if (row.ean && isSyntheticEan(product.ean)) {
+        const eanOwner = await prisma.product.findUnique({
+          where: { ean: row.ean },
+          select: { id: true },
+        });
+
+        if (!eanOwner) {
+          // Safe: no other product owns this real EAN, promote it
+          promotedEan = true;
+          logger.info("EAN_PROMOTED", {
+            event: "EAN_PROMOTED",
+            module: "ingestion/service",
+            productId: product.id,
+            oldEan: product.ean,
+            newEan: row.ean,
+          });
+        } else if (eanOwner.id !== product.id) {
+          // Unsafe: another product already owns this real EAN.
+          // Do not merge or overwrite; keep the synthetic EAN to avoid data corruption.
+          logger.warn("EAN_PROMOTION_CONFLICT", {
+            event: "EAN_PROMOTION_CONFLICT",
+            module: "ingestion/service",
+            productId: product.id,
+            syntheticEan: product.ean,
+            realEan: row.ean,
+            conflictingProductId: eanOwner.id,
+          });
+        }
+        // If eanOwner.id === product.id the product already has this EAN, no action needed
+      }
+
       await prisma.product.update({
         where: { id: product.id },
-        data: { imageUrl: row.imageUrl ?? product.imageUrl, name: row.name }
+        data: {
+          imageUrl: row.imageUrl ?? product.imageUrl,
+          name: row.name,
+          ...(promotedEan ? { ean: row.ean } : {}),
+        },
       });
     }
 
